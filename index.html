@@ -326,26 +326,24 @@
         </div>
     </div>
     
+    <!-- Firebase SDK -->
     <script type="module">
-        // === 1. CONFIGURACIÓN DE FIREBASE (SDK v9 - Módulos) ===
-        
-        // Importar funciones de los SDKs v9
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js";
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { 
             getFirestore, 
             collection, 
-            getDocs, 
             addDoc, 
-            doc, 
+            getDocs, 
             updateDoc, 
             deleteDoc, 
+            doc, 
             query, 
-            orderBy, 
-            writeBatch,
-            serverTimestamp 
-        } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js";
+            orderBy,
+            where
+        } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-        // Credenciales proporcionadas por el usuario
+        // Your web app's Firebase configuration
         const firebaseConfig = {
             apiKey: "AIzaSyDwGgTGRkaEO4SzVR-5KqM3K66Istba0a4",
             authDomain: "control-solicitudes-de-comida.firebaseapp.com",
@@ -355,272 +353,1195 @@
             appId: "1:255909685257:web:98e9d0697b374fdf32b0d8"
         };
 
-        // Inicializar Firebase y Firestore
+        // Initialize Firebase
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
-        const COLLECTION_NAME = 'comidaSolicitudes';
-        const foodRequestsRef = collection(db, COLLECTION_NAME); // Referencia a la colección
 
-        // === 2. LÓGICA DE LA APLICACIÓN ===
+        // Hacer la variable db disponible globalmente
+        window.db = db;
+        window.firestoreFunctions = {
+            collection,
+            addDoc,
+            getDocs,
+            updateDoc,
+            deleteDoc,
+            doc,
+            query,
+            orderBy,
+            where
+        };
+    </script>
 
-        // (Aquí va toda la lógica JavaScript del archivo anterior, pero con las funciones de Firebase v9 adaptadas)
-
-        const form = document.getElementById('foodRequestForm');
-        // ... (resto de referencias a elementos HTML)
-        const totalQuantityInput = document.getElementById('totalQuantity');
-        const deliveryPlaceInput = document.getElementById('deliveryPlace');
-        const deliveryDateTimeInput = document.getElementById('deliveryDateTime');
-        const unitCostInput = document.getElementById('unitCost');
-        const deliveryCostInput = document.getElementById('deliveryCost');
-        const deliveryCostOption = document.getElementById('deliveryCostOption');
-        const deliveryFree = document.getElementById('deliveryFree');
-        const costInput = document.getElementById('cost');
-        const providerNameSelect = document.getElementById('providerName');
-        const reasonTextarea = document.getElementById('reason');
-        const formActionsContainer = document.getElementById('formActions');
-        const deleteSelectedBtn = document.getElementById('deleteSelectedBtn');
-        const deleteModal = document.getElementById('deleteModal');
-        const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
-        const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
-        const modalText = document.getElementById('modalText');
-        const tableBody = document.getElementById('foodTableBody');
-        const noRequestsMessage = document.getElementById('noRequestsMessage');
-        const messageBox = document.getElementById('messageBox');
-        
-        // Variables globales
-        let foodRequests = [];
-        let editingRequestId = null;
-        let selectedInterStaff = [];
-        let currentFilter = '';
-        
-        // ... (Constantes y staffList - Mantener estas de tu código original)
-        const staffList = [ 
-            { id: 1, name: "BLANCO NEISABEL" }, { id: 2, name: "VILLAMIZAR NANCY" }, { id: 3, name: "CASTILLO TIBET" }, { id: 4, name: "QUINTERO ROSANA" }, { id: 5, name: "GONZALEZ LINO" }, { id: 6, name: "MORILLO ANA" }, { id: 7, name: "CARTAYA LENNYIS" }, { id: 8, name: "DELGADO JONATHAN" }, { id: 9, name: "TRONCOSO LAIS" }, { id: 10, name: "BRITO RONEY" }, { id: 11, name: "MUÑOZ KELVIN" }, { id: 12, name: "GALEA CESAR" }, { id: 13, name: "MORENO GEINES" }, { id: 14, name: "MACHADO JOSE" }, { id: 15, name: "SUAREZ KIR" }, { id: 16, name: "JIMENEZ DAIRELI" }, { id: 17, name: "GARCIA ANGELICA" }, { id: 18, name: "CONTRERAS NOELIA" }, { id: 19, name: "VEGAS ENYMAR" }, { id: 20, name: "GOMEZ SAMUEL" }, { id: 21, name: "LONGA JESUS" }, { id: 22, name: "QUIJADA WILFREDO" }, { id: 23, name: "PINO ALEJANDRO" }, { id: 24, name: "AMORUZO ANGELO" }, { id: 25, name: "CHINCHILLA OSMEL" }, { id: 26, name: "TERAN CASTO" }, { id: 27, name: "FERRER GABRIEL" }, { id: 28, name: "TOVAR LUIS" }, { id: 29, name: "ORTA WILNER" }, { id: 30, name: "TORRES KEIVER" }, { id: 31, name: "RODRIGUEZ MISAEL" }, { id: 32, name: "CASTILLO JHOAN" }, { id: 33, name: "VILLEGAS OSMER" }, { id: 34, name: "RAMOS FREDDY" }, { id: 35, name: "TOVAR JAIRO" }, { id: 36, name: "PEREZ LUIS" }, { id: 37, name: "BRITO JOSE" }, { id: 38, name: "ASCANIO FELIX" }, { id: 39, name: "CORONADO MIGUEL" }, { id: 40, name: "HELLO ALBANY" }, { id: 41, name: "PIRELA WILMER" }, { id: 42, name: "CASTELLANOS FRANKLIN" }, { id: 43, name: "JIMENEZ RONMEL" }, { id: 44, name: "PRIETO JAVIER" }, { id: 45, name: "LARA EDUARDO" }, { id: 46, name: "CASANOVA FABIAN" }, { id: 47, name: "CASTILLO ORIANA" }, { id: 48, name: "GARRIDO ADOLFO" }, { id: 49, name: "MORENO JOELIMAR" }, { id: 50, name: "CENTENO LUIS" }, { id: 51, name: "NEGRIN CARLOS" }, { id: 52, name: "SANCHEZ ARACELIS" }, { id: 53, name: "CASTILLO ANDRES" }, { id: 54, name: "COLMENARES MARCOS" }, { id: 55, name: "DELGADO WILMER" }, { id: 56, name: "RIVAS ISRAEL" }, { id: 57, name: "DELGADO NEIVELYS" }, { id: 58, name: "MORALES ISMAR" }, { id: 59, name: "BRICEÑO JOSE" }, { id: 60, name: "GARCIA WILMER" }, { id: 61, name: "REYES JUAN" }, { id: 62, name: "DELGADO EDGARYS" }, { id: 63, name: "PARRA MARIANGELA" }, { id: 64, name: "ORTIZ JOSE" }, { id: 65, name: "SALAS CARLOS" }, { id: 66, name: "MONTERO ERICK" }, { id: 67, name: "PALACIOS LUIS" }, { id: 68, name: "GONZALEZ LUIS" }, { id: 69, name: "DIAZ JESUS" }, { id: 70, name: "PARRA ESTEBAN" }, { id: 71, name: "GUERRERO ARGENIS" }, { id: 72, name: "GARCIA MIGUEL" }, { id: 73, name: "ROJAS CARLOS" }, { id: 74, name: "RODRIGUEZ EDUARDO" }, { id: 75, name: "ESPARZA ANGEL" }, { id: 76, name: "RODRIGUEZ RICARDO" }, { id: 77, name: "RODRIGUEZ EDGAR" }, { id: 78, name: "RODRIGUEZ JORGE" }, { id: 79, name: "LOZADA VICTOR" }, { id: 80, name: "RONDON VICTOR" }, { id: 81, name: "RAMOS JOSESIT" }, { id: 82, name: "PEREZ FRANKLIN" }, { id: 83, name: "SARRIA DANIEL" }, { id: 84, name: "PEREZ WILMER" }, { id: 85, name: "VELASQUEZ OMAR" }, { id: 86, name: "VARGAS CARLOS" }, { id: 87, name: "ESCALONA LUIS" }, { id: 88, name: "RODRIGUEZ JESUS" }, { id: 89, name: "RODRIGUEZ MARCOS" }, { id: 90, name: "ORTA GABRIEL" }
-        ];
-
-        // -------------------------------------------------------------------------
-        // === FUNCIONES DE FIREBASE (ADAPTADAS A SDK v9) ===
-        // -------------------------------------------------------------------------
-        
-        async function loadRequests() {
-            try {
-                // query() en SDK v9 se usa para construir la consulta
-                const q = query(foodRequestsRef, orderBy('timestamp', 'desc'));
-                const snapshot = await getDocs(q);
-                
-                foodRequests = snapshot.docs.map(doc => {
-                    const data = doc.data();
-                    const deliveryDateTime = data.deliveryDateTime instanceof Date
-                        ? data.deliveryDateTime.toISOString().slice(0, 10) 
-                        : data.deliveryDateTime;
-                    
-                    return { 
-                        id: doc.id,
-                        ...data,
-                        deliveryDateTime: deliveryDateTime
-                    };
-                });
-            } catch (error) {
-                showMessage(`Error al cargar los datos: ${error.message}`, 'error');
-                foodRequests = [];
-            }
-        }
-
-        async function saveRequest(data) {
-            try {
-                const cleanData = {
-                    ...data,
-                    timestamp: serverTimestamp(), // Función de SDK v9 para el timestamp
-                    totalQuantity: parseFloat(data.totalQuantity),
-                    unitCost: parseFloat(data.unitCost),
-                    deliveryCost: parseFloat(data.deliveryCost),
-                    cost: parseFloat(data.cost),
-                    interStaffSelected: data.interStaffSelected.map(staff => staff.name)
-                };
-
-                if (data.id) {
-                    // Modo edición: Referencia al documento y updateDoc()
-                    const docRef = doc(db, COLLECTION_NAME, data.id);
-                    await updateDoc(docRef, cleanData);
-                    showMessage("Solicitud actualizada con éxito.", "success");
-                } else {
-                    // Modo nuevo registro: addDoc()
-                    await addDoc(foodRequestsRef, cleanData);
-                    showMessage("Solicitud registrada con éxito.", "success");
-                }
-                
-                await initializeAppLogic();
-                resetForm();
-
-            } catch (error) {
-                showMessage(`Error al guardar la solicitud: ${error.message}`, 'error');
-            }
-        }
-
-        async function deleteSingleRequest(id) {
-            try {
-                const docRef = doc(db, COLLECTION_NAME, id);
-                await deleteDoc(docRef);
-                showMessage("Solicitud eliminada con éxito.", "success");
-                await initializeAppLogic();
-            } catch (error) {
-                showMessage(`Error al eliminar la solicitud: ${error.message}`, 'error');
-            }
-        }
-        
-        async function deleteMultipleRequests(ids) {
-            try {
-                const batch = writeBatch(db); // Función de SDK v9 para batch
-                ids.forEach(id => {
-                    const docRef = doc(db, COLLECTION_NAME, id);
-                    batch.delete(docRef);
-                });
-                await batch.commit();
-                showMessage(`Se eliminaron ${ids.length} solicitudes con éxito.`, "success");
-                await initializeAppLogic();
-            } catch (error) {
-                showMessage(`Error al eliminar múltiples solicitudes: ${error.message}`, 'error');
-            }
-        }
-
-        // -------------------------------------------------------------------------
-        // === LÓGICA DE VISTA Y EVENTOS (MANTENIDA) ===
-        // -------------------------------------------------------------------------
-
-        // Función para renderizar la tabla (La lógica interna permanece igual)
-        function renderTable() {
-            const dataToRender = currentFilter 
-                ? foodRequests.filter(req => req.department.toLowerCase().includes(currentFilter.toLowerCase()))
-                : foodRequests;
-
-            tableBody.innerHTML = '';
-
-            if (dataToRender.length === 0) {
-                noRequestsMessage.classList.remove('hidden');
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Esperar a que Firebase esté listo
+            if (!window.db) {
+                console.error("Firebase no se inicializó correctamente");
                 return;
             }
-            noRequestsMessage.classList.add('hidden');
 
-            dataToRender.forEach((request) => {
-                const row = tableBody.insertRow();
-                row.className = 'hover:bg-blue-50 transition duration-150';
+            const form = document.getElementById('foodRequestForm');
+            const departmentSelect = document.getElementById('department');
+            const mealTypeSelect = document.getElementById('mealType');
+            const eventSelect = document.getElementById('event');
 
-                // Checkbox con data-id
-                row.insertCell().innerHTML = `
-                    <input type="checkbox" class="row-checkbox h-4 w-4 text-inter-primary rounded" data-id="${request.id}">
-                `;
+            // Referencias a los campos de personal externo
+            const checkCANTV = document.getElementById('checkCANTV');
+            const quantityCANTV = document.getElementById('quantityCANTV');
+            const checkEDC = document.getElementById('checkEDC');
+            const quantityEDC = document.getElementById('quantityEDC');
+            const checkExternalOthers = document.getElementById('checkExternalOthers');
+            const quantityExternalOthers = document.getElementById('quantityExternalOthers');
+            const totalQuantityInput = document.getElementById('totalQuantity');
 
-                // ... (Resto de celdas de la tabla) ...
-                // Fecha de Entrega, Departamento, Tipo de Comida, Evento, etc. (mantener la lógica de tu archivo original)
+            // Nuevas referencias para el buscador de personal Inter
+            const interStaffSearchInput = document.getElementById('interStaffSearch');
+            const interStaffSearchResults = document.getElementById('interStaffSearchResults');
+            const interStaffSelectedList = document.getElementById('interStaffSelected');
+            
+            // Referencias a campos de la solicitud
+            const deliveryPlaceInput = document.getElementById('deliveryPlace');
+            const deliveryDateTimeInput = document.getElementById('deliveryDateTime');
+            const unitCostInput = document.getElementById('unitCost');
+            const deliveryCostInput = document.getElementById('deliveryCost');
+            const deliveryCostOption = document.getElementById('deliveryCostOption');
+            const deliveryFree = document.getElementById('deliveryFree');
+            const costInput = document.getElementById('cost');
+            const providerNameSelect = document.getElementById('providerName');
+            const reasonTextarea = document.getElementById('reason');
+            const formActionsContainer = document.getElementById('formActions');
 
-                // Ejemplo de celdas (adaptar de tu código)
-                row.insertCell().textContent = request.deliveryDateTime || 'N/A';
-                row.insertCell().textContent = request.department;
-                row.insertCell().textContent = request.mealType;
-                row.insertCell().textContent = request.event || 'N/A';
+            // Referencias de la tabla e interfaz
+            const tableBody = document.getElementById('foodTableBody');
+            const noRequestsMessage = document.getElementById('noRequestsMessage');
+            const messageBox = document.getElementById('messageBox');
+            const filterDepartmentInput = document.getElementById('filterDepartment');
+            const clearFilterBtn = document.getElementById('clearFilterBtn');
+            const exportCsvBtn = document.getElementById('exportCsvBtn');
+            const deleteSelectedBtn = document.getElementById('deleteSelectedBtn');
+            const selectAllCheckboxes = document.getElementById('selectAllCheckboxes');
+            const submitButton = form.querySelector('button[type="submit"]');
 
-                const externalStaffText = Object.keys(request.externalStaff || {})
-                    .filter(key => request.externalStaff[key] > 0)
-                    .map(key => `${key} (${request.externalStaff[key]})`)
-                    .join(', ');
-                row.insertCell().textContent = externalStaffText || 'N/A';
-                row.insertCell().textContent = (request.interStaffSelected || []).join(', ');
-                row.insertCell().className = 'text-right';
-                row.insertCell().textContent = parseFloat(request.totalQuantity).toFixed(0);
-                row.insertCell().textContent = request.deliveryPlace;
-                row.insertCell().textContent = request.reason.length > 50 ? request.reason.substring(0, 47) + '...' : request.reason;
-                row.insertCell().textContent = request.providerName;
-                row.insertCell().className = 'text-right';
-                row.insertCell().textContent = `$${parseFloat(request.unitCost).toFixed(2)}`;
-                row.insertCell().className = 'text-right';
-                row.insertCell().textContent = `$${parseFloat(request.deliveryCost).toFixed(2)}`;
-                row.insertCell().className = 'text-right font-bold';
-                row.insertCell().textContent = `$${parseFloat(request.cost).toFixed(2)}`;
-                
-                // Acciones (Usamos data-id)
-                row.insertCell().innerHTML = `
-                    <button onclick="window.startEditRequest('${request.id}')" class="text-inter-primary hover:text-blue-700 p-1 rounded transition duration-150" title="Editar Solicitud">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-9-4l9-9m-4 9l4-4" />
-                        </svg>
-                    </button>
-                    <button onclick="window.showDeleteModal('${request.id}')" class="text-red-500 hover:text-red-700 p-1 rounded transition duration-150" title="Eliminar Solicitud">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                        </svg>
-                    </button>
-                `;
-            });
-        }
+            // Referencias para los modales
+            const deleteModal = document.getElementById('deleteModal');
+            const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+            const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
+            const modalText = document.getElementById('modalText');
+            
+            // Elementos para el resumen de gastos
+            const dailyTotalEl = document.getElementById('dailyTotal');
+            const weeklyTotalEl = document.getElementById('weeklyTotal');
+            const monthlyTotalEl = document.getElementById('monthlyTotal');
 
+            // Gráficos
+            let annualProvidersChart = null;
+            let departmentRequestsChart = null;
+            let staffRequestsChart = null;
 
-        // Adaptar las funciones globales
-        window.startEditRequest = function(id) {
-            // ... (Tu lógica de edición, busca el ID en `foodRequests` y llena el formulario)
-            const request = foodRequests.find(req => req.id === id);
-            if (!request) return;
-            // ... (Resto de la lógica de llenado de formulario y cambio de botones)
-        };
-
-        window.showDeleteModal = function(id) {
-            confirmDeleteBtn.dataset.deleteId = id;
-            modalText.textContent = `¿Estás seguro de que quieres eliminar la solicitud con ID ${id.substring(0, 6)}...? Esta acción no se puede deshacer.`;
-            deleteModal.classList.remove('hidden');
-            confirmDeleteBtn.onclick = handleSingleDelete;
-        }
-
-        async function handleFormSubmit(e) {
-            e.preventDefault();
-            // ... (Recolección de datos del formulario)
-            const newRequest = {
-                id: editingRequestId,
-                // ... (Resto de los campos del formulario)
+            // Constantes y Variables Globales
+            const CHART_COLORS = { 
+                'Al momento': '#005BAA',
+                'Monteluso': '#5CE1E6',
+                'Susi fresh': '#00B8D9',
+                'otros': '#667EEA',
+                'fondo': '#E2E8F0' 
             };
-            await saveRequest(newRequest);
-        }
+            
+            let foodRequests = [];
+            let selectedInterStaff = [];
+            let editingRequestId = null;
+            
+            const staffList = [
+                { id: 1, name: "BLANCO NEISABEL" },
+                { id: 2, name: "VILLAMIZAR NANCY" },
+                { id: 3, name: "CASTILLO TIBET" },
+                { id: 4, name: "QUINTERO ROSANA" },
+                { id: 5, name: "GONZALEZ LINO" },
+                { id: 6, name: "MORILLO ANA" },
+                { id: 7, name: "CARTAYA LENNYIS" },
+                { id: 8, name: "DELGADO JONATHAN" },
+                { id: 9, name: "TRONCOSO LAIS" },
+                { id: 10, name: "BRITO RONEY" },
+                { id: 11, name: "MUÑOZ KELVIN" },
+                { id: 12, name: "GALEA CESAR" },
+                { id: 13, name: "MORENO GEINES" },
+                { id: 14, name: "MACHADO JOSE" },
+                { id: 15, name: "SUAREZ KIR" },
+                { id: 16, name: "JIMENEZ DAIRELI" },
+                { id: 17, name: "GARCIA ANGELICA" },
+                { id: 18, name: "CONTRERAS NOELIA" },
+                { id: 19, name: "VEGAS ENYMAR" },
+                { id: 20, name: "GOMEZ SAMUEL" },
+                { id: 21, name: "LONGA JESUS" },
+                { id: 22, name: "QUIJADA WILFREDO" },
+                { id: 23, name: "PINO ALEJANDRO" },
+                { id: 24, name: "AMORUZO ANGELO" },
+                { id: 25, name: "CHINCHILLA OSMEL" },
+                { id: 26, name: "TERAN CASTO" },
+                { id: 27, name: "FERRER GABRIEL" },
+                { id: 28, name: "TOVAR LUIS" },
+                { id: 29, name: "ORTA WILNER" },
+                { id: 30, name: "TORRES KEIVER" },
+                { id: 31, name: "RODRIGUEZ MISAEL" },
+                { id: 32, name: "CASTILLO JHOAN" },
+                { id: 33, name: "VILLEGAS OSMER" },
+                { id: 34, name: "RAMOS FREDDY" },
+                { id: 35, name: "TOVAR JAIRO" },
+                { id: 36, name: "PEREZ LUIS" },
+                { id: 37, name: "BRITO JOSE" },
+                { id: 38, name: "ASCANIO FELIX" },
+                { id: 39, name: "CORONADO MIGUEL" },
+                { id: 40, name: "HELLO ALBANY" },
+                { id: 41, name: "PIRELA WILMER" },
+                { id: 42, name: "CASTELLANOS FRANKLIN" },
+                { id: 43, name: "JIMENEZ RONMEL" },
+                { id: 44, name: "PRIETO JAVIER" },
+                { id: 45, name: "LARA EDUARDO" },
+                { id: 46, name: "CASANOVA FABIAN" },
+                { id: 47, name: "CASTILLO ORIANA" },
+                { id: 48, name: "GARRIDO ADOLFO" },
+                { id: 49, name: "MORENO JOELIMAR" },
+                { id: 50, name: "CENTENO LUIS" },
+                { id: 51, name: "NEGRIN CARLOS" },
+                { id: 52, name: "LADERA DAYANA" },
+                { id: 53, name: "PEREZ NELSON" },
+                { id: 54, name: "CHACON EDUARDO" },
+                { id: 55, name: "UZCATEGUI DARWIN" },
+                { id: 56, name: "VALENZUELA CARLOS" },
+                { id: 57, name: "TORRES CARLOS" },
+                { id: 58, name: "LOPEZ JIM" },
+                { id: 59, name: "RAMOS LISMAR" },
+                { id: 60, name: "CHIRINOS RHONY" },
+                { id: 61, name: "MORALES JOSUE" },
+                { id: 62, name: "DELGADO BRAYAN" },
+                { id: 63, name: "REVERON ROGELIO" },
+                { id: 64, name: "CEDEÑO LEONEL" },
+                { id: 65, name: "UZCATEGUI BREINER" },
+                { id: 66, name: "HERNANDEZ RAFAEL" },
+                { id: 67, name: "VILLAMIZAR YOHAN" },
+                { id: 68, name: "CASTRO MANUEL" },
+                { id: 69, name: "BRICEÑO ALEXY" },
+                { id: 70, name: "GONZALEZ JUAN" },
+                { id: 71, name: "ROCA YUNIOR" },
+                { id: 72, name: "DIAZ MANUEL" },
+                { id: 73, name: "ZERPA ODREIMY" },
+                { id: 74, name: "DIAZ ENNIO" },
+                { id: 75, name: "MANRIQUE LUIS" },
+                { id: 76, name: "RODRIGUEZ FELIX" },
+                { id: 77, name: "GARCIA ANGEL" },
+                { id: 78, name: "TONITO JULIO" },
+                { id: 79, name: "GARCIA EDNEY" },
+                { id: 80, name: "CASTRILLO MANUEL" },
+                { id: 81, name: "GUERRERO GABRIEL" },
+                { id: 82, name: "MATHEUS FERNANDO" },
+                { id: 83, name: "GARCIA LUIS" },
+                { id: 84, name: "VELASQUEZ JOSE" },
+                { id: 85, name: "PERNETT CESAR" },
+                { id: 86, name: "RODRIGUEZ OMAR" },
+                { id: 87, name: "RAMIREZ DARWIN" },
+                { id: 88, name: "YEMES GUILLERMO" },
+                { id: 89, name: "BAZAN WILLIAMS" },
+                { id: 90, name: "RAMIREZ FRANKLIN" },
+                { id: 91, name: "LOPEZ JORGE" },
+                { id: 92, name: "RAMOS ROBERT" },
+                { id: 93, name: "SANCHEZ GONZALO" },
+                { id: 94, name: "GARCIA CARLOS" },
+                { id: 95, name: "MENESES KELVIS" },
+                { id: 96, name: "MACHADO DANNY" },
+                { id: 97, name: "ROMERO LUIS" },
+                { id: 98, name: "PALACIOS LUIS" },
+                { id: 99, name: "HERNANDEZ SERGIO" },
+                { id: 100, name: "VERGARA JORGE" },
+                { id: 101, name: "BARRETO ANDRES" },
+                { id: 102, name: "HERNANDEZ LUIS" },
+                { id: 103, name: "MALDONADO DYLAN" },
+                { id: 104, name: "OLIVARES JOHN" },
+                { id: 105, name: "CASTILLO JUNIOR" },
+                { id: 106, name: "MORA DYLAN" },
+                { id: 107, name: "JULIO DANIEL" },
+                { id: 108, name: "CARVAJAL JOSE" },
+                { id: 109, name: "BLANCO EDWAR" },
+                { id: 110, name: "POSADA RAMON" },
+                { id: 111, name: "GUZMAN CESAR" },
+                { id: 112, name: "CAMPOS ARQUIMEDES" },
+                { id: 113, name: "ROJAS RONALD" },
+                { id: 114, name: "MOSQUERA JAVIER" },
+                { id: 115, name: "ESCORCIA ELITH" },
+                { id: 116, name: "VASQUEZ VICTOR" },
+                { id: 117, name: "ESCALONA WUILMER" },
+                { id: 118, name: "YEPEZ CESAR" },
+                { id: 119, name: "QUINTERO OSCAR" },
+                { id: 120, name: "MACHADO CARLOS" },
+                { id: 121, name: "APONTE YOSKARLA" },
+                { id: 122, name: "AZUAJE YAMILETH" },
+                { id: 123, name: "VALERO VANESA" },
+                { id: 124, name: "GIL DEMIAN" },
+                { id: 125, name: "MALVACEA ALANY" },
+                { id: 126, name: "FIGUERA REBECA" },
+                { id: 127, name: "VIVENES YETZIBEL" },
+                { id: 128, name: "BERRIOS RAIDEL" },
+                { id: 129, name: "URBAEZ HEISHMAR" },
+                { id: 130, name: "PEREZ JEIZER" },
+                { id: 131, name: "LABRADOR DAVID" },
+                { id: 132, name: "VELASQUEZ JOSE" },
+                { id: 133, name: "MARQUEZ BETANIA" },
+                { id: 134, name: "GASCA ALEXANDRO" },
+                { id: 135, name: "RIVERO SIMON" },
+                { id: 136, name: "MARRON FABRIZIO" },
+                { id: 137, name: "APONTE AHIBRAN" },
+                { id: 138, name: "TORRES CESAR" },
+                { id: 139, name: "PACHECO ESCARLET" },
+                { id: 140, name: "FERNANDEZ JORGE" },
+                { id: 141, name: "MARQUEZ ACXEL" },
+                { id: 142, name: "BARON YOSMAR" },
+                { id: 143, name: "SANCHEZ SARAI" },
+                { id: 144, name: "GALVAN RICARDO" },
+                { id: 145, name: "SIERRA DAVID" },
+                { id: 146, name: "SERRANO WILLIANA" },
+                { id: 147, name: "ESCORCHE VICTORIA" },
+                { id: 148, name: "LEDEZMA RALTH" },
+                { id: 149, name: "ORTIZ KATHERINE" },
+                { id: 150, name: "SANCHEZ ADRIANA" },
+                { id: 151, name: "RODRIGUEZ MERLIN" },
+                { id: 152, name: "VAMONDE JOSE" },
+                { id: 153, name: "MARTINEZ MARINA" },
+                { id: 154, name: "BORDONARO SEBASTIAN" },
+                { id: 155, name: "LISCANO YAILETH" },
+                { id: 156, name: "PEREZ JENNYFER" },
+                { id: 157, name: "CARRERO JOSHUA" },
+                { id: 158, name: "BASUALDO JORGE" },
+                { id: 159, name: "URBINA GENESIS" },
+                { id: 160, name: "MAGALLANES LUIS" },
+                { id: 161, name: "LEAL GREGORYS" },
+                { id: 162, name: "ESCALONA KARLA" },
+                { id: 163, name: "BRICEÑO ALEXA" },
+                { id: 164, name: "RUIZ EDGAR" },
+                { id: 165, name: "CEBALLOS LEONID" },
+                { id: 166, name: "RUIZ IONA" }
+            ];
 
-        async function handleSingleDelete() {
-            const id = confirmDeleteBtn.dataset.deleteId;
-            deleteModal.classList.add('hidden');
-            await deleteSingleRequest(id);
-        }
+            // --- Funciones de Firebase ---
 
-        async function handleDeleteMultiple() {
-            const selectedCheckboxes = Array.from(document.querySelectorAll('.row-checkbox:checked'));
-            const ids = selectedCheckboxes.map(cb => cb.dataset.id);
+            // Función para agregar una nueva solicitud a Firestore
+            async function addRequestToFirestore(request) {
+                try {
+                    const requestsRef = collection(db, 'foodRequests');
+                    const docRef = await addDoc(requestsRef, request);
+                    console.log("Solicitud agregada con ID: ", docRef.id);
+                    return { ...request, firestoreId: docRef.id };
+                } catch (error) {
+                    console.error("Error agregando solicitud:", error);
+                    throw error;
+                }
+            }
 
-            deleteModal.classList.add('hidden');
-            await deleteMultipleRequests(ids);
-        }
-        
-        // Event Listeners principales
-        form.addEventListener('submit', handleFormSubmit);
-        deleteSelectedBtn.addEventListener('click', () => {
-             const selectedIds = Array.from(document.querySelectorAll('.row-checkbox:checked')).map(cb => cb.dataset.id);
-            if (selectedIds.length > 0) {
-                modalText.textContent = `¿Estás seguro de que quieres eliminar ${selectedIds.length} solicitudes seleccionadas? Esta acción no se puede deshacer.`;
-                confirmDeleteBtn.onclick = handleDeleteMultiple;
+            // Función para actualizar una solicitud en Firestore
+            async function updateRequestInFirestore(requestId, updatedData) {
+                try {
+                    // Buscar el documento por el ID personalizado
+                    const requestsRef = collection(db, 'foodRequests');
+                    const q = query(requestsRef, where('id', '==', requestId));
+                    const querySnapshot = await getDocs(q);
+                    
+                    if (!querySnapshot.empty) {
+                        const docRef = doc(db, 'foodRequests', querySnapshot.docs[0].id);
+                        await updateDoc(docRef, updatedData);
+                        console.log("Solicitud actualizada correctamente");
+                    }
+                } catch (error) {
+                    console.error("Error actualizando solicitud:", error);
+                    throw error;
+                }
+            }
+
+            // Función para eliminar solicitudes de Firestore
+            async function deleteRequestsFromFirestore(requestIds) {
+                try {
+                    const requestsRef = collection(db, 'foodRequests');
+                    
+                    // Para cada ID, buscar y eliminar el documento correspondiente
+                    const deletePromises = requestIds.map(async (requestId) => {
+                        const q = query(requestsRef, where('id', '==', requestId));
+                        const querySnapshot = await getDocs(q);
+                        
+                        if (!querySnapshot.empty) {
+                            const docRef = doc(db, 'foodRequests', querySnapshot.docs[0].id);
+                            await deleteDoc(docRef);
+                        }
+                    });
+                    
+                    await Promise.all(deletePromises);
+                    console.log("Solicitudes eliminadas correctamente");
+                } catch (error) {
+                    console.error("Error eliminando solicitudes:", error);
+                    throw error;
+                }
+            }
+
+            // Función para cargar los datos de Firestore
+            async function loadRequests() {
+                try {
+                    const requestsRef = collection(db, 'foodRequests');
+                    const q = query(requestsRef, orderBy('deliveryDate', 'desc'));
+                    const querySnapshot = await getDocs(q);
+                    
+                    const requests = [];
+                    querySnapshot.forEach((doc) => {
+                        const data = doc.data();
+                        requests.push({
+                            ...data,
+                            firestoreId: doc.id
+                        });
+                    });
+                    
+                    console.log("Datos cargados desde Firestore:", requests.length, "solicitudes");
+                    return requests;
+                } catch (error) {
+                    console.error("Error cargando desde Firestore:", error);
+                    displayMessage('Error al cargar desde la base de datos', 'error');
+                    return [];
+                }
+            }
+
+            // --- Funciones de Utilidad ---
+
+            // Función para obtener la fecha y hora actual en formato YYYY-MM-DD
+            function getCurrentDate() {
+                const now = new Date();
+                const year = now.getFullYear();
+                const month = String(now.getMonth() + 1).padStart(2, '0');
+                const day = String(now.getDate()).padStart(2, '0');
+                return `${year}-${month}-${day}`;
+            }
+
+            // Inicializar campos al cargar la página
+            function initializeForm() {
+                deliveryDateTimeInput.value = getCurrentDate();
+                unitCostInput.value = '0.00';
+                deliveryCostInput.value = '0.00';
+                costInput.value = '0.00';
+                totalQuantityInput.value = '0';
+                
+                // Reiniciar estado de edición
+                editingRequestId = null;
+                submitButton.textContent = 'Registrar Solicitud';
+                submitButton.classList.remove('bg-green-600', 'hover:bg-green-700');
+                submitButton.classList.add('bg-inter-primary', 'hover:bg-blue-700');
+                removeCancelEditButton();
+
+                // Limpiar personal externo
+                document.querySelectorAll('input[name="externalStaff"]').forEach(checkbox => {
+                    checkbox.checked = false;
+                    const quantityInput = document.getElementById(`quantity${checkbox.value}`);
+                    if (quantityInput) {
+                        quantityInput.value = '0';
+                        quantityInput.classList.add('hidden-quantity');
+                    }
+                });
+                
+                // Limpiar personal Inter
+                selectedInterStaff = [];
+                renderSelectedStaff();
+            }
+
+            // Función para formatear fechas a YYYY-MM-DD para el input[type=date]
+            function formatDateForInput(dateString) {
+                if (!dateString) return '';
+                return dateString.split('T')[0];
+            }
+            
+            // Función para mostrar mensajes de estado
+            function displayMessage(message, type = 'success') {
+                messageBox.textContent = message;
+                messageBox.classList.remove('hidden', 'bg-red-100', 'text-red-700', 'bg-green-100', 'text-green-700');
+                if (type === 'error') {
+                    messageBox.classList.add('bg-red-100', 'text-red-700');
+                } else {
+                    messageBox.classList.add('bg-green-100', 'text-green-700');
+                }
+                setTimeout(() => {
+                    messageBox.classList.add('hidden');
+                }, 5000);
+            }
+
+            // --- Lógica del Calculo de Costos/Cantidad ---
+            
+            // Recalcula la cantidad total de comidas (Inter + Externos)
+            function calculateTotalQuantity() {
+                let externalQuantity = 0;
+                document.querySelectorAll('input[type="number"][id^="quantity"]').forEach(input => {
+                    externalQuantity += parseInt(input.value) || 0;
+                });
+
+                const interQuantity = selectedInterStaff.length;
+                const total = externalQuantity + interQuantity;
+                totalQuantityInput.value = total;
+                return total;
+            }
+
+            // Recalcula el costo total
+            function calculateTotalCost() {
+                const totalQuantity = calculateTotalQuantity();
+                const unitCost = parseFloat(unitCostInput.value) || 0;
+                const deliveryCost = deliveryFree.checked ? 0 : (parseFloat(deliveryCostInput.value) || 0);
+
+                const totalCost = (totalQuantity * unitCost) + deliveryCost;
+                costInput.value = totalCost.toFixed(2);
+            }
+
+            // --- Lógica de Personal Externo ---
+
+            // Manejar la visibilidad de los campos de cantidad para personal externo
+            document.querySelectorAll('input[name="externalStaff"]').forEach(checkbox => {
+                checkbox.addEventListener('change', (e) => {
+                    const quantityInput = document.getElementById(`quantity${e.target.value}`);
+                    if (quantityInput) {
+                        if (e.target.checked) {
+                            quantityInput.classList.remove('hidden-quantity');
+                            quantityInput.value = 1;
+                        } else {
+                            quantityInput.classList.add('hidden-quantity');
+                            quantityInput.value = 0;
+                        }
+                    }
+                    calculateTotalCost();
+                });
+            });
+
+            // Manejar la entrada de cantidad para personal externo
+            document.querySelectorAll('input[type="number"][id^="quantity"]').forEach(input => {
+                input.addEventListener('input', () => {
+                    if (parseInt(input.value) < 0 || input.value === '') {
+                        input.value = '0';
+                    }
+                    const checkboxId = input.id.replace('quantity', 'check');
+                    const checkbox = document.getElementById(checkboxId);
+                    if (checkbox) {
+                        checkbox.checked = parseInt(input.value) > 0;
+                        if (parseInt(input.value) === 0) {
+                             input.classList.add('hidden-quantity');
+                        } else {
+                            input.classList.remove('hidden-quantity');
+                        }
+                    }
+                    calculateTotalCost();
+                });
+            });
+
+            // --- Lógica de Personal Inter ---
+
+            // Renderiza la lista de personal de Inter seleccionado
+            function renderSelectedStaff() {
+                interStaffSelectedList.innerHTML = '';
+                selectedInterStaff.forEach((staffName, index) => {
+                    const li = document.createElement('li');
+                    li.className = 'flex items-center justify-between text-sm bg-blue-50 p-2 rounded';
+                    li.innerHTML = `
+                        <span class="text-gray-700">${staffName}</span>
+                        <button type="button" data-name="${staffName}"
+                                class="remove-staff-btn text-red-500 hover:text-red-700 ml-2 font-bold transition duration-150">
+                            &times;
+                        </button>
+                    `;
+                    interStaffSelectedList.appendChild(li);
+                });
+                calculateTotalCost();
+            }
+
+            // Manejar la búsqueda y filtrado
+            interStaffSearchInput.addEventListener('input', () => {
+                const query = interStaffSearchInput.value.trim().toUpperCase();
+                interStaffSearchResults.innerHTML = '';
+
+                if (query.length < 2) {
+                    interStaffSearchResults.classList.add('hidden');
+                    return;
+                }
+
+                const filteredStaff = staffList.filter(staff => 
+                    staff.name.includes(query) && !selectedInterStaff.includes(staff.name)
+                ).slice(0, 10);
+
+                if (filteredStaff.length > 0) {
+                    filteredStaff.forEach(staff => {
+                        const li = document.createElement('li');
+                        li.className = 'p-2 hover:bg-inter-accent-light hover:text-white cursor-pointer transition duration-150';
+                        li.textContent = staff.name;
+                        li.setAttribute('data-name', staff.name);
+                        li.addEventListener('click', (e) => {
+                            selectedInterStaff.push(e.target.getAttribute('data-name'));
+                            interStaffSearchInput.value = '';
+                            interStaffSearchResults.classList.add('hidden');
+                            renderSelectedStaff();
+                        });
+                        interStaffSearchResults.appendChild(li);
+                    });
+                    interStaffSearchResults.classList.remove('hidden');
+                } else {
+                    interStaffSearchResults.classList.add('hidden');
+                }
+            });
+
+            // Ocultar resultados de búsqueda al perder el foco
+            document.addEventListener('click', (e) => {
+                if (!interStaffSearchInput.contains(e.target) && !interStaffSearchResults.contains(e.target)) {
+                    interStaffSearchResults.classList.add('hidden');
+                }
+            });
+
+            // Manejar la eliminación de personal Inter seleccionado
+            interStaffSelectedList.addEventListener('click', (e) => {
+                if (e.target.classList.contains('remove-staff-btn')) {
+                    const staffName = e.target.getAttribute('data-name');
+                    selectedInterStaff = selectedInterStaff.filter(name => name !== staffName);
+                    renderSelectedStaff();
+                }
+            });
+
+            // --- Lógica del Formulario y Edición ---
+
+            // Toggle para el costo de delivery
+            document.querySelectorAll('input[name="deliveryOption"]').forEach(radio => {
+                radio.addEventListener('change', () => {
+                    if (deliveryCostOption.checked) {
+                        deliveryCostInput.classList.remove('hidden');
+                    } else {
+                        deliveryCostInput.classList.add('hidden');
+                        deliveryCostInput.value = '0.00';
+                    }
+                    calculateTotalCost();
+                });
+            });
+
+            // Event listeners para recalcular el costo
+            unitCostInput.addEventListener('input', calculateTotalCost);
+            deliveryCostInput.addEventListener('input', calculateTotalCost);
+
+            // Función para añadir el botón de Cancelar Edición
+            function addCancelEditButton() {
+                let cancelBtn = document.getElementById('cancelEditBtn');
+                if (!cancelBtn) {
+                    cancelBtn = document.createElement('button');
+                    cancelBtn.id = 'cancelEditBtn';
+                    cancelBtn.type = 'button';
+                    cancelBtn.textContent = 'Cancelar Edición';
+                    cancelBtn.className = 'bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-6 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105';
+                    cancelBtn.addEventListener('click', resetFormAndEditing);
+                    formActionsContainer.insertBefore(cancelBtn, submitButton);
+                }
+            }
+
+            // Función para eliminar el botón de Cancelar Edición
+            function removeCancelEditButton() {
+                const cancelBtn = document.getElementById('cancelEditBtn');
+                if (cancelBtn) {
+                    cancelBtn.remove();
+                }
+            }
+
+            // Función para resetear el formulario y el modo de edición
+            function resetFormAndEditing() {
+                form.reset();
+                initializeForm();
+                submitButton.textContent = 'Registrar Solicitud';
+                submitButton.classList.remove('bg-green-600', 'hover:bg-green-700');
+                submitButton.classList.add('bg-inter-primary', 'hover:bg-blue-700');
+                removeCancelEditButton();
+                deliveryCostInput.classList.add('hidden');
+            }
+
+            // Función para cargar una solicitud en el formulario para edición
+            window.editRequest = (id) => {
+                const requestToEdit = foodRequests.find(req => req.id === id);
+                if (!requestToEdit) return;
+
+                editingRequestId = id;
+                
+                // 1. Cargar datos básicos y de costo
+                departmentSelect.value = requestToEdit.department;
+                mealTypeSelect.value = requestToEdit.mealType;
+                eventSelect.value = requestToEdit.event || '';
+                deliveryPlaceInput.value = requestToEdit.deliveryPlace;
+                deliveryDateTimeInput.value = formatDateForInput(requestToEdit.deliveryDate);
+                unitCostInput.value = parseFloat(requestToEdit.unitCost).toFixed(2);
+                providerNameSelect.value = requestToEdit.providerName;
+                reasonTextarea.value = requestToEdit.reason;
+
+                // 2. Cargar personal externo
+                document.querySelectorAll('input[name="externalStaff"]').forEach(checkbox => {
+                    checkbox.checked = false;
+                    const quantityInput = document.getElementById(`quantity${checkbox.value}`);
+                    quantityInput.value = '0';
+                    quantityInput.classList.add('hidden-quantity');
+                });
+
+                if (requestToEdit.externalStaff) {
+                    Object.keys(requestToEdit.externalStaff).forEach(key => {
+                        const quantity = requestToEdit.externalStaff[key];
+                        if (quantity > 0) {
+                            const checkbox = document.getElementById(`check${key}`);
+                            const quantityInput = document.getElementById(`quantity${key}`);
+                            if (checkbox && quantityInput) {
+                                checkbox.checked = true;
+                                quantityInput.value = quantity;
+                                quantityInput.classList.remove('hidden-quantity');
+                            }
+                        }
+                    });
+                }
+
+                // 3. Cargar personal Inter
+                selectedInterStaff = requestToEdit.interStaff.slice();
+                renderSelectedStaff();
+
+                // 4. Cargar costo de delivery
+                const deliveryCostValue = parseFloat(requestToEdit.deliveryCost);
+                if (deliveryCostValue > 0) {
+                    deliveryCostOption.checked = true;
+                    deliveryFree.checked = false;
+                    deliveryCostInput.value = deliveryCostValue.toFixed(2);
+                    deliveryCostInput.classList.remove('hidden');
+                } else {
+                    deliveryFree.checked = true;
+                    deliveryCostOption.checked = false;
+                    deliveryCostInput.value = '0.00';
+                    deliveryCostInput.classList.add('hidden');
+                }
+                
+                calculateTotalCost();
+
+                // 5. Ajustar interfaz a modo Edición
+                submitButton.textContent = 'Guardar Cambios';
+                submitButton.classList.remove('bg-inter-primary', 'hover:bg-blue-700');
+                submitButton.classList.add('bg-green-600', 'hover:bg-green-700');
+                addCancelEditButton();
+
+                // Desplazarse al formulario
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            };
+
+            // Manejar el envío del formulario
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+
+                // Recopilar datos de personal externo
+                const externalStaffData = {};
+                document.querySelectorAll('input[name="externalStaff"]:checked').forEach(checkbox => {
+                    const quantityInput = document.getElementById(`quantity${checkbox.value}`);
+                    const quantity = parseInt(quantityInput.value) || 0;
+                    if (quantity > 0) {
+                        externalStaffData[checkbox.value] = quantity;
+                    }
+                });
+
+                const totalQuantity = calculateTotalQuantity();
+                const totalCost = parseFloat(costInput.value);
+                const deliveryCostValue = deliveryFree.checked ? 0 : (parseFloat(deliveryCostInput.value) || 0);
+
+                if (totalQuantity === 0) {
+                    displayMessage('El total de comidas debe ser mayor a 0.', 'error');
+                    return;
+                }
+                
+                if (departmentSelect.value === '') {
+                    displayMessage('Debe seleccionar un Departamento/Área.', 'error');
+                    return;
+                }
+
+                if (providerNameSelect.value === '') {
+                    displayMessage('Debe seleccionar un Proveedor.', 'error');
+                    return;
+                }
+
+                const newRequest = {
+                    id: editingRequestId || Date.now(),
+                    department: departmentSelect.value,
+                    mealType: mealTypeSelect.value,
+                    event: eventSelect.value,
+                    externalStaff: externalStaffData,
+                    interStaff: selectedInterStaff.slice(),
+                    totalQuantity: totalQuantity,
+                    deliveryPlace: deliveryPlaceInput.value,
+                    deliveryDate: deliveryDateTimeInput.value,
+                    unitCost: parseFloat(unitCostInput.value),
+                    deliveryCost: deliveryCostValue,
+                    totalCost: totalCost,
+                    providerName: providerNameSelect.value,
+                    reason: reasonTextarea.value,
+                    registrationDate: new Date().toISOString()
+                };
+
+                try {
+                    if (editingRequestId) {
+                        // Modo Edición: actualizar en Firestore
+                        await updateRequestInFirestore(editingRequestId, newRequest);
+                        
+                        // Actualizar localmente
+                        const index = foodRequests.findIndex(req => req.id === editingRequestId);
+                        if (index !== -1) {
+                            foodRequests[index] = newRequest;
+                        }
+                        
+                        displayMessage('Solicitud actualizada con éxito.', 'success');
+                        resetFormAndEditing();
+                    } else {
+                        // Modo Registro: añadir nuevo registro a Firestore
+                        const requestWithFirestoreId = await addRequestToFirestore(newRequest);
+                        foodRequests.push(requestWithFirestoreId);
+                        displayMessage('Solicitud registrada con éxito.', 'success');
+                        form.reset();
+                        initializeForm();
+                    }
+                    
+                    renderTable();
+                    updateSummaryTotals();
+                    updateCharts();
+                } catch (error) {
+                    displayMessage('Error al guardar la solicitud: ' + error.message, 'error');
+                }
+            });
+
+            // --- Lógica del Historial (Tabla) ---
+
+            // Formatea el costo a una cadena con dos decimales y el símbolo $
+            function formatCost(cost) {
+                return `$${parseFloat(cost || 0).toFixed(2)}`;
+            }
+            
+            // Función para renderizar la tabla de historial
+            function renderTable(filterQuery = '') {
+                let filteredRequests = foodRequests.slice();
+                if (filterQuery) {
+                    const query = filterQuery.toUpperCase();
+                    filteredRequests = filteredRequests.filter(req => 
+                        req.department.toUpperCase().includes(query) ||
+                        req.deliveryPlace.toUpperCase().includes(query) ||
+                        req.providerName.toUpperCase().includes(query) ||
+                        req.reason.toUpperCase().includes(query)
+                    );
+                }
+                
+                filteredRequests.sort((a, b) => {
+                    const dateA = new Date(a.deliveryDate + 'T12:00:00');
+                    const dateB = new Date(b.deliveryDate + 'T12:00:00');
+                    return dateB - dateA;
+                });
+
+                tableBody.innerHTML = '';
+                if (filteredRequests.length === 0) {
+                    noRequestsMessage.classList.remove('hidden');
+                    return;
+                }
+                noRequestsMessage.classList.add('hidden');
+
+                filteredRequests.forEach(request => {
+                    const externalStaffText = Object.keys(request.externalStaff)
+                        .map(key => `${key} (${request.externalStaff[key]})`)
+                        .join(', ');
+
+                    const interStaffText = request.interStaff.join(', ');
+                    
+                    const displayDate = new Date(request.deliveryDate + 'T12:00:00').toLocaleDateString('es-ES', {
+                        year: 'numeric',
+                        month: '2-digit',
+                        day: '2-digit',
+                    });
+
+                    const row = tableBody.insertRow();
+                    row.className = 'hover:bg-gray-50 transition duration-150';
+                    row.innerHTML = `
+                        <td class="px-6 py-4 whitespace-nowrap"><input type="checkbox" data-id="${request.id}" class="row-checkbox form-checkbox h-4 w-4 text-inter-primary rounded"></td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${displayDate}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${request.department}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${request.mealType}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${request.event || 'N/A'}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${externalStaffText || 'N/A'}</td>
+                        <td class="px-6 py-4 max-w-xs overflow-hidden truncate text-sm text-gray-500">${interStaffText || 'N/A'}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-right font-medium text-inter-primary">${request.totalQuantity}</td>
+                        <td class="px-6 py-4 text-sm text-gray-500 max-w-xs overflow-hidden truncate">${request.deliveryPlace}</td>
+                        <td class="px-6 py-4 text-sm text-gray-500 max-w-xs overflow-hidden truncate">${request.reason}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${request.providerName}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-700">${formatCost(request.totalQuantity * request.unitCost)}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-700">${formatCost(request.deliveryCost)}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-right font-bold text-inter-primary">${formatCost(request.totalCost)}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                            <button onclick="editRequest(${request.id})" class="bg-blue-500 hover:bg-blue-600 text-white py-1 px-3 rounded-md text-xs transition duration-150 transform hover:scale-105">
+                                Editar
+                            </button>
+                        </td>
+                    `;
+                });
+
+                selectAllCheckboxes.checked = false;
+            }
+
+            // --- Lógica de Filtros y Acciones de Tabla ---
+
+            // Filtro por departamento
+            filterDepartmentInput.addEventListener('input', (e) => {
+                renderTable(e.target.value.trim());
+            });
+
+            // Limpiar filtro
+            clearFilterBtn.addEventListener('click', () => {
+                filterDepartmentInput.value = '';
+                renderTable();
+            });
+            
+            // Seleccionar/Deseleccionar todos los checkboxes
+            selectAllCheckboxes.addEventListener('change', (e) => {
+                document.querySelectorAll('.row-checkbox').forEach(checkbox => {
+                    checkbox.checked = e.target.checked;
+                });
+            });
+
+            // Botón Eliminar Seleccionados
+            deleteSelectedBtn.addEventListener('click', async () => {
+                const selectedIds = Array.from(document.querySelectorAll('.row-checkbox:checked'))
+                    .map(cb => parseInt(cb.getAttribute('data-id')));
+
+                if (selectedIds.length === 0) {
+                    displayMessage('Debe seleccionar al menos una solicitud para eliminar.', 'error');
+                    return;
+                }
+
+                modalText.textContent = `¿Estás seguro de que quieres eliminar ${selectedIds.length} solicitud(es)? Esta acción no se puede deshacer.`;
                 deleteModal.classList.remove('hidden');
-            } else {
-                showMessage("Por favor, selecciona al menos una solicitud para eliminar.", "info");
+
+                confirmDeleteBtn.onclick = async () => {
+                    try {
+                        await deleteRequestsFromFirestore(selectedIds);
+                        
+                        foodRequests = foodRequests.filter(req => !selectedIds.includes(req.id));
+                        
+                        renderTable(filterDepartmentInput.value.trim());
+                        updateSummaryTotals();
+                        updateCharts();
+                        deleteModal.classList.add('hidden');
+                        displayMessage('Solicitud(es) eliminada(s) con éxito.', 'success');
+                    } catch (error) {
+                        displayMessage('Error al eliminar las solicitudes: ' + error.message, 'error');
+                        deleteModal.classList.add('hidden');
+                    }
+                };
+
+                cancelDeleteBtn.onclick = () => {
+                    deleteModal.classList.add('hidden');
+                };
+            });
+
+            // Exportar a CSV
+            exportCsvBtn.addEventListener('click', () => {
+                if (foodRequests.length === 0) {
+                    displayMessage('No hay datos para exportar.', 'error');
+                    return;
+                }
+                
+                const csvQuote = (str) => {
+                    return `"${String(str || '').replace(/"/g, '""')}"`;
+                };
+
+                let headers = [
+                    "Fecha de Entrega", 
+                    "Departamento", 
+                    "Tipo de Comida", 
+                    "Evento", 
+                    "Personal Externo (Detalle)", 
+                    "Personal Inter (Detalle)", 
+                    "Total Comidas", 
+                    "Lugar de Entrega", 
+                    "Motivo", 
+                    "Proveedor", 
+                    "Costo Comida Unitario ($)", 
+                    "Costo Total Comida ($)", 
+                    "Costo Delivery ($)", 
+                    "Costo Total Final ($)"
+                ];
+                
+                let csv = headers.join(";") + "\n";
+
+                foodRequests.forEach(req => {
+                    const externalStaffText = Object.keys(req.externalStaff)
+                        .map(key => `${key} (${req.externalStaff[key]})`)
+                        .join(' | ');
+
+                    const interStaffText = req.interStaff.join(' | ');
+                    const totalCostComida = req.totalQuantity * req.unitCost;
+                    
+                    const row = [
+                        csvQuote(req.deliveryDate),
+                        csvQuote(req.department),
+                        csvQuote(req.mealType),
+                        csvQuote(req.event || ''),
+                        csvQuote(externalStaffText),
+                        csvQuote(interStaffText),
+                        req.totalQuantity,
+                        csvQuote(req.deliveryPlace),
+                        csvQuote(req.reason),
+                        csvQuote(req.providerName),
+                        parseFloat(req.unitCost).toFixed(2).replace('.', ','),
+                        totalCostComida.toFixed(2).replace('.', ','),
+                        parseFloat(req.deliveryCost).toFixed(2).replace('.', ','),
+                        parseFloat(req.totalCost).toFixed(2).replace('.', ',')
+                    ];
+                    csv += row.join(";") + "\n";
+                });
+
+                const blob = new Blob(["\uFEFF", csv], { type: 'text/csv;charset=utf-8;' });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.setAttribute('href', url);
+                link.setAttribute('download', 'solicitudes_comidas.csv');
+                link.style.visibility = 'hidden';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                displayMessage('Datos exportados a CSV con éxito.', 'success');
+            });
+
+            // --- Lógica del Resumen de Gastos ---
+
+            function updateSummaryTotals() {
+                const now = new Date();
+                const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+                const weekStart = new Date(today);
+                weekStart.setDate(today.getDate() - today.getDay());
+                const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+
+                let dailyTotal = 0;
+                let weeklyTotal = 0;
+                let monthlyTotal = 0;
+
+                foodRequests.forEach(req => {
+                    const reqDateForComparison = new Date(req.deliveryDate + 'T12:00:00');
+                    const cost = parseFloat(req.totalCost) || 0;
+
+                    if (reqDateForComparison >= monthStart) {
+                        monthlyTotal += cost;
+                    }
+
+                    if (reqDateForComparison >= weekStart) {
+                        weeklyTotal += cost;
+                    }
+                    
+                    const todayStr = today.toISOString().split('T')[0];
+                    if (req.deliveryDate === todayStr) {
+                        dailyTotal += cost;
+                    }
+                });
+
+                dailyTotalEl.textContent = formatCost(dailyTotal);
+                weeklyTotalEl.textContent = formatCost(weeklyTotal);
+                monthlyTotalEl.textContent = formatCost(monthlyTotal);
+            }
+            
+            // --- Lógica de Gráficos ---
+
+            function getChartColor(index) {
+                const colors = ['#005BAA', '#5CE1E6', '#00B8D9', '#667EEA', '#F6AD55', '#E53E3E', '#38B2AC'];
+                return colors[index % colors.length];
+            }
+
+            function updateCharts() {
+                // 1. Preparar datos de Gasto Mensual por Proveedor
+                const monthlyProviderData = foodRequests.reduce((acc, req) => {
+                    const date = new Date(req.deliveryDate + 'T12:00:00');
+                    const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+                    const provider = req.providerName;
+                    const cost = parseFloat(req.totalCost) || 0;
+
+                    if (!acc[monthKey]) acc[monthKey] = {};
+                    if (!acc[monthKey][provider]) acc[monthKey][provider] = 0;
+                    acc[monthKey][provider] += cost;
+                    return acc;
+                }, {});
+
+                const allMonths = Object.keys(monthlyProviderData).sort();
+                const allProviders = [...new Set(foodRequests.map(r => r.providerName))];
+
+                const providerDatasets = allProviders.map((provider, index) => {
+                    const data = allMonths.map(month => monthlyProviderData[month][provider] || 0);
+                    return {
+                        label: provider,
+                        data: data,
+                        backgroundColor: getChartColor(index),
+                        borderColor: getChartColor(index),
+                        fill: false,
+                        tension: 0.1
+                    };
+                });
+
+                if (annualProvidersChart) {
+                    annualProvidersChart.destroy();
+                }
+                const providersCtx = document.getElementById('annualProvidersChart').getContext('2d');
+                annualProvidersChart = new Chart(providersCtx, {
+                    type: 'line',
+                    data: {
+                        labels: allMonths,
+                        datasets: providerDatasets
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                title: {
+                                    display: true,
+                                    text: 'Gasto Total (USD $)',
+                                    color: CHART_COLORS['Al momento']
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                position: 'top',
+                            },
+                            title: {
+                                display: false
+                            }
+                        }
+                    }
+                });
+
+                // 2. Preparar datos de Solicitudes por Empleado de Inter
+                const staffRequests = foodRequests.reduce((acc, req) => {
+                    req.interStaff.forEach(staff => {
+                        acc[staff] = (acc[staff] || 0) + 1;
+                    });
+                    return acc;
+                }, {});
+
+                const topStaff = Object.entries(staffRequests)
+                    .sort(([, a], [, b]) => b - a)
+                    .slice(0, 10);
+
+                const staffLabels = topStaff.map(([name]) => name);
+                const staffData = topStaff.map(([, count]) => count);
+                const staffColors = staffData.map((_, index) => getChartColor(index));
+
+                if (staffRequestsChart) {
+                    staffRequestsChart.destroy();
+                }
+                const staffCtx = document.getElementById('staffRequestsChart').getContext('2d');
+                staffRequestsChart = new Chart(staffCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: staffLabels,
+                        datasets: [{
+                            label: 'Número de Solicitudes',
+                            data: staffData,
+                            backgroundColor: staffColors,
+                            borderColor: staffColors.map(color => color.replace('0.2', '1')),
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        indexAxis: 'y',
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            x: {
+                                beginAtZero: true,
+                                title: {
+                                    display: true,
+                                    text: 'Cantidad de Solicitudes',
+                                },
+                                ticks: {
+                                    stepSize: 1,
+                                    callback: function(value) {
+                                        if (value % 1 === 0) {
+                                            return value;
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        }
+                    }
+                });
+
+                // 3. Preparar datos de Solicitudes por Departamento
+                const departmentCounts = foodRequests.reduce((acc, req) => {
+                    acc[req.department] = (acc[req.department] || 0) + 1;
+                    return acc;
+                }, {});
+                
+                const departmentLabels = Object.keys(departmentCounts).sort();
+                const departmentData = departmentLabels.map(dept => departmentCounts[dept]);
+                const departmentColors = departmentData.map((_, index) => getChartColor(index + 3));
+
+                if (departmentRequestsChart) {
+                    departmentRequestsChart.destroy();
+                }
+                const departmentCtx = document.getElementById('departmentRequestsChart').getContext('2d');
+                departmentRequestsChart = new Chart(departmentCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: departmentLabels,
+                        datasets: [{
+                            label: 'Número de Solicitudes',
+                            data: departmentData,
+                            backgroundColor: departmentColors,
+                            borderColor: departmentColors,
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                title: {
+                                    display: true,
+                                    text: 'Cantidad de Solicitudes',
+                                },
+                                ticks: {
+                                    stepSize: 1,
+                                    callback: function(value) {
+                                        if (value % 1 === 0) {
+                                            return value;
+                                        }
+                                    }
+                                }
+                            },
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: 'Departamento',
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        }
+                    }
+                });
+            }
+
+            // --- Inicio de la Aplicación ---
+
+            initializeForm();
+
+            // Cargar los datos y renderizar todo al inicio
+            try {
+                foodRequests = await loadRequests();
+                renderTable();
+                updateSummaryTotals();
+                updateCharts();
+                console.log("Página cargada y datos iniciales renderizados.");
+            } catch (error) {
+                console.error("Error al renderizar la página inicial:", error);
             }
         });
-        cancelDeleteBtn.addEventListener('click', () => { deleteModal.classList.add('hidden'); });
-
-        // --- Inicio de la Aplicación ---
-        async function initializeAppLogic() {
-            await loadRequests(); 
-            renderTable();
-            // ... (Tu función updateSummaryTotals)
-            // ... (Tu función updateCharts)
-        }
-
-        document.addEventListener('DOMContentLoaded', initializeAppLogic);
-
-        // ... (Todas las funciones auxiliares de tu código original: resetForm, calculateTotalQuantity, calculateTotalCost, updateSummaryTotals, updateCharts, showMessage, etc. Deben estar aquí, pero no necesitan ser exportadas) ...
-
-        // Nota: Asegúrate de que todas tus funciones auxiliares (como calculateTotalCost, updateSummaryTotals, etc.) estén definidas dentro de este bloque <script type="module">.
-        
     </script>
 </body>
 </html>
