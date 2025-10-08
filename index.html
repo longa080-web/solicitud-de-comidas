@@ -1,0 +1,1446 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Control de Solicitud de Comidas - Inter</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* Aplicar la fuente 'Inter' a todo el cuerpo del documento */
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* Definir colores personalizados basados en la marca Inter */
+        .bg-inter-primary { background-color: #005BAA; }
+        .bg-inter-accent-light { background-color: #5CE1E6; }
+        .text-inter-primary { color: #005BAA; }
+        .text-inter-accent-light { color: #5CE1E6; }
+        .border-inter-primary { border-color: #005BAA; }
+        .border-inter-accent-light { border-color: #5CE1E6; }
+        .focus\:ring-inter-primary:focus { --tw-ring-color: #005BAA; }
+
+        /* Ocultar el input de cantidad por defecto */
+        .hidden-quantity {
+            display: none;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 p-4 min-h-screen flex flex-col items-center">
+    <div class="w-full max-w-5xl bg-white rounded-xl shadow-lg p-6 md:p-8 mb-8">
+        <header class="text-center mb-6 bg-inter-primary rounded-t-xl py-6 relative overflow-hidden">
+            <h1 class="text-4xl font-extrabold text-white mb-2 relative z-10">
+                Control de Solicitud de Comidas
+            </h1>
+            <p class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-2xl font-extrabold text-white opacity-10 whitespace-nowrap select-none pointer-events-none z-0">
+                Inter Tu mundo, nuestro compromiso.
+            </p>
+            <p class="text-md text-white mt-2 relative z-10">Registro y gestión de solicitudes de comidas para el personal</p>
+        </header>
+
+        <section class="mb-8 p-6 bg-white rounded-lg border border-inter-primary shadow-lg">
+            <h2 class="text-2xl font-bold text-inter-primary mb-4">Registrar Nueva Solicitud de Comida</h2>
+            <form id="foodRequestForm" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                
+                <div>
+                    <label for="department" class="block text-sm font-medium text-gray-700 mb-1">
+                        Departamento/Área
+                    </label>
+                    <select id="department" required
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-inter-primary focus:border-inter-primary custom-select">
+                        <option value="" disabled selected>Selecciona un Departamento</option>
+                        <option value="Area Comercial">Área Comercial</option>
+                        <option value="C.O El Rosal">C.O El Rosal</option>
+                        <option value="C.O La Naya">C.O La Naya</option>
+                        <option value="C.O Los Ruices">C.O Los Ruices</option>
+                        <option value="Gerencia Senior">Gerencia Senior</option>
+                        <option value="Head End">Head End</option>
+                        <option value="MSO">MSO</option>
+                        <option value="Ocad">Ocad</option>
+                        <option value="Obras">Obras</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="mealType" class="block text-sm font-medium text-gray-700 mb-1">
+                        Tipo de Comida
+                    </label>
+                    <select id="mealType" required
+                            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-inter-primary focus:border-inter-primary custom-select">
+                        <option value="" disabled selected>Selecciona el Tipo</option>
+                        <option value="Almuerzo">Almuerzo</option>
+                        <option value="Cena">Cena</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="event" class="block text-sm font-medium text-gray-700 mb-1">
+                        Evento
+                    </label>
+                    <select id="event"
+                           class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-inter-primary focus:border-inter-primary custom-select">
+                        <option value="" disabled selected>Selecciona un Evento</option>
+                        <option value="Evento extraordinario">Evento extraordinario</option>
+                        <option value="Corte de fibra">Corte de fibra</option>
+                        <option value="Mantenimiento de red">Mantenimiento de red</option>
+                        <option value="Feeder y obras">Feeder y obras</option>
+                        <option value="Ventas en calle">Ventas en calle</option>
+                        <option value="Ventana de mantenimiento">Ventana de mantenimiento</option>
+                        <option value="Otros">Otros</option>
+                    </select>
+                </div>
+
+                <div class="col-span-1">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Personal Externo</label>
+                    <div class="space-y-2">
+                        <div class="flex items-center space-x-2">
+                            <input type="checkbox" id="checkCANTV" name="externalStaff" value="CANTV" class="form-checkbox h-4 w-4 text-inter-primary rounded">
+                            <label for="checkCANTV" class="text-gray-700">CANTV</label>
+                            <input type="number" id="quantityCANTV" min="0" value="0"
+                                   class="w-20 ml-auto px-2 py-1 border border-gray-300 rounded-md shadow-sm hidden-quantity"
+                                   placeholder="Cantidad">
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <input type="checkbox" id="checkEDC" name="externalStaff" value="EDC" class="form-checkbox h-4 w-4 text-inter-primary rounded">
+                            <label for="checkEDC" class="text-gray-700">EDC</label>
+                            <input type="number" id="quantityEDC" min="0" value="0"
+                                   class="w-20 ml-auto px-2 py-1 border border-gray-300 rounded-md shadow-sm hidden-quantity"
+                                   placeholder="Cantidad">
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <input type="checkbox" id="checkExternalOthers" name="externalStaff" value="ExternalOthers" class="form-checkbox h-4 w-4 text-inter-primary rounded">
+                            <label for="checkExternalOthers" class="text-gray-700">Otros</label>
+                            <input type="number" id="quantityExternalOthers" min="0" value="0"
+                                   class="w-20 ml-auto px-2 py-1 border border-gray-300 rounded-md shadow-sm hidden-quantity"
+                                   placeholder="Cantidad">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-span-1">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Personal Inter</label>
+                    <div class="relative">
+                        <input type="text" id="interStaffSearch" placeholder="Buscar personal de Inter..."
+                            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-inter-primary focus:border-inter-primary">
+                        <ul id="interStaffSearchResults" class="absolute z-10 w-full bg-white border border-gray-300 rounded-md shadow-lg mt-1 max-h-48 overflow-y-auto hidden"></ul>
+                    </div>
+                    <ul id="interStaffSelected" class="mt-2 space-y-2">
+                        </ul>
+                </div>
+
+                <div class="col-span-1">
+                    <label for="totalQuantity" class="block text-sm font-medium text-gray-700 mb-1">
+                        Total de Comidas
+                    </label>
+                    <input type="number" id="totalQuantity" min="0" value="0" readonly
+                           class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-100 cursor-not-allowed">
+                </div>
+                
+                <div class="col-span-1 md:col-span-2">
+                    <label for="deliveryPlace" class="block text-sm font-medium text-gray-700 mb-1">
+                        Lugar de Entrega
+                    </label>
+                    <input type="text" id="deliveryPlace" required
+                           class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-inter-primary focus:border-inter-primary"
+                           placeholder="Ej. Administración, Sede Principal, Campo (con dirección)">
+                </div>
+                <div>
+                    <label for="deliveryDateTime" class="block text-sm font-medium text-gray-700 mb-1">
+                        Fecha de Entrega
+                    </label>
+                    <input type="date" id="deliveryDateTime" required
+                           class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-inter-primary focus:border-inter-primary">
+                </div>
+                <div>
+                    <label for="unitCost" class="block text-sm font-medium text-gray-700 mb-1">
+                        Costo Unitario Comida (USD $)
+                    </label>
+                    <input type="number" id="unitCost" step="0.01" min="0" value="0.00" required
+                           class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-inter-primary focus:border-inter-primary">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">
+                        Costo de Delivery
+                    </label>
+                    <div class="flex items-center space-x-4 mb-2">
+                        <label class="inline-flex items-center">
+                            <input type="radio" name="deliveryOption" value="free" checked
+                                   class="form-radio text-inter-primary h-4 w-4" id="deliveryFree">
+                            <span class="ml-2 text-gray-700">Gratuito</span>
+                        </label>
+                        <label class="inline-flex items-center">
+                            <input type="radio" name="deliveryOption" value="cost"
+                                   class="form-radio text-inter-primary h-4 w-4" id="deliveryCostOption">
+                            <span class="ml-2 text-gray-700">Con costo</span>
+                        </label>
+                    </div>
+                    <input type="number" id="deliveryCost" step="0.01" min="0" value="0.00"
+                           class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-inter-primary focus:border-inter-primary hidden"
+                           placeholder="Costo de Delivery ($)">
+                </div>
+                <div>
+                    <label for="cost" class="block text-sm font-medium text-gray-700 mb-1">
+                        Costo Total (USD $)
+                    </label>
+                    <input type="number" id="cost" step="0.01" min="0" value="0.00" readonly
+                           class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-inter-primary focus:border-inter-primary bg-gray-100 cursor-not-allowed">
+                </div>
+                <div>
+                    <label for="providerName" class="block text-sm font-medium text-gray-700 mb-1">
+                        Nombre del Proveedor
+                    </label>
+                    <select id="providerName" required
+                           class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-inter-primary focus:border-inter-primary custom-select">
+                        <option value="" disabled selected>Selecciona un Proveedor</option>
+                        <option value="Al momento">Al momento</option>
+                        <option value="Monteluso">Monteluso</option>
+                        <option value="Susi fresh">Susi fresh</option>
+                    </select>
+                </div>
+                <div class="col-span-1 md:col-span-3">
+                    <label for="reason" class="block text-sm font-medium text-gray-700 mb-1">
+                        Motivo de la Solicitud (Obligatorio para justificar)
+                    </label>
+                    <textarea id="reason" rows="3" required
+                             class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-inter-primary focus:border-inter-primary"
+                                 placeholder="Ej. Personal de Área Técnica trabajando en proyecto X fuera de horario, Área Comercial en visita a cliente en Y."></textarea>
+                </div>
+                <div class="col-span-1 md:col-span-3 flex justify-end items-center gap-4" id="formActions">
+                    <button type="submit"
+                            class="bg-inter-primary hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105">
+                        Registrar Solicitud
+                    </button>
+                    </div>
+            </form>
+            <div id="messageBox" class="mt-4 p-3 rounded-md text-sm hidden"></div>
+        </section>
+
+        <section class="mb-8 p-6 bg-white rounded-lg border border-inter-accent-light shadow-lg">
+            <h2 class="text-2xl font-bold text-inter-primary mb-4">Resumen de Gastos de Comidas</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
+                <div class="bg-white p-4 rounded-lg shadow-md">
+                    <h3 class="text-lg font-semibold text-gray-700">Gastos Diarios</h3>
+                    <p id="dailyTotal" class="text-3xl font-extrabold text-inter-primary mt-2">$0.00</p>
+                </div>
+                <div class="bg-white p-4 rounded-lg shadow-md">
+                    <h3 class="text-lg font-semibold text-gray-700">Gastos Semanales</h3>
+                    <p id="weeklyTotal" class="text-3xl font-extrabold text-inter-primary mt-2">$0.00</p>
+                </div>
+                <div class="bg-white p-4 rounded-lg shadow-md">
+                    <h3 class="text-lg font-semibold text-gray-700">Gastos Mensuales</h3>
+                    <p id="monthlyTotal" class="text-3xl font-extrabold text-inter-primary mt-2">$0.00</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="p-6 bg-white rounded-lg border border-inter-primary shadow-lg">
+            <h2 class="text-2xl font-bold text-inter-primary mb-4">Historial de Solicitudes de Comida</h2>
+
+            <div class="mb-4 p-4 bg-blue-50 rounded-lg flex flex-col md:flex-row items-center gap-4">
+                <label for="filterDepartment" class="text-sm font-medium text-gray-700 whitespace-nowrap">
+                    Filtrar por Departamento:
+                </label>
+                <input type="text" id="filterDepartment"
+                       class="w-full md:w-auto flex-grow px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-inter-primary focus:border-inter-primary"
+                       placeholder="Nombre del departamento">
+                <button id="clearFilterBtn"
+                        class="bg-gray-400 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded-lg shadow-md transition duration-300 ease-in-out">
+                    Limpiar Filtro
+                </button>
+                <button id="exportCsvBtn"
+                        class="bg-inter-accent-light hover:bg-cyan-600 text-white font-bold py-2 px-4 rounded-lg shadow-md transition duration-300 ease-in-out">
+                    Exportar a Excel (CSV)
+                </button>
+                <button id="deleteSelectedBtn"
+                        class="bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded-lg shadow-md transition duration-300 ease-in-out">
+                    Eliminar Seleccionados
+                </button>
+            </div>
+
+            <div class="overflow-x-auto rounded-lg shadow-md">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-blue-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-inter-primary uppercase tracking-wider">
+                                <input type="checkbox" id="selectAllCheckboxes" class="form-checkbox h-4 w-4 text-inter-primary rounded">
+                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-inter-primary uppercase tracking-wider">Fecha de Entrega</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-inter-primary uppercase tracking-wider">Departamento</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-inter-primary uppercase tracking-wider">Tipo de Comida</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-inter-primary uppercase tracking-wider">Evento</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-inter-primary uppercase tracking-wider">Personal Externo</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-inter-primary uppercase tracking-wider">Personal Inter</th>
+                            <th class="px-6 py-3 text-right text-xs font-medium text-inter-primary uppercase tracking-wider">Total Comidas</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-inter-primary uppercase tracking-wider">Lugar de Entrega</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-inter-primary uppercase tracking-wider">Motivo</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-inter-primary uppercase tracking-wider">Proveedor</th>
+                            <th class="px-6 py-3 text-right text-xs font-medium text-inter-primary uppercase tracking-wider">Costo Comida ($)</th>
+                            <th class="px-6 py-3 text-right text-xs font-medium text-inter-primary uppercase tracking-wider">Costo Delivery ($)</th>
+                            <th class="px-6 py-3 text-right text-xs font-medium text-inter-primary uppercase tracking-wider">Costo Total ($)</th>
+                            <th class="px-6 py-3 text-center text-xs font-medium text-inter-primary uppercase tracking-wider">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="foodTableBody" class="bg-white divide-y divide-gray-200">
+                        </tbody>
+                </table>
+            </div>
+            <p id="noRequestsMessage" class="text-center text-gray-500 mt-4 hidden">No hay solicitudes de comida registradas aún.</p>
+        </section>
+
+        <section class="mt-8 p-6 bg-white rounded-lg border border-inter-accent-light shadow-lg">
+            <h2 class="text-2xl font-bold text-inter-primary mb-4">Análisis de Gastos</h2>
+
+            <div class="p-4 bg-gray-50 rounded-lg shadow-inner flex flex-col items-center mb-6">
+                <h3 id="annualProvidersChartTitle" class="text-xl font-bold text-inter-primary mb-4 text-center">Gasto Mensual por Proveedor</h3>
+                <div class="w-full max-w-lg h-64">
+                    <canvas id="annualProvidersChart"></canvas>
+                </div>
+            </div>
+            
+            <div class="p-4 bg-gray-50 rounded-lg shadow-inner flex flex-col items-center mt-6">
+                <h3 id="staffRequestsChartTitle" class="text-xl font-bold text-inter-primary mb-4 text-center">Cantidad de Solicitudes por Empleado de Inter</h3>
+                <div class="w-full max-w-xl h-96">
+                    <canvas id="staffRequestsChart"></canvas>
+                </div>
+            </div>
+
+            <div class="p-4 bg-gray-50 rounded-lg shadow-inner flex flex-col items-center mt-6">
+                <h3 id="departmentRequestsChartTitle" class="text-xl font-bold text-inter-primary mb-4 text-center">Cantidad de Solicitudes por Departamento</h3>
+                <div class="w-full max-w-xl h-64">
+                    <canvas id="departmentRequestsChart"></canvas>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <div id="deleteModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center hidden">
+        <div class="bg-white p-6 rounded-lg shadow-xl w-full max-w-md">
+            <h3 class="text-xl font-bold mb-4">Confirmar Eliminación</h3>
+            <p class="mb-4" id="modalText">¿Estás seguro de que quieres eliminar la(s) solicitud(es) seleccionada(s)? Esta acción no se puede deshacer.</p>
+            <div class="flex justify-end gap-4">
+                <button id="cancelDeleteBtn" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-lg">Cancelar</button>
+                <button id="confirmDeleteBtn" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg">Eliminar</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const form = document.getElementById('foodRequestForm');
+            const departmentSelect = document.getElementById('department');
+            const mealTypeSelect = document.getElementById('mealType');
+            const eventSelect = document.getElementById('event');
+
+            // Referencias a los campos de personal externo
+            const checkCANTV = document.getElementById('checkCANTV');
+            const quantityCANTV = document.getElementById('quantityCANTV');
+            const checkEDC = document.getElementById('checkEDC');
+            const quantityEDC = document.getElementById('quantityEDC');
+            const checkExternalOthers = document.getElementById('checkExternalOthers');
+            const quantityExternalOthers = document.getElementById('quantityExternalOthers');
+            const totalQuantityInput = document.getElementById('totalQuantity');
+
+            // Nuevas referencias para el buscador de personal Inter
+            const interStaffSearchInput = document.getElementById('interStaffSearch');
+            const interStaffSearchResults = document.getElementById('interStaffSearchResults');
+            const interStaffSelectedList = document.getElementById('interStaffSelected');
+            
+            // Referencias a campos de la solicitud
+            const deliveryPlaceInput = document.getElementById('deliveryPlace');
+            const deliveryDateTimeInput = document.getElementById('deliveryDateTime');
+            const unitCostInput = document.getElementById('unitCost');
+            const deliveryCostInput = document.getElementById('deliveryCost');
+            const deliveryCostOption = document.getElementById('deliveryCostOption');
+            const deliveryFree = document.getElementById('deliveryFree');
+            const costInput = document.getElementById('cost');
+            const providerNameSelect = document.getElementById('providerName');
+            const reasonTextarea = document.getElementById('reason');
+            const formActionsContainer = document.getElementById('formActions'); // Nuevo contenedor para acciones de formulario
+
+            // Referencias de la tabla e interfaz
+            const tableBody = document.getElementById('foodTableBody');
+            const noRequestsMessage = document.getElementById('noRequestsMessage');
+            const messageBox = document.getElementById('messageBox');
+            const filterDepartmentInput = document.getElementById('filterDepartment');
+            const clearFilterBtn = document.getElementById('clearFilterBtn');
+            const exportCsvBtn = document.getElementById('exportCsvBtn');
+            const deleteSelectedBtn = document.getElementById('deleteSelectedBtn');
+            const selectAllCheckboxes = document.getElementById('selectAllCheckboxes');
+            const submitButton = form.querySelector('button[type="submit"]');
+
+            // Referencias para los modales
+            const deleteModal = document.getElementById('deleteModal');
+            const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+            const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
+            const modalText = document.getElementById('modalText');
+            
+            // Elementos para el resumen de gastos
+            const dailyTotalEl = document.getElementById('dailyTotal');
+            const weeklyTotalEl = document.getElementById('weeklyTotal');
+            const monthlyTotalEl = document.getElementById('monthlyTotal');
+
+            // Gráficos
+            let annualProvidersChart = null;
+            let departmentRequestsChart = null;
+            let staffRequestsChart = null;
+
+            // Constantes y Variables Globales
+            const CHART_COLORS = { 
+                'Al momento': '#005BAA', // Inter Primary 
+                'Monteluso': '#5CE1E6', // Inter Accent Light 
+                'Susi fresh': '#00B8D9', // Un color de contraste 
+                'otros': '#667EEA', // Un color para el resto de datos 
+                'fondo': '#E2E8F0' 
+            };
+            
+            let foodRequests = loadRequests();
+            let selectedInterStaff = [];
+            let editingRequestId = null; // Variable para rastrear la solicitud en edición
+            
+            const staffList = [
+                { id: 1, name: "BLANCO NEISABEL" },
+                { id: 2, name: "VILLAMIZAR NANCY" },
+                { id: 3, name: "CASTILLO TIBET" },
+                { id: 4, name: "QUINTERO ROSANA" },
+                { id: 5, name: "GONZALEZ LINO" },
+                { id: 6, name: "MORILLO ANA" },
+                { id: 7, name: "CARTAYA LENNYIS" },
+                { id: 8, name: "DELGADO JONATHAN" },
+                { id: 9, name: "TRONCOSO LAIS" },
+                { id: 10, name: "BRITO RONEY" },
+                { id: 11, name: "MUÑOZ KELVIN" },
+                { id: 12, name: "GALEA CESAR" },
+                { id: 13, name: "MORENO GEINES" },
+                { id: 14, name: "MACHADO JOSE" },
+                { id: 15, name: "SUAREZ KIR" },
+                { id: 16, name: "JIMENEZ DAIRELI" },
+                { id: 17, name: "GARCIA ANGELICA" },
+                { id: 18, name: "CONTRERAS NOELIA" },
+                { id: 19, name: "VEGAS ENYMAR" },
+                { id: 20, name: "GOMEZ SAMUEL" },
+                { id: 21, name: "LONGA JESUS" },
+                { id: 22, name: "QUIJADA WILFREDO" },
+                { id: 23, name: "PINO ALEJANDRO" },
+                { id: 24, name: "AMORUZO ANGELO" },
+                { id: 25, name: "CHINCHILLA OSMEL" },
+                { id: 26, name: "TERAN CASTO" },
+                { id: 27, name: "FERRER GABRIEL" },
+                { id: 28, name: "TOVAR LUIS" },
+                { id: 29, name: "ORTA WILNER" },
+                { id: 30, name: "TORRES KEIVER" },
+                { id: 31, name: "RODRIGUEZ MISAEL" },
+                { id: 32, name: "CASTILLO JHOAN" },
+                { id: 33, name: "VILLEGAS OSMER" },
+                { id: 34, name: "RAMOS FREDDY" },
+                { id: 35, name: "TOVAR JAIRO" },
+                { id: 36, name: "PEREZ LUIS" },
+                { id: 37, name: "BRITO JOSE" },
+                { id: 38, name: "ASCANIO FELIX" },
+                { id: 39, name: "CORONADO MIGUEL" },
+                { id: 40, name: "HELLO ALBANY" },
+                { id: 41, name: "PIRELA WILMER" },
+                { id: 42, name: "CASTELLANOS FRANKLIN" },
+                { id: 43, name: "JIMENEZ RONMEL" },
+                { id: 44, name: "PRIETO JAVIER" },
+                { id: 45, name: "LARA EDUARDO" },
+                { id: 46, name: "CASANOVA FABIAN" },
+                { id: 47, name: "CASTILLO ORIANA" },
+                { id: 48, name: "GARRIDO ADOLFO" },
+                { id: 49, name: "MORENO JOELIMAR" },
+                { id: 50, name: "CENTENO LUIS" },
+                { id: 51, name: "NEGRIN CARLOS" },
+                { id: 52, name: "LADERA DAYANA" },
+                { id: 53, name: "PEREZ NELSON" },
+                { id: 54, name: "CHACON EDUARDO" },
+                { id: 55, name: "UZCATEGUI DARWIN" },
+                { id: 56, name: "VALENZUELA CARLOS" },
+                { id: 57, name: "TORRES CARLOS" },
+                { id: 58, name: "LOPEZ JIM" },
+                { id: 59, name: "RAMOS LISMAR" },
+                { id: 60, name: "CHIRINOS RHONY" },
+                { id: 61, name: "MORALES JOSUE" },
+                { id: 62, name: "DELGADO BRAYAN" },
+                { id: 63, name: "REVERON ROGELIO" },
+                { id: 64, name: "CEDEÑO LEONEL" },
+                { id: 65, name: "UZCATEGUI BREINER" },
+                { id: 66, name: "HERNANDEZ RAFAEL" },
+                { id: 67, name: "VILLAMIZAR YOHAN" },
+                { id: 68, name: "CASTRO MANUEL" },
+                { id: 69, name: "BRICEÑO ALEXY" },
+                { id: 70, name: "GONZALEZ JUAN" },
+                { id: 71, name: "ROCA YUNIOR" },
+                { id: 72, name: "DIAZ MANUEL" },
+                { id: 73, name: "ZERPA ODREIMY" },
+                { id: 74, name: "DIAZ ENNIO" },
+                { id: 75, name: "MANRIQUE LUIS" },
+                { id: 76, name: "RODRIGUEZ FELIX" },
+                { id: 77, name: "GARCIA ANGEL" },
+                { id: 78, name: "TONITO JULIO" },
+                { id: 79, name: "GARCIA EDNEY" },
+                { id: 80, name: "CASTRILLO MANUEL" },
+                { id: 81, name: "GUERRERO GABRIEL" },
+                { id: 82, name: "MATHEUS FERNANDO" },
+                { id: 83, name: "GARCIA LUIS" },
+                { id: 84, name: "VELASQUEZ JOSE" },
+                { id: 85, name: "PERNETT CESAR" },
+                { id: 86, name: "RODRIGUEZ OMAR" },
+                { id: 87, name: "RAMIREZ DARWIN" },
+                { id: 88, name: "YEMES GUILLERMO" },
+                { id: 89, name: "BAZAN WILLIAMS" },
+                { id: 90, name: "RAMIREZ FRANKLIN" },
+                { id: 91, name: "LOPEZ JORGE" },
+                { id: 92, name: "RAMOS ROBERT" },
+                { id: 93, name: "SANCHEZ GONZALO" },
+                { id: 94, name: "GARCIA CARLOS" },
+                { id: 95, name: "MENESES KELVIS" },
+                { id: 96, name: "MACHADO DANNY" },
+                { id: 97, name: "ROMERO LUIS" },
+                { id: 98, name: "PALACIOS LUIS" },
+                { id: 99, name: "HERNANDEZ SERGIO" },
+                { id: 100, name: "VERGARA JORGE" },
+                { id: 101, name: "BARRETO ANDRES" },
+                { id: 102, name: "HERNANDEZ LUIS" },
+                { id: 103, name: "MALDONADO DYLAN" },
+                { id: 104, name: "OLIVARES JOHN" },
+                { id: 105, name: "CASTILLO JUNIOR" },
+                { id: 106, name: "MORA DYLAN" },
+                { id: 107, name: "JULIO DANIEL" },
+                { id: 108, name: "CARVAJAL JOSE" },
+                { id: 109, name: "BLANCO EDWAR" },
+                { id: 110, name: "POSADA RAMON" },
+                { id: 111, name: "GUZMAN CESAR" },
+                { id: 112, name: "CAMPOS ARQUIMEDES" },
+                { id: 113, name: "ROJAS RONALD" },
+                { id: 114, name: "MOSQUERA JAVIER" },
+                { id: 115, name: "ESCORCIA ELITH" },
+                { id: 116, name: "VASQUEZ VICTOR" },
+                { id: 117, name: "ESCALONA WUILMER" },
+                { id: 118, name: "YEPEZ CESAR" },
+                { id: 119, name: "QUINTERO OSCAR" },
+                { id: 120, name: "MACHADO CARLOS" },
+                { id: 121, name: "APONTE YOSKARLA" },
+                { id: 122, name: "AZUAJE YAMILETH" },
+                { id: 123, name: "VALERO VANESA" },
+                { id: 124, name: "GIL DEMIAN" },
+                { id: 125, name: "MALVACEA ALANY" },
+                { id: 126, name: "FIGUERA REBECA" },
+                { id: 127, name: "VIVENES YETZIBEL" },
+                { id: 128, name: "BERRIOS RAIDEL" },
+                { id: 129, name: "URBAEZ HEISHMAR" },
+                { id: 130, name: "PEREZ JEIZER" },
+                { id: 131, name: "LABRADOR DAVID" },
+                { id: 132, name: "VELASQUEZ JOSE" },
+                { id: 133, name: "MARQUEZ BETANIA" },
+                { id: 134, name: "GASCA ALEXANDRO" },
+                { id: 135, name: "RIVERO SIMON" },
+                { id: 136, name: "MARRON FABRIZIO" },
+                { id: 137, name: "APONTE AHIBRAN" },
+                { id: 138, name: "TORRES CESAR" },
+                { id: 139, name: "PACHECO ESCARLET" },
+                { id: 140, name: "FERNANDEZ JORGE" },
+                { id: 141, name: "MARQUEZ ACXEL" },
+                { id: 142, name: "BARON YOSMAR" },
+                { id: 143, name: "SANCHEZ SARAI" },
+                { id: 144, name: "GALVAN RICARDO" },
+                { id: 145, name: "SIERRA DAVID" },
+                { id: 146, name: "SERRANO WILLIANA" },
+                { id: 147, name: "ESCORCHE VICTORIA" },
+                { id: 148, name: "LEDEZMA RALTH" },
+                { id: 149, name: "ORTIZ KATHERINE" },
+                { id: 150, name: "SANCHEZ ADRIANA" },
+                { id: 151, name: "RODRIGUEZ MERLIN" },
+                { id: 152, name: "VAMONDE JOSE" },
+                { id: 153, name: "MARTINEZ MARINA" },
+                { id: 154, name: "BORDONARO SEBASTIAN" },
+                { id: 155, name: "LISCANO YAILETH" },
+                { id: 156, name: "PEREZ JENNYFER" },
+                { id: 157, name: "CARRERO JOSHUA" },
+                { id: 158, name: "BASUALDO JORGE" },
+                { id: 159, name: "URBINA GENESIS" },
+                { id: 160, name: "MAGALLANES LUIS" },
+                { id: 161, name: "LEAL GREGORYS" },
+                { id: 162, name: "ESCALONA KARLA" },
+                { id: 163, name: "BRICEÑO ALEXA" },
+                { id: 164, name: "RUIZ EDGAR" },
+                { id: 165, name: "CEBALLOS LEONID" },
+                { id: 166, name: "RUIZ IONA" }
+            ];
+
+            // --- Funciones de Utilidad ---
+
+            // Función para obtener la fecha y hora actual en formato YYYY-MM-DDTHH:MM
+            function getCurrentDate() {
+                const now = new Date();
+                const year = now.getFullYear();
+                const month = String(now.getMonth() + 1).padStart(2, '0');
+                const day = String(now.getDate()).padStart(2, '0');
+                return `${year}-${month}-${day}`;
+            }
+
+            // Inicializar campos al cargar la página
+            function initializeForm() {
+                // SÓLO FECHA
+                deliveryDateTimeInput.value = getCurrentDate();
+                unitCostInput.value = '0.00';
+                deliveryCostInput.value = '0.00';
+                costInput.value = '0.00';
+                totalQuantityInput.value = '0';
+                
+                // Reiniciar estado de edición
+                editingRequestId = null;
+                submitButton.textContent = 'Registrar Solicitud';
+                submitButton.classList.remove('bg-green-600', 'hover:bg-green-700');
+                submitButton.classList.add('bg-inter-primary', 'hover:bg-blue-700');
+                removeCancelEditButton();
+
+                // Limpiar personal externo
+                document.querySelectorAll('input[name="externalStaff"]').forEach(checkbox => {
+                    checkbox.checked = false;
+                    const quantityInput = document.getElementById(`quantity${checkbox.value}`);
+                    if (quantityInput) {
+                        quantityInput.value = '0';
+                        quantityInput.classList.add('hidden-quantity');
+                    }
+                });
+                
+                // Limpiar personal Inter
+                selectedInterStaff = [];
+                renderSelectedStaff();
+            }
+
+            // Función para guardar los datos en localStorage
+            function saveRequests() {
+                localStorage.setItem('foodRequests', JSON.stringify(foodRequests));
+            }
+
+            // Función para cargar los datos de localStorage
+            function loadRequests() {
+                const data = localStorage.getItem('foodRequests');
+                return data ? JSON.parse(data) : [];
+            }
+            
+            // Función para formatear fechas a YYYY-MM-DD para el input[type=date]
+            function formatDateForInput(dateString) {
+                if (!dateString) return '';
+                // Asume que el string ya está en formato YYYY-MM-DD o YYYY-MM-DDTHH:MM
+                return dateString.split('T')[0];
+            }
+            
+            // Función para mostrar mensajes de estado
+            function displayMessage(message, type = 'success') {
+                messageBox.textContent = message;
+                messageBox.classList.remove('hidden', 'bg-red-100', 'text-red-700', 'bg-green-100', 'text-green-700');
+                if (type === 'error') {
+                    messageBox.classList.add('bg-red-100', 'text-red-700');
+                } else {
+                    messageBox.classList.add('bg-green-100', 'text-green-700');
+                }
+                setTimeout(() => {
+                    messageBox.classList.add('hidden');
+                }, 5000);
+            }
+
+            // --- Lógica del Calculo de Costos/Cantidad ---
+            
+            // Recalcula la cantidad total de comidas (Inter + Externos)
+            function calculateTotalQuantity() {
+                let externalQuantity = 0;
+                document.querySelectorAll('input[type="number"][id^="quantity"]').forEach(input => {
+                    externalQuantity += parseInt(input.value) || 0;
+                });
+
+                const interQuantity = selectedInterStaff.length;
+                const total = externalQuantity + interQuantity;
+                totalQuantityInput.value = total;
+                return total;
+            }
+
+            // Recalcula el costo total
+            function calculateTotalCost() {
+                const totalQuantity = calculateTotalQuantity();
+                const unitCost = parseFloat(unitCostInput.value) || 0;
+                const deliveryCost = deliveryFree.checked ? 0 : (parseFloat(deliveryCostInput.value) || 0);
+
+                const totalCost = (totalQuantity * unitCost) + deliveryCost;
+                costInput.value = totalCost.toFixed(2);
+            }
+
+            // --- Lógica de Personal Externo ---
+
+            // Manejar la visibilidad de los campos de cantidad para personal externo
+            document.querySelectorAll('input[name="externalStaff"]').forEach(checkbox => {
+                checkbox.addEventListener('change', (e) => {
+                    const quantityInput = document.getElementById(`quantity${e.target.value}`);
+                    if (quantityInput) {
+                        if (e.target.checked) {
+                            quantityInput.classList.remove('hidden-quantity');
+                            quantityInput.value = 1; // Asigna 1 por defecto al marcar
+                        } else {
+                            quantityInput.classList.add('hidden-quantity');
+                            quantityInput.value = 0; // Resetea a 0 al desmarcar
+                        }
+                    }
+                    calculateTotalCost();
+                });
+            });
+
+            // Manejar la entrada de cantidad para personal externo
+            document.querySelectorAll('input[type="number"][id^="quantity"]').forEach(input => {
+                input.addEventListener('input', () => {
+                    // Asegura que el valor sea un número no negativo
+                    if (parseInt(input.value) < 0 || input.value === '') {
+                        input.value = '0';
+                    }
+                    // Asegura que el checkbox esté marcado si la cantidad es > 0
+                    const checkboxId = input.id.replace('quantity', 'check');
+                    const checkbox = document.getElementById(checkboxId);
+                    if (checkbox) {
+                        checkbox.checked = parseInt(input.value) > 0;
+                        if (parseInt(input.value) === 0) {
+                             input.classList.add('hidden-quantity');
+                        } else {
+                            input.classList.remove('hidden-quantity');
+                        }
+                    }
+                    calculateTotalCost();
+                });
+            });
+
+            // --- Lógica de Personal Inter ---
+
+            // Renderiza la lista de personal de Inter seleccionado
+            function renderSelectedStaff() {
+                interStaffSelectedList.innerHTML = '';
+                selectedInterStaff.forEach((staffName, index) => {
+                    const li = document.createElement('li');
+                    li.className = 'flex items-center justify-between text-sm bg-blue-50 p-2 rounded';
+                    li.innerHTML = `
+                        <span class="text-gray-700">${staffName}</span>
+                        <button type="button" data-name="${staffName}"
+                                class="remove-staff-btn text-red-500 hover:text-red-700 ml-2 font-bold transition duration-150">
+                            &times;
+                        </button>
+                    `;
+                    interStaffSelectedList.appendChild(li);
+                });
+                calculateTotalCost();
+            }
+
+            // Manejar la búsqueda y filtrado
+            interStaffSearchInput.addEventListener('input', () => {
+                const query = interStaffSearchInput.value.trim().toUpperCase();
+                interStaffSearchResults.innerHTML = '';
+
+                if (query.length < 2) {
+                    interStaffSearchResults.classList.add('hidden');
+                    return;
+                }
+
+                const filteredStaff = staffList.filter(staff => 
+                    staff.name.includes(query) && !selectedInterStaff.includes(staff.name)
+                ).slice(0, 10); // Mostrar solo los primeros 10 resultados
+
+                if (filteredStaff.length > 0) {
+                    filteredStaff.forEach(staff => {
+                        const li = document.createElement('li');
+                        li.className = 'p-2 hover:bg-inter-accent-light hover:text-white cursor-pointer transition duration-150';
+                        li.textContent = staff.name;
+                        li.setAttribute('data-name', staff.name);
+                        li.addEventListener('click', (e) => {
+                            // Agregar a la lista de seleccionados
+                            selectedInterStaff.push(e.target.getAttribute('data-name'));
+                            interStaffSearchInput.value = '';
+                            interStaffSearchResults.classList.add('hidden');
+                            renderSelectedStaff();
+                        });
+                        interStaffSearchResults.appendChild(li);
+                    });
+                    interStaffSearchResults.classList.remove('hidden');
+                } else {
+                    interStaffSearchResults.classList.add('hidden');
+                }
+            });
+
+            // Ocultar resultados de búsqueda al perder el foco
+            document.addEventListener('click', (e) => {
+                if (!interStaffSearchInput.contains(e.target) && !interStaffSearchResults.contains(e.target)) {
+                    interStaffSearchResults.classList.add('hidden');
+                }
+            });
+
+            // Manejar la eliminación de personal Inter seleccionado
+            interStaffSelectedList.addEventListener('click', (e) => {
+                if (e.target.classList.contains('remove-staff-btn')) {
+                    const staffName = e.target.getAttribute('data-name');
+                    selectedInterStaff = selectedInterStaff.filter(name => name !== staffName);
+                    renderSelectedStaff();
+                }
+            });
+
+            // --- Lógica del Formulario y Edición ---
+
+            // Toggle para el costo de delivery
+            document.querySelectorAll('input[name="deliveryOption"]').forEach(radio => {
+                radio.addEventListener('change', () => {
+                    if (deliveryCostOption.checked) {
+                        deliveryCostInput.classList.remove('hidden');
+                    } else {
+                        deliveryCostInput.classList.add('hidden');
+                        deliveryCostInput.value = '0.00';
+                    }
+                    calculateTotalCost();
+                });
+            });
+
+            // Event listeners para recalcular el costo
+            unitCostInput.addEventListener('input', calculateTotalCost);
+            deliveryCostInput.addEventListener('input', calculateTotalCost);
+
+            // Función para añadir el botón de Cancelar Edición
+            function addCancelEditButton() {
+                let cancelBtn = document.getElementById('cancelEditBtn');
+                if (!cancelBtn) {
+                    cancelBtn = document.createElement('button');
+                    cancelBtn.id = 'cancelEditBtn';
+                    cancelBtn.type = 'button';
+                    cancelBtn.textContent = 'Cancelar Edición';
+                    cancelBtn.className = 'bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-6 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105';
+                    cancelBtn.addEventListener('click', resetFormAndEditing);
+                    formActionsContainer.insertBefore(cancelBtn, submitButton);
+                }
+            }
+
+            // Función para eliminar el botón de Cancelar Edición
+            function removeCancelEditButton() {
+                const cancelBtn = document.getElementById('cancelEditBtn');
+                if (cancelBtn) {
+                    cancelBtn.remove();
+                }
+            }
+
+            // Función para resetear el formulario y el modo de edición
+            function resetFormAndEditing() {
+                form.reset();
+                initializeForm();
+                submitButton.textContent = 'Registrar Solicitud';
+                submitButton.classList.remove('bg-green-600', 'hover:bg-green-700');
+                submitButton.classList.add('bg-inter-primary', 'hover:bg-blue-700');
+                removeCancelEditButton();
+                // Ocultar campo de costo de delivery si se resetea a gratuito
+                deliveryCostInput.classList.add('hidden');
+            }
+
+            // Función para cargar una solicitud en el formulario para edición
+            window.editRequest = (id) => {
+                const requestToEdit = foodRequests.find(req => req.id === id);
+                if (!requestToEdit) return;
+
+                editingRequestId = id;
+                
+                // 1. Cargar datos básicos y de costo
+                departmentSelect.value = requestToEdit.department;
+                mealTypeSelect.value = requestToEdit.mealType;
+                eventSelect.value = requestToEdit.event || '';
+                deliveryPlaceInput.value = requestToEdit.deliveryPlace;
+                // Usar la función para convertir el formato de la fecha
+                deliveryDateTimeInput.value = formatDateForInput(requestToEdit.deliveryDate); 
+                unitCostInput.value = parseFloat(requestToEdit.unitCost).toFixed(2);
+                providerNameSelect.value = requestToEdit.providerName;
+                reasonTextarea.value = requestToEdit.reason;
+
+                // 2. Cargar personal externo
+                document.querySelectorAll('input[name="externalStaff"]').forEach(checkbox => {
+                    checkbox.checked = false;
+                    const quantityInput = document.getElementById(`quantity${checkbox.value}`);
+                    quantityInput.value = '0';
+                    quantityInput.classList.add('hidden-quantity');
+                });
+
+                if (requestToEdit.externalStaff) {
+                    Object.keys(requestToEdit.externalStaff).forEach(key => {
+                        const quantity = requestToEdit.externalStaff[key];
+                        if (quantity > 0) {
+                            const checkbox = document.getElementById(`check${key}`);
+                            const quantityInput = document.getElementById(`quantity${key}`);
+                            if (checkbox && quantityInput) {
+                                checkbox.checked = true;
+                                quantityInput.value = quantity;
+                                quantityInput.classList.remove('hidden-quantity');
+                            }
+                        }
+                    });
+                }
+
+                // 3. Cargar personal Inter
+                selectedInterStaff = requestToEdit.interStaff.slice(); // Clonar el array
+                renderSelectedStaff();
+
+                // 4. Cargar costo de delivery
+                const deliveryCostValue = parseFloat(requestToEdit.deliveryCost);
+                if (deliveryCostValue > 0) {
+                    deliveryCostOption.checked = true;
+                    deliveryFree.checked = false;
+                    deliveryCostInput.value = deliveryCostValue.toFixed(2);
+                    deliveryCostInput.classList.remove('hidden');
+                } else {
+                    deliveryFree.checked = true;
+                    deliveryCostOption.checked = false;
+                    deliveryCostInput.value = '0.00';
+                    deliveryCostInput.classList.add('hidden');
+                }
+                
+                calculateTotalCost();
+
+                // 5. Ajustar interfaz a modo Edición
+                submitButton.textContent = 'Guardar Cambios';
+                submitButton.classList.remove('bg-inter-primary', 'hover:bg-blue-700');
+                submitButton.classList.add('bg-green-600', 'hover:bg-green-700');
+                addCancelEditButton();
+
+                // Desplazarse al formulario
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            };
+
+            // Manejar el envío del formulario
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+
+                // Recopilar datos de personal externo
+                const externalStaffData = {};
+                document.querySelectorAll('input[name="externalStaff"]:checked').forEach(checkbox => {
+                    const quantityInput = document.getElementById(`quantity${checkbox.value}`);
+                    const quantity = parseInt(quantityInput.value) || 0;
+                    if (quantity > 0) {
+                        externalStaffData[checkbox.value] = quantity;
+                    }
+                });
+
+                const totalQuantity = calculateTotalQuantity();
+                const totalCost = parseFloat(costInput.value);
+                const deliveryCostValue = deliveryFree.checked ? 0 : (parseFloat(deliveryCostInput.value) || 0);
+
+                if (totalQuantity === 0) {
+                    displayMessage('El total de comidas debe ser mayor a 0.', 'error');
+                    return;
+                }
+                
+                if (departmentSelect.value === '') {
+                    displayMessage('Debe seleccionar un Departamento/Área.', 'error');
+                    return;
+                }
+
+                if (providerNameSelect.value === '') {
+                    displayMessage('Debe seleccionar un Proveedor.', 'error');
+                    return;
+                }
+
+
+                const newRequest = {
+                    id: editingRequestId || Date.now(), // Usar ID existente si se está editando
+                    department: departmentSelect.value,
+                    mealType: mealTypeSelect.value,
+                    event: eventSelect.value,
+                    externalStaff: externalStaffData,
+                    interStaff: selectedInterStaff.slice(),
+                    totalQuantity: totalQuantity,
+                    deliveryPlace: deliveryPlaceInput.value,
+                    // Almacenar solo la fecha (YYYY-MM-DD)
+                    deliveryDate: deliveryDateTimeInput.value, 
+                    unitCost: parseFloat(unitCostInput.value),
+                    deliveryCost: deliveryCostValue,
+                    totalCost: totalCost,
+                    providerName: providerNameSelect.value,
+                    reason: reasonTextarea.value,
+                    registrationDate: new Date().toISOString()
+                };
+
+                if (editingRequestId) {
+                    // Modo Edición: reemplazar el registro existente
+                    const index = foodRequests.findIndex(req => req.id === editingRequestId);
+                    if (index !== -1) {
+                        foodRequests[index] = newRequest;
+                        displayMessage('Solicitud actualizada con éxito.', 'success');
+                    }
+                    resetFormAndEditing();
+                } else {
+                    // Modo Registro: añadir nuevo registro
+                    foodRequests.push(newRequest);
+                    displayMessage('Solicitud registrada con éxito.', 'success');
+                    form.reset();
+                    initializeForm();
+                }
+                
+                saveRequests();
+                renderTable();
+                updateSummaryTotals();
+                updateCharts();
+            });
+
+            // --- Lógica del Historial (Tabla) ---
+
+            // Formatea el costo a una cadena con dos decimales y el símbolo $
+            function formatCost(cost) {
+                return `$${parseFloat(cost || 0).toFixed(2)}`;
+            }
+            
+            // Función para renderizar la tabla de historial
+            function renderTable(filterQuery = '') {
+                // 1. Filtrar
+                let filteredRequests = foodRequests.slice();
+                if (filterQuery) {
+                    const query = filterQuery.toUpperCase();
+                    filteredRequests = filteredRequests.filter(req => 
+                        req.department.toUpperCase().includes(query) ||
+                        req.deliveryPlace.toUpperCase().includes(query) ||
+                        req.providerName.toUpperCase().includes(query) ||
+                        req.reason.toUpperCase().includes(query)
+                    );
+                }
+                
+                // 2. Ordenar por Fecha de Entrega (Descendente: más reciente primero)
+                // Usamos el campo deliveryDate (que ahora es solo fecha) para ordenar.
+                filteredRequests.sort((a, b) => {
+                    // FIX: Asegurar que se creen los objetos Date correctamente para la comparación.
+                    const dateA = new Date(a.deliveryDate + 'T12:00:00');
+                    const dateB = new Date(b.deliveryDate + 'T12:00:00');
+                    return dateB - dateA; // Orden descendente (más nuevo primero)
+                });
+                
+
+                // 3. Renderizar
+                tableBody.innerHTML = '';
+                if (filteredRequests.length === 0) {
+                    noRequestsMessage.classList.remove('hidden');
+                    return;
+                }
+                noRequestsMessage.classList.add('hidden');
+
+                filteredRequests.forEach(request => {
+                    // Crear lista de personal externo
+                    const externalStaffText = Object.keys(request.externalStaff)
+                        .map(key => `${key} (${request.externalStaff[key]})`)
+                        .join(', ');
+
+                    // Crear lista de personal Inter
+                    const interStaffText = request.interStaff.join(', ');
+                    
+                    // FIX: Formatear la fecha para la visualización. Se añade 'T12:00:00' para evitar 
+                    // que el desfase de zona horaria cause que la fecha retroceda al día anterior.
+                    const displayDate = new Date(request.deliveryDate + 'T12:00:00').toLocaleDateString('es-ES', {
+                        year: 'numeric',
+                        month: '2-digit',
+                        day: '2-digit',
+                    });
+
+                    const row = tableBody.insertRow();
+                    row.className = 'hover:bg-gray-50 transition duration-150';
+                    row.innerHTML = `
+                        <td class="px-6 py-4 whitespace-nowrap"><input type="checkbox" data-id="${request.id}" class="row-checkbox form-checkbox h-4 w-4 text-inter-primary rounded"></td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${displayDate}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${request.department}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${request.mealType}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${request.event || 'N/A'}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${externalStaffText || 'N/A'}</td>
+                        <td class="px-6 py-4 max-w-xs overflow-hidden truncate text-sm text-gray-500">${interStaffText || 'N/A'}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-right font-medium text-inter-primary">${request.totalQuantity}</td>
+                        <td class="px-6 py-4 text-sm text-gray-500 max-w-xs overflow-hidden truncate">${request.deliveryPlace}</td>
+                        <td class="px-6 py-4 text-sm text-gray-500 max-w-xs overflow-hidden truncate">${request.reason}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${request.providerName}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-700">${formatCost(request.totalQuantity * request.unitCost)}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-700">${formatCost(request.deliveryCost)}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-right font-bold text-inter-primary">${formatCost(request.totalCost)}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                            <button onclick="editRequest(${request.id})" class="bg-blue-500 hover:bg-blue-600 text-white py-1 px-3 rounded-md text-xs transition duration-150 transform hover:scale-105">
+                                Editar
+                            </button>
+                        </td>
+                    `;
+                });
+
+                // Resetear el checkbox maestro al renderizar la tabla
+                selectAllCheckboxes.checked = false;
+            }
+
+            // --- Lógica de Filtros y Acciones de Tabla ---
+
+            // Filtro por departamento
+            filterDepartmentInput.addEventListener('input', (e) => {
+                renderTable(e.target.value.trim());
+            });
+
+            // Limpiar filtro
+            clearFilterBtn.addEventListener('click', () => {
+                filterDepartmentInput.value = '';
+                renderTable();
+            });
+            
+            // Seleccionar/Deseleccionar todos los checkboxes
+            selectAllCheckboxes.addEventListener('change', (e) => {
+                document.querySelectorAll('.row-checkbox').forEach(checkbox => {
+                    checkbox.checked = e.target.checked;
+                });
+            });
+
+            // Botón Eliminar Seleccionados
+            deleteSelectedBtn.addEventListener('click', () => {
+                const selectedIds = Array.from(document.querySelectorAll('.row-checkbox:checked'))
+                    .map(cb => parseInt(cb.getAttribute('data-id')));
+
+                if (selectedIds.length === 0) {
+                    displayMessage('Debe seleccionar al menos una solicitud para eliminar.', 'error');
+                    return;
+                }
+
+                modalText.textContent = `¿Estás seguro de que quieres eliminar ${selectedIds.length} solicitud(es)? Esta acción no se puede deshacer.`;
+                deleteModal.classList.remove('hidden');
+
+                // Manejar la confirmación de eliminación
+                confirmDeleteBtn.onclick = () => {
+                    foodRequests = foodRequests.filter(req => !selectedIds.includes(req.id));
+                    saveRequests();
+                    renderTable(filterDepartmentInput.value.trim());
+                    updateSummaryTotals();
+                    updateCharts();
+                    deleteModal.classList.add('hidden');
+                    displayMessage('Solicitud(es) eliminada(s) con éxito.', 'success');
+                };
+
+                cancelDeleteBtn.onclick = () => {
+                    deleteModal.classList.add('hidden');
+                };
+            });
+
+            // Exportar a CSV
+            exportCsvBtn.addEventListener('click', () => {
+                if (foodRequests.length === 0) {
+                    displayMessage('No hay datos para exportar.', 'error');
+                    return;
+                }
+                
+                // Función auxiliar para escapar comillas dobles (reemplaza " por "")
+                // e incluye el valor entre comillas dobles, como requiere el formato CSV.
+                const csvQuote = (str) => {
+                    return `"${String(str || '').replace(/"/g, '""')}"`;
+                };
+
+                // Lista de encabezados SIN ID ni Fecha de Registro
+                let headers = [
+                    "Fecha de Entrega", 
+                    "Departamento", 
+                    "Tipo de Comida", 
+                    "Evento", 
+                    "Personal Externo (Detalle)", 
+                    "Personal Inter (Detalle)", 
+                    "Total Comidas", 
+                    "Lugar de Entrega", 
+                    "Motivo", 
+                    "Proveedor", 
+                    "Costo Comida Unitario ($)", 
+                    "Costo Total Comida ($)", 
+                    "Costo Delivery ($)", 
+                    "Costo Total Final ($)"
+                ];
+                
+                let csv = headers.join(";") + "\n"; // Usamos punto y coma para CSV en Excel
+
+                foodRequests.forEach(req => {
+                    const externalStaffText = Object.keys(req.externalStaff)
+                        .map(key => `${key} (${req.externalStaff[key]})`)
+                        .join(' | ');
+
+                    const interStaffText = req.interStaff.join(' | ');
+                    const totalCostComida = req.totalQuantity * req.unitCost;
+                    
+                    // Lista de valores de la fila SIN ID ni Fecha de Registro
+                    const row = [
+                        csvQuote(req.deliveryDate),
+                        csvQuote(req.department),
+                        csvQuote(req.mealType),
+                        csvQuote(req.event || ''),
+                        csvQuote(externalStaffText),
+                        csvQuote(interStaffText),
+                        req.totalQuantity,
+                        csvQuote(req.deliveryPlace),
+                        csvQuote(req.reason),
+                        csvQuote(req.providerName),
+                        parseFloat(req.unitCost).toFixed(2).replace('.', ','), // Uso de la coma decimal
+                        totalCostComida.toFixed(2).replace('.', ','), // Uso de la coma decimal
+                        parseFloat(req.deliveryCost).toFixed(2).replace('.', ','), // Uso de la coma decimal
+                        parseFloat(req.totalCost).toFixed(2).replace('.', ',') // Uso de la coma decimal
+                    ];
+                    csv += row.join(";") + "\n";
+                });
+
+                // Se mantiene el Byte Order Mark (BOM) \uFEFF para que Excel interprete correctamente UTF-8
+                const blob = new Blob(["\uFEFF", csv], { type: 'text/csv;charset=utf-8;' });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.setAttribute('href', url);
+                link.setAttribute('download', 'solicitudes_comidas.csv');
+                link.style.visibility = 'hidden';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                displayMessage('Datos exportados a CSV con éxito.', 'success');
+            });
+
+            // --- Lógica del Resumen de Gastos ---
+
+            function updateSummaryTotals() {
+                const now = new Date();
+                // Crea fechas de inicio para el día, semana y mes con la hora local a medianoche.
+                const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+                const weekStart = new Date(today);
+                weekStart.setDate(today.getDate() - today.getDay()); // Domingo (inicio de semana)
+                const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+
+                let dailyTotal = 0;
+                let weeklyTotal = 0;
+                let monthlyTotal = 0;
+
+                foodRequests.forEach(req => {
+                    // FIX: Crear la fecha de la solicitud para la comparación de forma segura.
+                    // Se añade 'T12:00:00' para asegurar que el objeto Date resultante caiga en el día
+                    // correcto de la zona horaria local, evitando el error de -1 día.
+                    const reqDateForComparison = new Date(req.deliveryDate + 'T12:00:00'); 
+                    
+                    const cost = parseFloat(req.totalCost) || 0;
+
+                    // Gasto Mensual
+                    if (reqDateForComparison >= monthStart) {
+                        monthlyTotal += cost;
+                    }
+
+                    // Gasto Semanal
+                    if (reqDateForComparison >= weekStart) {
+                        weeklyTotal += cost;
+                    }
+                    
+                    // Gasto Diario: Se compara la fecha de entrega (que ahora tiene hora 12:00) con la fecha actual (hora 00:00).
+                    // Para una comparación de días, es más seguro comparar la cadena YYYY-MM-DD.
+                    const todayStr = today.toISOString().split('T')[0];
+                    if (req.deliveryDate === todayStr) {
+                        dailyTotal += cost;
+                    }
+                });
+
+                dailyTotalEl.textContent = formatCost(dailyTotal);
+                weeklyTotalEl.textContent = formatCost(weeklyTotal);
+                monthlyTotalEl.textContent = formatCost(monthlyTotal);
+            }
+            
+            // --- Lógica de Gráficos ---
+
+            // Función para obtener un color de la paleta
+            function getChartColor(index) {
+                const colors = ['#005BAA', '#5CE1E6', '#00B8D9', '#667EEA', '#F6AD55', '#E53E3E', '#38B2AC'];
+                return colors[index % colors.length];
+            }
+
+            function updateCharts() {
+                // 1. Preparar datos de Gasto Mensual por Proveedor
+                const monthlyProviderData = foodRequests.reduce((acc, req) => {
+                    // FIX: Asegurar la correcta interpretación de la fecha
+                    const date = new Date(req.deliveryDate + 'T12:00:00'); 
+                    const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+                    const provider = req.providerName;
+                    const cost = parseFloat(req.totalCost) || 0;
+
+                    if (!acc[monthKey]) acc[monthKey] = {};
+                    if (!acc[monthKey][provider]) acc[monthKey][provider] = 0;
+                    acc[monthKey][provider] += cost;
+                    return acc;
+                }, {});
+
+                const allMonths = Object.keys(monthlyProviderData).sort();
+                const allProviders = [...new Set(foodRequests.map(r => r.providerName))];
+
+                const providerDatasets = allProviders.map((provider, index) => {
+                    const data = allMonths.map(month => monthlyProviderData[month][provider] || 0);
+                    return {
+                        label: provider,
+                        data: data,
+                        backgroundColor: getChartColor(index),
+                        borderColor: getChartColor(index),
+                        fill: false,
+                        tension: 0.1
+                    };
+                });
+
+                if (annualProvidersChart) {
+                    annualProvidersChart.destroy();
+                }
+                const providersCtx = document.getElementById('annualProvidersChart').getContext('2d');
+                annualProvidersChart = new Chart(providersCtx, {
+                    type: 'line',
+                    data: {
+                        labels: allMonths,
+                        datasets: providerDatasets
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                title: {
+                                    display: true,
+                                    text: 'Gasto Total (USD $)',
+                                    color: CHART_COLORS['Al momento']
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                position: 'top',
+                            },
+                            title: {
+                                display: false
+                            }
+                        }
+                    }
+                });
+
+
+                // 2. Preparar datos de Solicitudes por Empleado de Inter (Gráfico de Barras Horizontal)
+                const staffRequests = foodRequests.reduce((acc, req) => {
+                    req.interStaff.forEach(staff => {
+                        acc[staff] = (acc[staff] || 0) + 1;
+                    });
+                    return acc;
+                }, {});
+
+                const topStaff = Object.entries(staffRequests)
+                    .sort(([, a], [, b]) => b - a)
+                    .slice(0, 10); // Mostrar el Top 10
+
+                const staffLabels = topStaff.map(([name]) => name);
+                const staffData = topStaff.map(([, count]) => count);
+                const staffColors = staffData.map((_, index) => getChartColor(index));
+
+
+                if (staffRequestsChart) {
+                    staffRequestsChart.destroy();
+                }
+                const staffCtx = document.getElementById('staffRequestsChart').getContext('2d');
+                staffRequestsChart = new Chart(staffCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: staffLabels,
+                        datasets: [{
+                            label: 'Número de Solicitudes',
+                            data: staffData,
+                            backgroundColor: staffColors,
+                            borderColor: staffColors.map(color => color.replace('0.2', '1')), // Color más oscuro para el borde
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        indexAxis: 'y', // Hace el gráfico horizontal
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            x: {
+                                beginAtZero: true,
+                                title: {
+                                    display: true,
+                                    text: 'Cantidad de Solicitudes',
+                                },
+                                ticks: {
+                                    stepSize: 1,
+                                    callback: function(value) {
+                                        if (value % 1 === 0) {
+                                            return value;
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        }
+                    }
+                });
+
+                // 3. Preparar datos de Solicitudes por Departamento (Gráfico de Barras Vertical)
+                const departmentCounts = foodRequests.reduce((acc, req) => {
+                    acc[req.department] = (acc[req.department] || 0) + 1;
+                    return acc;
+                }, {});
+                
+                const departmentLabels = Object.keys(departmentCounts).sort();
+                const departmentData = departmentLabels.map(dept => departmentCounts[dept]);
+                const departmentColors = departmentData.map((_, index) => getChartColor(index + 3)); // Usar un índice diferente para otros colores
+
+                if (departmentRequestsChart) {
+                    departmentRequestsChart.destroy();
+                }
+                const departmentCtx = document.getElementById('departmentRequestsChart').getContext('2d');
+                departmentRequestsChart = new Chart(departmentCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: departmentLabels,
+                        datasets: [{
+                            label: 'Número de Solicitudes',
+                            data: departmentData,
+                            backgroundColor: departmentColors,
+                            borderColor: departmentColors,
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                title: {
+                                    display: true,
+                                    text: 'Cantidad de Solicitudes',
+                                },
+                                ticks: {
+                                    stepSize: 1,
+                                    callback: function(value) {
+                                        if (value % 1 === 0) {
+                                            return value;
+                                        }
+                                    }
+                                }
+                            },
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: 'Departamento',
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        }
+                    }
+                });
+            }
+
+            // --- Inicio de la Aplicación ---
+
+            initializeForm();
+            
+            // Cargar los datos y renderizar todo al inicio
+            try {
+                renderTable();
+                updateSummaryTotals();
+                updateCharts();
+                console.log("Página cargada y datos iniciales renderizados.");
+            } catch (error) {
+                console.error("Error al renderizar la página inicial:", error);
+            }
+        });
+    </script>
+</body>
+</html>
