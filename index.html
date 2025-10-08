@@ -357,9 +357,10 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // Hacer la variable db disponible globalmente
-        window.db = db;
-        window.firestoreFunctions = {
+        // Hacer las funciones de Firebase disponibles globalmente
+        window.firebaseApp = app;
+        window.firebaseDb = db;
+        window.firebaseFunctions = {
             collection,
             addDoc,
             getDocs,
@@ -370,15 +371,28 @@
             orderBy,
             where
         };
+
+        console.log("Firebase inicializado correctamente");
     </script>
 
     <script>
+        // Variables globales para Firebase
+        let db;
+        let firebaseFunctions;
+
         document.addEventListener('DOMContentLoaded', async () => {
             // Esperar a que Firebase esté listo
-            if (!window.db) {
+            if (!window.firebaseDb || !window.firebaseFunctions) {
                 console.error("Firebase no se inicializó correctamente");
+                displayMessage('Error: Firebase no se pudo inicializar', 'error');
                 return;
             }
+
+            // Asignar las referencias de Firebase
+            db = window.firebaseDb;
+            firebaseFunctions = window.firebaseFunctions;
+
+            console.log("Firebase configurado correctamente en la aplicación");
 
             const form = document.getElementById('foodRequestForm');
             const departmentSelect = document.getElementById('department');
@@ -625,8 +639,8 @@
             // Función para agregar una nueva solicitud a Firestore
             async function addRequestToFirestore(request) {
                 try {
-                    const requestsRef = collection(db, 'foodRequests');
-                    const docRef = await addDoc(requestsRef, request);
+                    const requestsRef = firebaseFunctions.collection(db, 'foodRequests');
+                    const docRef = await firebaseFunctions.addDoc(requestsRef, request);
                     console.log("Solicitud agregada con ID: ", docRef.id);
                     return { ...request, firestoreId: docRef.id };
                 } catch (error) {
@@ -639,13 +653,13 @@
             async function updateRequestInFirestore(requestId, updatedData) {
                 try {
                     // Buscar el documento por el ID personalizado
-                    const requestsRef = collection(db, 'foodRequests');
-                    const q = query(requestsRef, where('id', '==', requestId));
-                    const querySnapshot = await getDocs(q);
+                    const requestsRef = firebaseFunctions.collection(db, 'foodRequests');
+                    const q = firebaseFunctions.query(requestsRef, firebaseFunctions.where('id', '==', requestId));
+                    const querySnapshot = await firebaseFunctions.getDocs(q);
                     
                     if (!querySnapshot.empty) {
-                        const docRef = doc(db, 'foodRequests', querySnapshot.docs[0].id);
-                        await updateDoc(docRef, updatedData);
+                        const docRef = firebaseFunctions.doc(db, 'foodRequests', querySnapshot.docs[0].id);
+                        await firebaseFunctions.updateDoc(docRef, updatedData);
                         console.log("Solicitud actualizada correctamente");
                     }
                 } catch (error) {
@@ -657,16 +671,16 @@
             // Función para eliminar solicitudes de Firestore
             async function deleteRequestsFromFirestore(requestIds) {
                 try {
-                    const requestsRef = collection(db, 'foodRequests');
+                    const requestsRef = firebaseFunctions.collection(db, 'foodRequests');
                     
                     // Para cada ID, buscar y eliminar el documento correspondiente
                     const deletePromises = requestIds.map(async (requestId) => {
-                        const q = query(requestsRef, where('id', '==', requestId));
-                        const querySnapshot = await getDocs(q);
+                        const q = firebaseFunctions.query(requestsRef, firebaseFunctions.where('id', '==', requestId));
+                        const querySnapshot = await firebaseFunctions.getDocs(q);
                         
                         if (!querySnapshot.empty) {
-                            const docRef = doc(db, 'foodRequests', querySnapshot.docs[0].id);
-                            await deleteDoc(docRef);
+                            const docRef = firebaseFunctions.doc(db, 'foodRequests', querySnapshot.docs[0].id);
+                            await firebaseFunctions.deleteDoc(docRef);
                         }
                     });
                     
@@ -681,9 +695,9 @@
             // Función para cargar los datos de Firestore
             async function loadRequests() {
                 try {
-                    const requestsRef = collection(db, 'foodRequests');
-                    const q = query(requestsRef, orderBy('deliveryDate', 'desc'));
-                    const querySnapshot = await getDocs(q);
+                    const requestsRef = firebaseFunctions.collection(db, 'foodRequests');
+                    const q = firebaseFunctions.query(requestsRef, firebaseFunctions.orderBy('deliveryDate', 'desc'));
+                    const querySnapshot = await firebaseFunctions.getDocs(q);
                     
                     const requests = [];
                     querySnapshot.forEach((doc) => {
