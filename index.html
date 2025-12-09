@@ -28,6 +28,29 @@
         .hidden-quantity {
             display: none;
         }
+        
+        /* Estilos para filtros avanzados */
+        .filter-tag {
+            background-color: #E3F2FD;
+            color: #005BAA;
+            padding: 4px 10px;
+            border-radius: 16px;
+            font-size: 12px;
+            margin-right: 5px;
+            margin-bottom: 5px;
+            display: inline-flex;
+            align-items: center;
+        }
+        
+        .filter-tag-remove {
+            margin-left: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        
+        .filter-tag-remove:hover {
+            color: #FF5252;
+        }
     </style>
 </head>
 <body class="bg-gray-100 p-4 min-h-screen flex flex-col items-center">
@@ -53,6 +76,7 @@
                     <select id="department" required
                         class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-inter-primary focus:border-inter-primary custom-select">
                         <option value="" disabled selected>Selecciona un Departamento</option>
+                        <option value="Administracion">Administración</option>
                         <option value="Area Comercial">Área Comercial</option>
                         <option value="C.O El Rosal">C.O El Rosal</option>
                         <option value="C.O La Naya">C.O La Naya</option>
@@ -64,6 +88,24 @@
                         <option value="Obras">Obras</option>
                     </select>
                 </div>
+                
+                <!-- Campo de observaciones para MSO -->
+                <div id="msoObservationsContainer" class="hidden">
+                    <label for="msoObservations" class="block text-sm font-medium text-gray-700 mb-1">
+                        Departamento MSO específico
+                    </label>
+                    <select id="msoObservations"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-inter-primary focus:border-inter-primary">
+                        <option value="" selected>Selecciona departamento MSO</option>
+                        <option value="Marketing">Marketing</option>
+                        <option value="Presidencia">Presidencia</option>
+                        <option value="Interconexiones">Interconexiones</option>
+                        <option value="Importaciones">Importaciones</option>
+                        <option value="RRHH MSO">RRHH MSO</option>
+                        <option value="Documentacion de obras">Documentación de obras</option>
+                    </select>
+                </div>
+                
                 <div>
                     <label for="mealType" class="block text-sm font-medium text-gray-700 mb-1">
                         Tipo de Comida
@@ -71,8 +113,10 @@
                     <select id="mealType" required
                             class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-inter-primary focus:border-inter-primary custom-select">
                         <option value="" disabled selected>Selecciona el Tipo</option>
+                        <option value="Desayuno">Desayuno</option>
                         <option value="Almuerzo">Almuerzo</option>
                         <option value="Cena">Cena</option>
+                        <option value="Refrigerios">Refrigerios</option>
                     </select>
                 </div>
                 <div>
@@ -197,6 +241,7 @@
                         <option value="Al momento">Al momento</option>
                         <option value="Monteluso">Monteluso</option>
                         <option value="Susi fresh">Susi fresh</option>
+                        <option value="Cumbes Barlovento">Cumbes Barlovento</option>
                     </select>
                 </div>
                 <div class="col-span-1 md:col-span-3">
@@ -239,24 +284,39 @@
             <h2 class="text-2xl font-bold text-inter-primary mb-4">Historial de Solicitudes de Comida</h2>
 
             <div class="mb-4 p-4 bg-blue-50 rounded-lg flex flex-col md:flex-row items-center gap-4">
-                <label for="filterDepartment" class="text-sm font-medium text-gray-700 whitespace-nowrap">
-                    Filtrar por Departamento:
-                </label>
-                <input type="text" id="filterDepartment"
-                       class="w-full md:w-auto flex-grow px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-inter-primary focus:border-inter-primary"
-                       placeholder="Nombre del departamento">
-                <button id="clearFilterBtn"
-                        class="bg-gray-400 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded-lg shadow-md transition duration-300 ease-in-out">
-                    Limpiar Filtro
-                </button>
-                <button id="exportCsvBtn"
-                        class="bg-inter-accent-light hover:bg-cyan-600 text-white font-bold py-2 px-4 rounded-lg shadow-md transition duration-300 ease-in-out">
-                    Exportar a Excel (CSV)
-                </button>
-                <button id="deleteSelectedBtn"
-                        class="bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded-lg shadow-md transition duration-300 ease-in-out">
-                    Eliminar Seleccionados
-                </button>
+                <div class="w-full">
+                    <label for="filterInput" class="block text-sm font-medium text-gray-700 mb-2">
+                        Filtros de Búsqueda Avanzada
+                    </label>
+                    <div class="flex items-center gap-2 mb-2">
+                        <input type="text" id="filterInput"
+                               class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-inter-primary focus:border-inter-primary"
+                               placeholder="Buscar por nombre, apellido, departamento, tipo de comida...">
+                        <button id="addFilterBtn"
+                                class="bg-inter-primary hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg shadow-md transition duration-300 ease-in-out whitespace-nowrap">
+                            Añadir Filtro
+                        </button>
+                    </div>
+                    
+                    <div id="activeFilters" class="flex flex-wrap gap-2 mb-2">
+                        <!-- Aquí se mostrarán los filtros activos -->
+                    </div>
+                    
+                    <div class="flex flex-wrap gap-2">
+                        <button id="clearAllFiltersBtn"
+                                class="bg-gray-400 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded-lg shadow-md transition duration-300 ease-in-out whitespace-nowrap">
+                            Limpiar Todos los Filtros
+                        </button>
+                        <button id="exportCsvBtn"
+                                class="bg-inter-accent-light hover:bg-cyan-600 text-white font-bold py-2 px-4 rounded-lg shadow-md transition duration-300 ease-in-out whitespace-nowrap">
+                            Exportar a Excel (CSV)
+                        </button>
+                        <button id="deleteSelectedBtn"
+                                class="bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded-lg shadow-md transition duration-300 ease-in-out whitespace-nowrap">
+                            Eliminar Seleccionados
+                        </button>
+                    </div>
+                </div>
             </div>
 
             <div class="overflow-x-auto rounded-lg shadow-md">
@@ -292,24 +352,48 @@
         <section class="mt-8 p-6 bg-white rounded-lg border border-inter-accent-light shadow-lg">
             <h2 class="text-2xl font-bold text-inter-primary mb-4">Análisis de Gastos</h2>
 
-            <div class="p-4 bg-gray-50 rounded-lg shadow-inner flex flex-col items-center mb-6">
-                <h3 id="annualProvidersChartTitle" class="text-xl font-bold text-inter-primary mb-4 text-center">Gasto Mensual por Proveedor</h3>
-                <div class="w-full max-w-lg h-64">
-                    <canvas id="annualProvidersChart"></canvas>
-                </div>
-            </div>
-            
-            <div class="p-4 bg-gray-50 rounded-lg shadow-inner flex flex-col items-center mt-6">
-                <h3 id="staffRequestsChartTitle" class="text-xl font-bold text-inter-primary mb-4 text-center">Cantidad de Solicitudes por Empleado de Inter</h3>
-                <div class="w-full max-w-xl h-96">
-                    <canvas id="staffRequestsChart"></canvas>
+            <div class="mb-6">
+                <h3 class="text-xl font-bold text-inter-primary mb-4 text-center">Gastos Mensuales (Mes Actual)</h3>
+                <div class="p-4 bg-gray-50 rounded-lg shadow-inner">
+                    <div class="w-full h-64">
+                        <canvas id="monthlyProvidersChart"></canvas>
+                    </div>
                 </div>
             </div>
 
-            <div class="p-4 bg-gray-50 rounded-lg shadow-inner flex flex-col items-center mt-6">
+            <div class="mb-6">
+                <h3 class="text-xl font-bold text-inter-primary mb-4 text-center">Gastos Anuales por Proveedor</h3>
+                <div class="p-4 bg-gray-50 rounded-lg shadow-inner">
+                    <div class="w-full h-64">
+                        <canvas id="annualProvidersChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mb-6">
+                <h3 class="text-xl font-bold text-inter-primary mb-4 text-center">Comportamiento de Gastos Mensual por Departamento</h3>
+                <div class="p-4 bg-gray-50 rounded-lg shadow-inner">
+                    <div class="w-full h-96">
+                        <canvas id="departmentExpensesChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mb-6">
+                <h3 id="staffRequestsChartTitle" class="text-xl font-bold text-inter-primary mb-4 text-center">Cantidad de Solicitudes por Empleado de Inter</h3>
+                <div class="p-4 bg-gray-50 rounded-lg shadow-inner">
+                    <div class="w-full max-w-xl h-96 mx-auto">
+                        <canvas id="staffRequestsChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-6">
                 <h3 id="departmentRequestsChartTitle" class="text-xl font-bold text-inter-primary mb-4 text-center">Cantidad de Solicitudes por Departamento</h3>
-                <div class="w-full max-w-xl h-64">
-                    <canvas id="departmentRequestsChart"></canvas>
+                <div class="p-4 bg-gray-50 rounded-lg shadow-inner">
+                    <div class="w-full max-w-xl h-64 mx-auto">
+                        <canvas id="departmentRequestsChart"></canvas>
+                    </div>
                 </div>
             </div>
         </section>
@@ -396,6 +480,8 @@
 
             const form = document.getElementById('foodRequestForm');
             const departmentSelect = document.getElementById('department');
+            const msoObservationsContainer = document.getElementById('msoObservationsContainer');
+            const msoObservationsSelect = document.getElementById('msoObservations');
             const mealTypeSelect = document.getElementById('mealType');
             const eventSelect = document.getElementById('event');
 
@@ -429,8 +515,12 @@
             const tableBody = document.getElementById('foodTableBody');
             const noRequestsMessage = document.getElementById('noRequestsMessage');
             const messageBox = document.getElementById('messageBox');
-            const filterDepartmentInput = document.getElementById('filterDepartment');
-            const clearFilterBtn = document.getElementById('clearFilterBtn');
+            
+            // Referencias para el filtro avanzado
+            const filterInput = document.getElementById('filterInput');
+            const addFilterBtn = document.getElementById('addFilterBtn');
+            const activeFiltersContainer = document.getElementById('activeFilters');
+            const clearAllFiltersBtn = document.getElementById('clearAllFiltersBtn');
             const exportCsvBtn = document.getElementById('exportCsvBtn');
             const deleteSelectedBtn = document.getElementById('deleteSelectedBtn');
             const selectAllCheckboxes = document.getElementById('selectAllCheckboxes');
@@ -448,7 +538,9 @@
             const monthlyTotalEl = document.getElementById('monthlyTotal');
 
             // Gráficos
+            let monthlyProvidersChart = null;
             let annualProvidersChart = null;
+            let departmentExpensesChart = null;
             let departmentRequestsChart = null;
             let staffRequestsChart = null;
 
@@ -457,6 +549,7 @@
                 'Al momento': '#005BAA',
                 'Monteluso': '#5CE1E6',
                 'Susi fresh': '#00B8D9',
+                'Cumbes Barlovento': '#FF9800',
                 'otros': '#667EEA',
                 'fondo': '#E2E8F0' 
             };
@@ -464,6 +557,7 @@
             let foodRequests = [];
             let selectedInterStaff = [];
             let editingRequestId = null;
+            let activeFilters = [];
             
             const staffList = [
                 { id: 1, name: "BLANCO NEISABEL" },
@@ -728,6 +822,16 @@
                 return `${year}-${month}-${day}`;
             }
 
+            // Mostrar/ocultar campo de observaciones para MSO
+            departmentSelect.addEventListener('change', function() {
+                if (this.value === 'MSO') {
+                    msoObservationsContainer.classList.remove('hidden');
+                } else {
+                    msoObservationsContainer.classList.add('hidden');
+                    msoObservationsSelect.value = '';
+                }
+            });
+
             // Inicializar campos al cargar la página
             function initializeForm() {
                 deliveryDateTimeInput.value = getCurrentDate();
@@ -756,6 +860,12 @@
                 // Limpiar personal Inter
                 selectedInterStaff = [];
                 renderSelectedStaff();
+                
+                // Ocultar campo MSO si no está seleccionado
+                if (departmentSelect.value !== 'MSO') {
+                    msoObservationsContainer.classList.add('hidden');
+                    msoObservationsSelect.value = '';
+                }
             }
 
             // Función para formatear fechas a YYYY-MM-DD para el input[type=date]
@@ -981,7 +1091,16 @@
                 providerNameSelect.value = requestToEdit.providerName;
                 reasonTextarea.value = requestToEdit.reason;
 
-                // 2. Cargar personal externo
+                // 2. Cargar campo MSO si corresponde
+                if (requestToEdit.department === 'MSO' && requestToEdit.msoDepartment) {
+                    msoObservationsContainer.classList.remove('hidden');
+                    msoObservationsSelect.value = requestToEdit.msoDepartment;
+                } else {
+                    msoObservationsContainer.classList.add('hidden');
+                    msoObservationsSelect.value = '';
+                }
+
+                // 3. Cargar personal externo
                 document.querySelectorAll('input[name="externalStaff"]').forEach(checkbox => {
                     checkbox.checked = false;
                     const quantityInput = document.getElementById(`quantity${checkbox.value}`);
@@ -1004,11 +1123,11 @@
                     });
                 }
 
-                // 3. Cargar personal Inter
+                // 4. Cargar personal Inter
                 selectedInterStaff = requestToEdit.interStaff.slice();
                 renderSelectedStaff();
 
-                // 4. Cargar costo de delivery
+                // 5. Cargar costo de delivery
                 const deliveryCostValue = parseFloat(requestToEdit.deliveryCost);
                 if (deliveryCostValue > 0) {
                     deliveryCostOption.checked = true;
@@ -1024,7 +1143,7 @@
                 
                 calculateTotalCost();
 
-                // 5. Ajustar interfaz a modo Edición
+                // 6. Ajustar interfaz a modo Edición
                 submitButton.textContent = 'Guardar Cambios';
                 submitButton.classList.remove('bg-inter-primary', 'hover:bg-blue-700');
                 submitButton.classList.add('bg-green-600', 'hover:bg-green-700');
@@ -1085,6 +1204,11 @@
                     registrationDate: new Date().toISOString()
                 };
 
+                // Agregar observaciones MSO si corresponde
+                if (departmentSelect.value === 'MSO' && msoObservationsSelect.value) {
+                    newRequest.msoDepartment = msoObservationsSelect.value;
+                }
+
                 try {
                     if (editingRequestId) {
                         // Modo Edición: actualizar en Firestore
@@ -1122,19 +1246,43 @@
                 return `$${parseFloat(cost || 0).toFixed(2)}`;
             }
             
-            // Función para renderizar la tabla de historial
-            function renderTable(filterQuery = '') {
+            // Función para renderizar la tabla de historial con filtros
+            function renderTable() {
                 let filteredRequests = foodRequests.slice();
-                if (filterQuery) {
-                    const query = filterQuery.toUpperCase();
-                    filteredRequests = filteredRequests.filter(req => 
-                        req.department.toUpperCase().includes(query) ||
-                        req.deliveryPlace.toUpperCase().includes(query) ||
-                        req.providerName.toUpperCase().includes(query) ||
-                        req.reason.toUpperCase().includes(query)
-                    );
+                
+                // Aplicar filtros activos
+                if (activeFilters.length > 0) {
+                    filteredRequests = filteredRequests.filter(request => {
+                        return activeFilters.every(filter => {
+                            const searchTerm = filter.term.toLowerCase();
+                            
+                            // Buscar en diferentes campos
+                            if (filter.field === 'all') {
+                                // Búsqueda en todos los campos
+                                return (
+                                    request.department.toLowerCase().includes(searchTerm) ||
+                                    request.mealType.toLowerCase().includes(searchTerm) ||
+                                    request.deliveryPlace.toLowerCase().includes(searchTerm) ||
+                                    request.providerName.toLowerCase().includes(searchTerm) ||
+                                    request.reason.toLowerCase().includes(searchTerm) ||
+                                    request.interStaff.some(staff => staff.toLowerCase().includes(searchTerm)) ||
+                                    (request.msoDepartment && request.msoDepartment.toLowerCase().includes(searchTerm))
+                                );
+                            } else if (filter.field === 'department') {
+                                return request.department.toLowerCase().includes(searchTerm);
+                            } else if (filter.field === 'mealType') {
+                                return request.mealType.toLowerCase().includes(searchTerm);
+                            } else if (filter.field === 'provider') {
+                                return request.providerName.toLowerCase().includes(searchTerm);
+                            } else if (filter.field === 'staff') {
+                                return request.interStaff.some(staff => staff.toLowerCase().includes(searchTerm));
+                            }
+                            return true;
+                        });
+                    });
                 }
                 
+                // Ordenar por fecha
                 filteredRequests.sort((a, b) => {
                     const dateA = new Date(a.deliveryDate + 'T12:00:00');
                     const dateB = new Date(b.deliveryDate + 'T12:00:00');
@@ -1161,12 +1309,17 @@
                         day: '2-digit',
                     });
 
+                    // Mostrar departamento MSO específico si existe
+                    const displayDepartment = request.department === 'MSO' && request.msoDepartment 
+                        ? `${request.department} (${request.msoDepartment})`
+                        : request.department;
+
                     const row = tableBody.insertRow();
                     row.className = 'hover:bg-gray-50 transition duration-150';
                     row.innerHTML = `
                         <td class="px-6 py-4 whitespace-nowrap"><input type="checkbox" data-id="${request.id}" class="row-checkbox form-checkbox h-4 w-4 text-inter-primary rounded"></td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${displayDate}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${request.department}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${displayDepartment}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${request.mealType}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${request.event || 'N/A'}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${externalStaffText || 'N/A'}</td>
@@ -1189,18 +1342,98 @@
                 selectAllCheckboxes.checked = false;
             }
 
-            // --- Lógica de Filtros y Acciones de Tabla ---
+            // --- Lógica de Filtros Avanzados ---
 
-            // Filtro por departamento
-            filterDepartmentInput.addEventListener('input', (e) => {
-                renderTable(e.target.value.trim());
-            });
-
-            // Limpiar filtro
-            clearFilterBtn.addEventListener('click', () => {
-                filterDepartmentInput.value = '';
+            function renderActiveFilters() {
+                activeFiltersContainer.innerHTML = '';
+                
+                if (activeFilters.length === 0) {
+                    return;
+                }
+                
+                activeFilters.forEach((filter, index) => {
+                    const filterTag = document.createElement('div');
+                    filterTag.className = 'filter-tag';
+                    filterTag.innerHTML = `
+                        <span>${filter.field === 'all' ? 'Todos:' : filter.field === 'department' ? 'Depto:' : filter.field === 'mealType' ? 'Tipo:' : filter.field === 'provider' ? 'Prov:' : 'Personal:'} ${filter.term}</span>
+                        <span class="filter-tag-remove" data-index="${index}">×</span>
+                    `;
+                    activeFiltersContainer.appendChild(filterTag);
+                });
+                
+                // Agregar evento para eliminar filtros
+                document.querySelectorAll('.filter-tag-remove').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const index = parseInt(this.getAttribute('data-index'));
+                        removeFilter(index);
+                    });
+                });
+                
                 renderTable();
+            }
+
+            function addFilter() {
+                const searchTerm = filterInput.value.trim();
+                if (!searchTerm) {
+                    displayMessage('Por favor ingrese un término de búsqueda', 'error');
+                    return;
+                }
+                
+                // Intentar detectar el tipo de búsqueda
+                let field = 'all';
+                const termLower = searchTerm.toLowerCase();
+                
+                // Verificar si es un tipo de comida específico
+                const mealTypes = ['desayuno', 'almuerzo', 'cena', 'refrigerios'];
+                if (mealTypes.some(type => termLower.includes(type))) {
+                    field = 'mealType';
+                }
+                // Verificar si es un proveedor específico
+                else if (termLower.includes('monteluso') || termLower.includes('susi') || termLower.includes('cumbes') || termLower.includes('al momento')) {
+                    field = 'provider';
+                }
+                // Verificar si parece ser un nombre de personal
+                else if (termLower.split(' ').length >= 2) {
+                    field = 'staff';
+                }
+                // Verificar si parece ser un departamento
+                else if (termLower.includes('admin') || termLower.includes('comercial') || termLower.includes('gerencia') || 
+                         termLower.includes('head') || termLower.includes('mso') || termLower.includes('ocad') || 
+                         termLower.includes('obras') || termLower.includes('rosal') || termLower.includes('naya') || 
+                         termLower.includes('ruices')) {
+                    field = 'department';
+                }
+                
+                activeFilters.push({
+                    field: field,
+                    term: searchTerm
+                });
+                
+                filterInput.value = '';
+                renderActiveFilters();
+            }
+
+            function removeFilter(index) {
+                activeFilters.splice(index, 1);
+                renderActiveFilters();
+            }
+
+            function clearAllFilters() {
+                activeFilters = [];
+                filterInput.value = '';
+                renderActiveFilters();
+            }
+
+            // Event listeners para filtros
+            addFilterBtn.addEventListener('click', addFilter);
+            
+            filterInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    addFilter();
+                }
             });
+            
+            clearAllFiltersBtn.addEventListener('click', clearAllFilters);
             
             // Seleccionar/Deseleccionar todos los checkboxes
             selectAllCheckboxes.addEventListener('change', (e) => {
@@ -1228,7 +1461,7 @@
                         
                         foodRequests = foodRequests.filter(req => !selectedIds.includes(req.id));
                         
-                        renderTable(filterDepartmentInput.value.trim());
+                        renderTable();
                         updateSummaryTotals();
                         updateCharts();
                         deleteModal.classList.add('hidden');
@@ -1258,6 +1491,7 @@
                 let headers = [
                     "Fecha de Entrega", 
                     "Departamento", 
+                    "Departamento MSO (si aplica)",
                     "Tipo de Comida", 
                     "Evento", 
                     "Personal Externo (Detalle)", 
@@ -1285,6 +1519,7 @@
                     const row = [
                         csvQuote(req.deliveryDate),
                         csvQuote(req.department),
+                        csvQuote(req.msoDepartment || ''),
                         csvQuote(req.mealType),
                         csvQuote(req.event || ''),
                         csvQuote(externalStaffText),
@@ -1352,13 +1587,82 @@
             // --- Lógica de Gráficos ---
 
             function getChartColor(index) {
-                const colors = ['#005BAA', '#5CE1E6', '#00B8D9', '#667EEA', '#F6AD55', '#E53E3E', '#38B2AC'];
+                const colors = ['#005BAA', '#5CE1E6', '#00B8D9', '#FF9800', '#667EEA', '#F6AD55', '#E53E3E', '#38B2AC'];
                 return colors[index % colors.length];
             }
 
             function updateCharts() {
-                // 1. Preparar datos de Gasto Mensual por Proveedor
-                const monthlyProviderData = foodRequests.reduce((acc, req) => {
+                const now = new Date();
+                const currentMonth = now.getMonth();
+                const currentYear = now.getFullYear();
+                
+                // Filtrar solicitudes del mes actual para gráfica mensual
+                const currentMonthRequests = foodRequests.filter(req => {
+                    const reqDate = new Date(req.deliveryDate + 'T12:00:00');
+                    return reqDate.getMonth() === currentMonth && reqDate.getFullYear() === currentYear;
+                });
+                
+                // Filtrar solicitudes del año actual para gráfica anual
+                const currentYearRequests = foodRequests.filter(req => {
+                    const reqDate = new Date(req.deliveryDate + 'T12:00:00');
+                    return reqDate.getFullYear() === currentYear;
+                });
+
+                // 1. Gráfica de Gastos Mensuales por Proveedor (mes actual)
+                const monthlyProviderData = currentMonthRequests.reduce((acc, req) => {
+                    const provider = req.providerName;
+                    const cost = parseFloat(req.totalCost) || 0;
+
+                    if (!acc[provider]) acc[provider] = 0;
+                    acc[provider] += cost;
+                    return acc;
+                }, {});
+
+                const monthlyProviders = Object.keys(monthlyProviderData);
+                const monthlyCosts = monthlyProviders.map(provider => monthlyProviderData[provider]);
+                const monthlyColors = monthlyProviders.map((provider, index) => 
+                    CHART_COLORS[provider] || getChartColor(index)
+                );
+
+                if (monthlyProvidersChart) {
+                    monthlyProvidersChart.destroy();
+                }
+                const monthlyCtx = document.getElementById('monthlyProvidersChart').getContext('2d');
+                monthlyProvidersChart = new Chart(monthlyCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: monthlyProviders,
+                        datasets: [{
+                            data: monthlyCosts,
+                            backgroundColor: monthlyColors,
+                            borderColor: monthlyColors.map(color => color.replace('0.8', '1')),
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'right',
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        const label = context.label || '';
+                                        const value = context.parsed || 0;
+                                        const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                        const percentage = Math.round((value / total) * 100);
+                                        return `${label}: $${value.toFixed(2)} (${percentage}%)`;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+
+                // 2. Gráfica de Gastos Anuales por Proveedor
+                const annualProviderData = currentYearRequests.reduce((acc, req) => {
                     const date = new Date(req.deliveryDate + 'T12:00:00');
                     const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
                     const provider = req.providerName;
@@ -1370,16 +1674,16 @@
                     return acc;
                 }, {});
 
-                const allMonths = Object.keys(monthlyProviderData).sort();
-                const allProviders = [...new Set(foodRequests.map(r => r.providerName))];
+                const allMonths = Object.keys(annualProviderData).sort();
+                const allProviders = [...new Set(currentYearRequests.map(r => r.providerName))];
 
                 const providerDatasets = allProviders.map((provider, index) => {
-                    const data = allMonths.map(month => monthlyProviderData[month][provider] || 0);
+                    const data = allMonths.map(month => annualProviderData[month][provider] || 0);
                     return {
                         label: provider,
                         data: data,
-                        backgroundColor: getChartColor(index),
-                        borderColor: getChartColor(index),
+                        backgroundColor: CHART_COLORS[provider] || getChartColor(index),
+                        borderColor: CHART_COLORS[provider] || getChartColor(index),
                         fill: false,
                         tension: 0.1
                     };
@@ -1388,8 +1692,8 @@
                 if (annualProvidersChart) {
                     annualProvidersChart.destroy();
                 }
-                const providersCtx = document.getElementById('annualProvidersChart').getContext('2d');
-                annualProvidersChart = new Chart(providersCtx, {
+                const annualCtx = document.getElementById('annualProvidersChart').getContext('2d');
+                annualProvidersChart = new Chart(annualCtx, {
                     type: 'line',
                     data: {
                         labels: allMonths,
@@ -1411,16 +1715,72 @@
                         plugins: {
                             legend: {
                                 position: 'top',
-                            },
-                            title: {
-                                display: false
                             }
                         }
                     }
                 });
 
-                // 2. Preparar datos de Solicitudes por Empleado de Inter
-                const staffRequests = foodRequests.reduce((acc, req) => {
+                // 3. Gráfica de Comportamiento Mensual por Departamento
+                const departmentMonthlyData = currentYearRequests.reduce((acc, req) => {
+                    const date = new Date(req.deliveryDate + 'T12:00:00');
+                    const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+                    const department = req.department;
+                    const cost = parseFloat(req.totalCost) || 0;
+
+                    if (!acc[monthKey]) acc[monthKey] = {};
+                    if (!acc[monthKey][department]) acc[monthKey][department] = 0;
+                    acc[monthKey][department] += cost;
+                    return acc;
+                }, {});
+
+                const departmentMonths = Object.keys(departmentMonthlyData).sort();
+                const allDepartments = [...new Set(currentYearRequests.map(r => r.department))];
+                
+                const departmentDatasets = allDepartments.map((department, index) => {
+                    const data = departmentMonths.map(month => departmentMonthlyData[month][department] || 0);
+                    return {
+                        label: department,
+                        data: data,
+                        backgroundColor: getChartColor(index),
+                        borderColor: getChartColor(index),
+                        fill: false,
+                        tension: 0.1
+                    };
+                });
+
+                if (departmentExpensesChart) {
+                    departmentExpensesChart.destroy();
+                }
+                const deptExpensesCtx = document.getElementById('departmentExpensesChart').getContext('2d');
+                departmentExpensesChart = new Chart(deptExpensesCtx, {
+                    type: 'line',
+                    data: {
+                        labels: departmentMonths,
+                        datasets: departmentDatasets
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                title: {
+                                    display: true,
+                                    text: 'Gasto Total (USD $)',
+                                    color: CHART_COLORS['Al momento']
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                position: 'top',
+                            }
+                        }
+                    }
+                });
+
+                // 4. Preparar datos de Solicitudes por Empleado de Inter
+                const staffRequests = currentYearRequests.reduce((acc, req) => {
                     req.interStaff.forEach(staff => {
                         acc[staff] = (acc[staff] || 0) + 1;
                     });
@@ -1480,8 +1840,8 @@
                     }
                 });
 
-                // 3. Preparar datos de Solicitudes por Departamento
-                const departmentCounts = foodRequests.reduce((acc, req) => {
+                // 5. Preparar datos de Solicitudes por Departamento
+                const departmentCounts = currentYearRequests.reduce((acc, req) => {
                     acc[req.department] = (acc[req.department] || 0) + 1;
                     return acc;
                 }, {});
