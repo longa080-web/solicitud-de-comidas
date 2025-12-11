@@ -9,6 +9,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Librerías para exportar a PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         /* Aplicar la fuente 'Inter' a todo el cuerpo del documento */
         body {
@@ -50,6 +53,81 @@
         
         .filter-tag-remove:hover {
             color: #FF5252;
+        }
+
+        /* Estilos para el reporte en PDF */
+        .report-pdf {
+            background-color: white;
+            padding: 20px;
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .pdf-header {
+            text-align: center;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #005BAA;
+            padding-bottom: 15px;
+        }
+        
+        .pdf-title {
+            color: #005BAA;
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .pdf-subtitle {
+            color: #666;
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+        
+        .pdf-section {
+            margin-bottom: 20px;
+            page-break-inside: avoid;
+        }
+        
+        .pdf-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 10px;
+            font-size: 11px;
+        }
+        
+        .pdf-table th {
+            background-color: #f0f7ff;
+            color: #005BAA;
+            font-weight: bold;
+            padding: 8px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+        
+        .pdf-table td {
+            padding: 8px;
+            border: 1px solid #ddd;
+        }
+        
+        .pdf-table .total-row {
+            font-weight: bold;
+            background-color: #f9f9f9;
+        }
+        
+        .pdf-summary-box {
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+        
+        .pdf-footer {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 15px;
+            border-top: 1px solid #ddd;
+            color: #666;
+            font-size: 10px;
         }
     </style>
 </head>
@@ -357,19 +435,28 @@
                 <label for="reportMonth" class="block text-sm font-medium text-gray-700 mb-2">
                     Seleccionar Mes y Año para el Reporte
                 </label>
-                <div class="flex items-center gap-4">
+                <div class="flex flex-wrap items-center gap-4">
                     <input type="month" id="reportMonth" 
                            class="px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-inter-primary focus:border-inter-primary"
                            value="">
                     <button id="generateReportBtn" 
-                            class="bg-inter-primary hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg shadow-md transition duration-300 ease-in-out">
+                            class="bg-inter-primary hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg shadow-md transition duration-300 ease-in-out whitespace-nowrap">
                         Generar Reporte
                     </button>
                     <button id="exportReportBtn" 
-                            class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-6 rounded-lg shadow-md transition duration-300 ease-in-out hidden">
+                            class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-6 rounded-lg shadow-md transition duration-300 ease-in-out hidden whitespace-nowrap">
                         Exportar a Excel
                     </button>
+                    <button id="exportPdfBtn" 
+                            class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-6 rounded-lg shadow-md transition duration-300 ease-in-out hidden whitespace-nowrap">
+                        Exportar a PDF
+                    </button>
                 </div>
+            </div>
+
+            <!-- Contenedor oculto para el PDF -->
+            <div id="pdfContent" class="hidden">
+                <!-- Este contenido se generará dinámicamente para el PDF -->
             </div>
 
             <div id="reportContent" class="space-y-8">
@@ -604,6 +691,9 @@
         // Variables globales para Firebase
         let db;
         let firebaseFunctions;
+
+        // Referencias a jsPDF (disponible globalmente)
+        const { jsPDF } = window.jspdf;
 
         document.addEventListener('DOMContentLoaded', async () => {
             // Esperar a que Firebase esté listo
@@ -873,6 +963,7 @@
             const reportMonthInput = document.getElementById('reportMonth');
             const generateReportBtn = document.getElementById('generateReportBtn');
             const exportReportBtn = document.getElementById('exportReportBtn');
+            const exportPdfBtn = document.getElementById('exportPdfBtn');
             const departmentReportBody = document.getElementById('departmentReportBody');
             const providerReportBody = document.getElementById('providerReportBody');
             const totalDepartmentMeals = document.getElementById('totalDepartmentMeals');
@@ -884,6 +975,7 @@
             const msoTotalMeals = document.getElementById('msoTotalMeals');
             const msoTotalAmount = document.getElementById('msoTotalAmount');
             const grandTotalAmount = document.getElementById('grandTotalAmount');
+            const pdfContent = document.getElementById('pdfContent');
 
             // Definir las unidades de operación (departamentos)
             const departmentList = [
@@ -2239,8 +2331,9 @@
                 // Calcular totales
                 calculateTotals(departmentData);
                 
-                // Mostrar botón de exportar
+                // Mostrar botones de exportar
                 exportReportBtn.classList.remove('hidden');
+                exportPdfBtn.classList.remove('hidden');
                 
                 // Verificación final
                 const comidasAreaComercial = departmentData['AREA COMERCIAL'] ? departmentData['AREA COMERCIAL'].meals : 0;
@@ -2423,6 +2516,217 @@
                 displayMessage('Reporte exportado exitosamente', 'success');
             }
 
+            // Función para exportar a PDF
+            async function exportReportToPDF() {
+                const selectedMonth = reportMonthInput.value;
+                if (!selectedMonth) {
+                    displayMessage('Por favor genere primero un reporte', 'error');
+                    return;
+                }
+                
+                const [year, month] = selectedMonth.split('-');
+                const monthName = getMonthName(month);
+                const today = new Date();
+                const todayStr = today.toLocaleDateString('es-ES');
+                
+                // Mostrar mensaje de procesamiento
+                displayMessage('Generando PDF...', 'success');
+                
+                try {
+                    // Obtener datos de las tablas
+                    const departmentRows = Array.from(departmentReportBody.querySelectorAll('tr'));
+                    const providerRows = Array.from(providerReportBody.querySelectorAll('tr'));
+                    
+                    // Crear contenido HTML para el PDF
+                    let pdfHTML = `
+                        <div class="report-pdf">
+                            <div class="pdf-header">
+                                <h1 class="pdf-title">Reporte de Gastos de Comida</h1>
+                                <div class="pdf-subtitle">${monthName} ${year}</div>
+                                <div class="pdf-subtitle">Fecha de generación: ${todayStr}</div>
+                            </div>
+                            
+                            <div class="pdf-section">
+                                <h2 style="color: #005BAA; font-size: 18px; margin-bottom: 10px; border-bottom: 1px solid #005BAA; padding-bottom: 5px;">
+                                    SOLICITUD DE COMIDAS POR UNIDAD DE OPERACIONES
+                                </h2>
+                                <table class="pdf-table">
+                                    <thead>
+                                        <tr>
+                                            <th>UNIDAD DE OPERACION</th>
+                                            <th>CANTIDAD DE COMIDAS SOLICITADAS</th>
+                                            <th>IMPORTE</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                    `;
+                    
+                    // Agregar filas de departamentos
+                    departmentRows.forEach(row => {
+                        const cells = row.querySelectorAll('td');
+                        if (cells.length >= 3) {
+                            const dept = cells[0].textContent;
+                            const meals = cells[1].textContent;
+                            const amount = cells[2].textContent;
+                            
+                            pdfHTML += `
+                                <tr>
+                                    <td>${dept}</td>
+                                    <td style="text-align: center;">${meals}</td>
+                                    <td style="text-align: right;">${amount}</td>
+                                </tr>
+                            `;
+                        }
+                    });
+                    
+                    // Agregar total de departamentos
+                    pdfHTML += `
+                                <tr class="total-row">
+                                    <td><strong>TOTAL</strong></td>
+                                    <td style="text-align: center;"><strong>${totalDepartmentMeals.textContent}</strong></td>
+                                    <td style="text-align: right;"><strong>${totalDepartmentAmount.textContent}</strong></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="pdf-section">
+                        <h2 style="color: #005BAA; font-size: 18px; margin-bottom: 10px; border-bottom: 1px solid #005BAA; padding-bottom: 5px;">
+                            SOLICITUD DE COMIDAS POR PROVEEDOR
+                        </h2>
+                        <table class="pdf-table">
+                            <thead>
+                                <tr>
+                                    <th>PROVEEDOR</th>
+                                    <th>CANTIDAD DE COMIDAS</th>
+                                    <th>IMPORTE</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                    `;
+                    
+                    // Agregar filas de proveedores
+                    providerRows.forEach(row => {
+                        const cells = row.querySelectorAll('td');
+                        if (cells.length >= 3) {
+                            const provider = cells[0].textContent;
+                            const meals = cells[1].textContent;
+                            const amount = cells[2].textContent;
+                            
+                            pdfHTML += `
+                                <tr>
+                                    <td>${provider}</td>
+                                    <td style="text-align: center;">${meals}</td>
+                                    <td style="text-align: right;">${amount}</td>
+                                </tr>
+                            `;
+                        }
+                    });
+                    
+                    // Agregar total de proveedores
+                    pdfHTML += `
+                                <tr class="total-row">
+                                    <td><strong>TOTAL</strong></td>
+                                    <td style="text-align: center;"><strong>${totalProviderMeals.textContent}</strong></td>
+                                    <td style="text-align: right;"><strong>${totalProviderAmount.textContent}</strong></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="pdf-section">
+                        <h2 style="color: #005BAA; font-size: 18px; margin-bottom: 10px; border-bottom: 1px solid #005BAA; padding-bottom: 5px;">
+                            RESUMEN POR TIPO DE UNIDAD
+                        </h2>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
+                            <div class="pdf-summary-box" style="flex: 1; margin-right: 10px;">
+                                <h3 style="color: #005BAA; font-size: 16px; margin-bottom: 10px;">UNIDAD CCS</h3>
+                                <div style="margin-bottom: 5px;">
+                                    <span>Total Comidas: </span>
+                                    <strong>${ccsTotalMeals.textContent}</strong>
+                                </div>
+                                <div>
+                                    <span>Importe Total: </span>
+                                    <strong>${ccsTotalAmount.textContent}</strong>
+                                </div>
+                            </div>
+                            <div class="pdf-summary-box" style="flex: 1; margin-left: 10px;">
+                                <h3 style="color: #005BAA; font-size: 16px; margin-bottom: 10px;">UNIDAD MSO</h3>
+                                <div style="margin-bottom: 5px;">
+                                    <span>Total Comidas: </span>
+                                    <strong>${msoTotalMeals.textContent}</strong>
+                                </div>
+                                <div>
+                                    <span>Importe Total: </span>
+                                    <strong>${msoTotalAmount.textContent}</strong>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div style="text-align: center; padding: 15px; background-color: #f0f7ff; border-radius: 5px; border: 1px solid #005BAA;">
+                            <div style="font-size: 16px; font-weight: bold; color: #005BAA; margin-bottom: 5px;">
+                                GRAN TOTAL MENSUAL
+                            </div>
+                            <div style="font-size: 24px; font-weight: bold; color: #005BAA;">
+                                ${grandTotalAmount.textContent}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="pdf-footer">
+                        <div>Reporte generado el ${todayStr}</div>
+                        <div>Control de Solicitud de Comidas - Inter</div>
+                    </div>
+                </div>
+                    `;
+                    
+                    // Crear elemento temporal para el contenido del PDF
+                    const tempDiv = document.createElement('div');
+                    tempDiv.innerHTML = pdfHTML;
+                    tempDiv.style.position = 'absolute';
+                    tempDiv.style.left = '-9999px';
+                    tempDiv.style.top = '0';
+                    tempDiv.style.width = '800px';
+                    tempDiv.style.backgroundColor = 'white';
+                    tempDiv.style.padding = '20px';
+                    document.body.appendChild(tempDiv);
+                    
+                    // Usar html2canvas para capturar el contenido
+                    const canvas = await html2canvas(tempDiv, {
+                        scale: 2,
+                        useCORS: true,
+                        logging: false,
+                        backgroundColor: '#ffffff'
+                    });
+                    
+                    // Remover el elemento temporal
+                    document.body.removeChild(tempDiv);
+                    
+                    // Crear PDF
+                    const pdf = new jsPDF({
+                        orientation: 'portrait',
+                        unit: 'mm',
+                        format: 'a4'
+                    });
+                    
+                    // Agregar imagen del canvas al PDF
+                    const imgData = canvas.toDataURL('image/png');
+                    const imgWidth = 190; // Ancho en mm para A4
+                    const imgHeight = (canvas.height * imgWidth) / canvas.width;
+                    
+                    pdf.addImage(imgData, 'PNG', 10, 10, imgWidth, imgHeight);
+                    
+                    // Guardar el PDF
+                    pdf.save(`Reporte_Comidas_${monthName}_${year}.pdf`);
+                    
+                    displayMessage('PDF generado exitosamente', 'success');
+                    
+                } catch (error) {
+                    console.error('Error generando PDF:', error);
+                    displayMessage('Error al generar el PDF: ' + error.message, 'error');
+                }
+            }
+
             // Función auxiliar para obtener nombre del mes
             function getMonthName(monthNumber) {
                 const months = [
@@ -2435,6 +2739,7 @@
             // Event Listeners para reporte
             generateReportBtn.addEventListener('click', generateReport);
             exportReportBtn.addEventListener('click', exportReportToExcel);
+            exportPdfBtn.addEventListener('click', exportReportToPDF);
 
             // --- Inicio de la Aplicación ---
 
