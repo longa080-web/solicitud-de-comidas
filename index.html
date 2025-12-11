@@ -574,6 +574,49 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- NUEVA SECCIÓN: Servicios por Unidad y Proveedor -->
+                <div class="bg-gray-50 p-4 rounded-lg mt-6">
+                    <h3 class="text-xl font-bold text-inter-primary mb-4">
+                        SERVICIOS POR UNIDAD Y PROVEEDOR
+                    </h3>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200 border border-gray-300">
+                            <thead class="bg-blue-50">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-sm font-medium text-inter-primary uppercase tracking-wider border border-gray-300">
+                                        UNIDAD
+                                    </th>
+                                    <th class="px-6 py-3 text-left text-sm font-medium text-inter-primary uppercase tracking-wider border border-gray-300">
+                                        PROVEEDOR
+                                    </th>
+                                    <th class="px-6 py-3 text-left text-sm font-medium text-inter-primary uppercase tracking-wider border border-gray-300">
+                                        CANTIDAD DE COMIDAS
+                                    </th>
+                                    <th class="px-6 py-3 text-left text-sm font-medium text-inter-primary uppercase tracking-wider border border-gray-300">
+                                        IMPORTE
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody id="unitProviderReportBody" class="bg-white divide-y divide-gray-200">
+                                <!-- Los datos se llenarán dinámicamente -->
+                            </tbody>
+                            <tfoot class="bg-gray-100">
+                                <tr>
+                                    <td colspan="2" class="px-6 py-3 text-left text-sm font-bold text-gray-900 border border-gray-300">
+                                        TOTAL GENERAL
+                                    </td>
+                                    <td id="totalUnitProviderMeals" class="px-6 py-3 text-left text-sm font-bold text-inter-primary border border-gray-300">
+                                        0
+                                    </td>
+                                    <td id="totalUnitProviderAmount" class="px-6 py-3 text-left text-sm font-bold text-inter-primary border border-gray-300">
+                                        $0.00
+                                    </td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
             </div>
         </section>
 
@@ -976,6 +1019,11 @@
             const msoTotalAmount = document.getElementById('msoTotalAmount');
             const grandTotalAmount = document.getElementById('grandTotalAmount');
             const pdfContent = document.getElementById('pdfContent');
+
+            // --- NUEVAS REFERENCIAS PARA SERVICIOS POR UNIDAD Y PROVEEDOR ---
+            const unitProviderReportBody = document.getElementById('unitProviderReportBody');
+            const totalUnitProviderMeals = document.getElementById('totalUnitProviderMeals');
+            const totalUnitProviderAmount = document.getElementById('totalUnitProviderAmount');
 
             // Definir las unidades de operación (departamentos)
             const departmentList = [
@@ -2126,7 +2174,7 @@
                     acc[req.department] = (acc[req.department] || 0) + 1;
                     return acc;
                 }, {});
-                
+
                 const departmentLabels = Object.keys(departmentCounts).sort();
                 const departmentData = departmentLabels.map(dept => departmentCounts[dept]);
                 const departmentColors = departmentData.map((_, index) => getChartColor(index + 3));
@@ -2210,6 +2258,25 @@
                 
                 // Si no coincide, devolver el original normalizado
                 return dept;
+            }
+
+            // Función para clasificar si es CCS o MSO
+            function classifyUnit(department, msoDepartment) {
+                const dept = department.toString().trim().toUpperCase();
+                
+                // Si es MSO o contiene "PRESIDENCIA", "MARKETING", etc., es MSO
+                if (dept === 'MSO' || 
+                    dept.includes('PRESIDENCIA') || 
+                    dept.includes('MARKETING') || 
+                    dept.includes('INTERCONEXIONES') ||
+                    dept.includes('IMPORTACIONES') ||
+                    dept.includes('RRHH MSO') ||
+                    dept.includes('DOCUMENTACION DE OBRAS')) {
+                    return 'MSO';
+                }
+                
+                // Si es cualquier otro departamento, es CCS
+                return 'CCS';
             }
 
             // Función para generar el reporte
@@ -2331,6 +2398,9 @@
                 // Calcular totales
                 calculateTotals(departmentData);
                 
+                // Renderizar reporte por unidad y proveedor
+                renderUnitProviderReport(filteredRequests);
+                
                 // Mostrar botones de exportar
                 exportReportBtn.classList.remove('hidden');
                 exportPdfBtn.classList.remove('hidden');
@@ -2449,6 +2519,128 @@
                 console.log(`MSO: ${msoMeals} comidas, $${msoAmount.toFixed(2)}`);
             }
 
+            // Función para renderizar el reporte combinado por unidad y proveedor
+            function renderUnitProviderReport(filteredRequests) {
+                unitProviderReportBody.innerHTML = '';
+                
+                // Crear estructura de datos combinada
+                const unitProviderData = {};
+                
+                // Inicializar estructura
+                const units = ['CCS', 'MSO'];
+                const allProviders = [...new Set(filteredRequests.map(r => r.providerName))];
+                
+                units.forEach(unit => {
+                    unitProviderData[unit] = {};
+                    allProviders.forEach(provider => {
+                        unitProviderData[unit][provider] = {
+                            meals: 0,
+                            amount: 0
+                        };
+                    });
+                });
+                
+                // Procesar cada solicitud
+                filteredRequests.forEach(request => {
+                    const unit = classifyUnit(request.department, request.msoDepartment);
+                    const provider = request.providerName || 'No especificado';
+                    const meals = parseInt(request.totalQuantity) || 0;
+                    const amount = parseFloat(request.totalCost) || 0;
+                    
+                    if (!unitProviderData[unit]) {
+                        unitProviderData[unit] = {};
+                    }
+                    
+                    if (!unitProviderData[unit][provider]) {
+                        unitProviderData[unit][provider] = { meals: 0, amount: 0 };
+                    }
+                    
+                    unitProviderData[unit][provider].meals += meals;
+                    unitProviderData[unit][provider].amount += amount;
+                });
+                
+                let totalMeals = 0;
+                let totalAmount = 0;
+                
+                // Renderizar la tabla
+                units.forEach(unit => {
+                    // Verificar si hay datos para esta unidad
+                    const unitHasData = Object.keys(unitProviderData[unit]).some(
+                        provider => unitProviderData[unit][provider].meals > 0
+                    );
+                    
+                    if (unitHasData) {
+                        // Fila de encabezado de unidad
+                        const headerRow = document.createElement('tr');
+                        headerRow.className = 'bg-blue-50 font-bold';
+                        headerRow.innerHTML = `
+                            <td colspan="4" class="px-6 py-3 text-lg text-inter-primary border border-gray-300">
+                                ${unit}
+                            </td>
+                        `;
+                        unitProviderReportBody.appendChild(headerRow);
+                        
+                        // Filas de proveedores para esta unidad
+                        Object.keys(unitProviderData[unit])
+                            .filter(provider => unitProviderData[unit][provider].meals > 0)
+                            .sort((a, b) => unitProviderData[unit][b].meals - unitProviderData[unit][a].meals)
+                            .forEach(provider => {
+                                const data = unitProviderData[unit][provider];
+                                totalMeals += data.meals;
+                                totalAmount += data.amount;
+                                
+                                const row = document.createElement('tr');
+                                row.className = 'hover:bg-gray-50';
+                                row.innerHTML = `
+                                    <td class="px-6 py-4 text-sm text-gray-900 border border-gray-300"></td>
+                                    <td class="px-6 py-4 text-sm text-gray-900 border border-gray-300">
+                                        ${provider}
+                                    </td>
+                                    <td class="px-6 py-4 text-sm text-gray-900 text-center border border-gray-300">
+                                        ${data.meals}
+                                    </td>
+                                    <td class="px-6 py-4 text-sm text-gray-900 text-right border border-gray-300">
+                                        $${data.amount.toFixed(2)}
+                                    </td>
+                                `;
+                                unitProviderReportBody.appendChild(row);
+                            });
+                        
+                        // Fila de subtotal por unidad
+                        const unitMeals = Object.keys(unitProviderData[unit])
+                            .reduce((sum, provider) => sum + unitProviderData[unit][provider].meals, 0);
+                        const unitAmount = Object.keys(unitProviderData[unit])
+                            .reduce((sum, provider) => sum + unitProviderData[unit][provider].amount, 0);
+                        
+                        const subtotalRow = document.createElement('tr');
+                        subtotalRow.className = 'bg-gray-100 font-bold';
+                        subtotalRow.innerHTML = `
+                            <td colspan="2" class="px-6 py-3 text-sm text-gray-900 border border-gray-300 text-right">
+                                Subtotal ${unit}
+                            </td>
+                            <td class="px-6 py-3 text-sm text-inter-primary text-center border border-gray-300">
+                                ${unitMeals}
+                            </td>
+                            <td class="px-6 py-3 text-sm text-inter-primary text-right border border-gray-300">
+                                $${unitAmount.toFixed(2)}
+                            </td>
+                        `;
+                        unitProviderReportBody.appendChild(subtotalRow);
+                        
+                        // Fila en blanco para separación
+                        const spacerRow = document.createElement('tr');
+                        spacerRow.innerHTML = '<td colspan="4" class="py-2"></td>';
+                        unitProviderReportBody.appendChild(spacerRow);
+                    }
+                });
+                
+                // Actualizar totales
+                totalUnitProviderMeals.textContent = totalMeals;
+                totalUnitProviderAmount.textContent = `$${totalAmount.toFixed(2)}`;
+                
+                console.log(`Total unidad/proveedor: ${totalMeals} comidas, $${totalAmount.toFixed(2)}`);
+            }
+
             // Función para exportar a Excel
             function exportReportToExcel() {
                 const selectedMonth = reportMonthInput.value;
@@ -2494,7 +2686,35 @@
                 
                 csv += `TOTAL;${totalProviderMeals.textContent};${totalProviderAmount.textContent.replace('$', '').replace('.', ',')}\n\n`;
                 
-                // Sección 3: Resumen
+                // Sección 3: Servicios por Unidad y Proveedor
+                csv += "SERVICIOS POR UNIDAD Y PROVEEDOR\n";
+                csv += "UNIDAD;PROVEEDOR;CANTIDAD DE COMIDAS;IMPORTE\n";
+                
+                const unitProviderRows = Array.from(unitProviderReportBody.querySelectorAll('tr'));
+                unitProviderRows.forEach(row => {
+                    const cells = row.querySelectorAll('td');
+                    if (cells.length === 4) {
+                        const unit = cells[0].textContent || '';
+                        const provider = cells[1].textContent.replace(';', ',');
+                        const meals = cells[2].textContent;
+                        const amount = cells[3].textContent.replace('$', '').replace('.', ',');
+                        
+                        if (unit.trim() || provider.trim()) {
+                            csv += `${unit};${provider};${meals};${amount}\n`;
+                        }
+                    } else if (cells.length === 1 && cells[0].colSpan === 4) {
+                        // Es un encabezado de unidad
+                        const unit = cells[0].textContent.replace(';', ',');
+                        csv += `${unit};;;;\n`;
+                    } else if (cells.length === 1 && cells[0].className.includes('py-2')) {
+                        // Es un separador
+                        csv += `;;;;\n`;
+                    }
+                });
+                
+                csv += `TOTAL GENERAL;;${totalUnitProviderMeals.textContent};${totalUnitProviderAmount.textContent.replace('$', '').replace('.', ',')}\n\n`;
+                
+                // Sección 4: Resumen
                 csv += "RESUMEN POR TIPO DE UNIDAD\n";
                 csv += `UNIDAD CCS Total Comidas;${ccsTotalMeals.textContent}\n`;
                 csv += `UNIDAD CCS Importe Total;${ccsTotalAmount.textContent.replace('$', '').replace('.', ',')}\n`;
@@ -2536,6 +2756,7 @@
                     // Obtener datos de las tablas
                     const departmentRows = Array.from(departmentReportBody.querySelectorAll('tr'));
                     const providerRows = Array.from(providerReportBody.querySelectorAll('tr'));
+                    const unitProviderRows = Array.from(unitProviderReportBody.querySelectorAll('tr'));
                     
                     // Crear contenido HTML para el PDF
                     let pdfHTML = `
@@ -2629,6 +2850,68 @@
                                     <td><strong>TOTAL</strong></td>
                                     <td style="text-align: center;"><strong>${totalProviderMeals.textContent}</strong></td>
                                     <td style="text-align: right;"><strong>${totalProviderAmount.textContent}</strong></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="pdf-section">
+                        <h2 style="color: #005BAA; font-size: 18px; margin-bottom: 10px; border-bottom: 1px solid #005BAA; padding-bottom: 5px;">
+                            SERVICIOS POR UNIDAD Y PROVEEDOR
+                        </h2>
+                        <table class="pdf-table">
+                            <thead>
+                                <tr>
+                                    <th>UNIDAD</th>
+                                    <th>PROVEEDOR</th>
+                                    <th>CANTIDAD DE COMIDAS</th>
+                                    <th>IMPORTE</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                    `;
+                    
+                    // Agregar filas de unidad/proveedor
+                    let currentUnit = '';
+                    unitProviderRows.forEach(row => {
+                        const cells = row.querySelectorAll('td');
+                        
+                        if (cells.length === 1 && cells[0].colSpan === 4) {
+                            // Es un encabezado de unidad
+                            currentUnit = cells[0].textContent;
+                            pdfHTML += `
+                                <tr style="background-color: #f0f7ff; font-weight: bold;">
+                                    <td colspan="4" style="color: #005BAA; font-size: 16px; padding: 8px; border: 1px solid #ddd;">
+                                        ${currentUnit}
+                                    </td>
+                                </tr>
+                            `;
+                        } else if (cells.length === 4) {
+                            // Es una fila de proveedor
+                            const unit = cells[0].textContent;
+                            const provider = cells[1].textContent;
+                            const meals = cells[2].textContent;
+                            const amount = cells[3].textContent;
+                            
+                            if (provider.trim()) {
+                                pdfHTML += `
+                                    <tr>
+                                        <td>${unit}</td>
+                                        <td>${provider}</td>
+                                        <td style="text-align: center;">${meals}</td>
+                                        <td style="text-align: right;">${amount}</td>
+                                    </tr>
+                                `;
+                            }
+                        }
+                    });
+                    
+                    // Agregar total de unidad/proveedor
+                    pdfHTML += `
+                                <tr class="total-row">
+                                    <td colspan="2"><strong>TOTAL GENERAL</strong></td>
+                                    <td style="text-align: center;"><strong>${totalUnitProviderMeals.textContent}</strong></td>
+                                    <td style="text-align: right;"><strong>${totalUnitProviderAmount.textContent}</strong></td>
                                 </tr>
                             </tbody>
                         </table>
