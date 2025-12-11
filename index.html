@@ -2100,6 +2100,26 @@
                 reportMonthInput.value = `${year}-${month}`;
             });
 
+            // Función para mapear departamentos (versión mejorada)
+            function mapDepartment(department, msoDepartment) {
+                if (!department) return 'NO ESPECIFICADO';
+                
+                const dept = department.toString().trim().toUpperCase();
+                
+                // Mapeos específicos
+                if (dept.includes('EL ROSAL') || dept === 'C.O EL ROSAL') return 'C.O EL ROSAL';
+                if (dept.includes('LOS RUICES') || dept === 'C.O LOS RUICES') return 'C.O LOS RUICES';
+                if (dept.includes('LA NAYA') || dept === 'C.O LA NAYA') return 'C.O LA NAYA';
+                if (dept.includes('PARAISO') || dept === 'C.O PARAISO-CATIA') return 'C.O PARAISO-CATIA';
+                if (dept.includes('OBRAS') || dept === 'DPTO DE OBRAS') return 'DPTO DE OBRAS';
+                if (dept.includes('COMERCIAL') || dept === 'AREA COMERCIAL' || dept === 'ÁREA COMERCIAL') return 'AREA COMERCIAL';
+                if (dept.includes('GERENCIA SENIOR') || dept === 'G. SENIOR') return 'G. SENIOR';
+                if (dept.includes('MSO') || dept === 'MSO') return 'MSO';
+                
+                // Si no coincide, devolver el original normalizado
+                return dept;
+            }
+
             // Función para generar el reporte
             function generateReport() {
                 const selectedMonth = reportMonthInput.value;
@@ -2122,11 +2142,14 @@
                     return;
                 }
                 
+                console.log(`=== GENERANDO REPORTE PARA ${month}/${year} ===`);
+                console.log(`Total solicitudes: ${filteredRequests.length}`);
+                
                 // Inicializar estructuras de datos
                 const departmentData = {};
                 const providerData = {};
                 
-                // Inicializar departamentos
+                // Inicializar departamentos con 0
                 departmentList.forEach(dept => {
                     departmentData[dept] = {
                         meals: 0,
@@ -2134,7 +2157,7 @@
                     };
                 });
                 
-                // Inicializar proveedores
+                // Inicializar proveedores con 0
                 providerList.forEach(provider => {
                     providerData[provider] = {
                         meals: 0,
@@ -2142,15 +2165,39 @@
                     };
                 });
                 
+                // Contador para depuración
+                let totalComidasCalculadas = 0;
+                let areaComercialComidas = 0;
+                
                 // Procesar datos de las solicitudes
-                filteredRequests.forEach(request => {
+                filteredRequests.forEach((request, index) => {
                     const departmentKey = mapDepartment(request.department, request.msoDepartment);
                     const providerKey = request.providerName;
-                    const meals = request.totalQuantity;
+                    
+                    // Asegurar que totalQuantity sea un número entero
+                    const meals = parseInt(request.totalQuantity) || 0;
                     const amount = parseFloat(request.totalCost) || 0;
+                    
+                    // Depuración para Área Comercial
+                    if (departmentKey === 'AREA COMERCIAL') {
+                        areaComercialComidas += meals;
+                        console.log(`Registro ${index + 1} - Área Comercial: ${meals} comidas (ID: ${request.id})`);
+                        console.log(`  - TotalQuantity: ${request.totalQuantity}`);
+                        console.log(`  - Departamento original: ${request.department}`);
+                    }
+                    
+                    totalComidasCalculadas += meals;
                     
                     // Acumular por departamento
                     if (departmentData[departmentKey]) {
+                        departmentData[departmentKey].meals += meals;
+                        departmentData[departmentKey].amount += amount;
+                    } else {
+                        console.warn(`⚠️ Departamento no encontrado en lista: ${departmentKey} (original: ${request.department})`);
+                        // Si no está en la lista, crear una entrada
+                        if (!departmentData[departmentKey]) {
+                            departmentData[departmentKey] = { meals: 0, amount: 0 };
+                        }
                         departmentData[departmentKey].meals += meals;
                         departmentData[departmentKey].amount += amount;
                     }
@@ -2159,8 +2206,29 @@
                     if (providerData[providerKey]) {
                         providerData[providerKey].meals += meals;
                         providerData[providerKey].amount += amount;
+                    } else {
+                        // Si el proveedor no está en la lista, usar "Otros"
+                        const providerKeyNormalized = providerKey || 'Otros';
+                        if (!providerData[providerKeyNormalized]) {
+                            providerData[providerKeyNormalized] = { meals: 0, amount: 0 };
+                        }
+                        providerData[providerKeyNormalized].meals += meals;
+                        providerData[providerKeyNormalized].amount += amount;
                     }
                 });
+                
+                console.log(`=== RESUMEN ===`);
+                console.log(`Total comidas calculadas: ${totalComidasCalculadas}`);
+                console.log(`Comidas Área Comercial: ${areaComercialComidas}`);
+                console.log('Datos por departamento:', JSON.stringify(departmentData, null, 2));
+                
+                // Verificar consistencia
+                let sumaDepartamentos = 0;
+                Object.values(departmentData).forEach(data => {
+                    sumaDepartamentos += data.meals;
+                });
+                
+                console.log(`Suma departamentos: ${sumaDepartamentos}`);
                 
                 // Renderizar reporte por departamento
                 renderDepartmentReport(departmentData);
@@ -2174,20 +2242,11 @@
                 // Mostrar botón de exportar
                 exportReportBtn.classList.remove('hidden');
                 
-                displayMessage(`Reporte generado para ${getMonthName(month)} ${year}`, 'success');
-            }
-
-            // Función para mapear departamentos (incluye subdepartamentos de MSO)
-            function mapDepartment(department, msoDepartment) {
-                if (department === 'C.O El Rosal') return 'C.O EL ROSAL';
-                if (department === 'C.O Los Ruices') return 'C.O LOS RUICES';
-                if (department === 'C.O La Naya') return 'C.O LA NAYA';
-                if (department === 'C.O Paraiso-Catia') return 'C.O PARAISO-CATIA';
-                if (department === 'Obras') return 'DPTO DE OBRAS';
-                if (department === 'Área Comercial') return 'AREA COMERCIAL';
-                if (department === 'Gerencia Senior') return 'G. SENIOR';
-                if (department === 'MSO') return 'MSO';
-                return department;
+                // Verificación final
+                const comidasAreaComercial = departmentData['AREA COMERCIAL'] ? departmentData['AREA COMERCIAL'].meals : 0;
+                console.log(`✅ Comidas finales Área Comercial en reporte: ${comidasAreaComercial}`);
+                
+                displayMessage(`Reporte generado para ${getMonthName(month)} ${year}. Área Comercial: ${comidasAreaComercial} comidas`, 'success');
             }
 
             // Función para renderizar reporte por departamento
@@ -2220,6 +2279,8 @@
                 
                 totalDepartmentMeals.textContent = totalMeals;
                 totalDepartmentAmount.textContent = `$${totalAmount.toFixed(2)}`;
+                
+                console.log(`Total departamentos en reporte: ${totalMeals} comidas, $${totalAmount.toFixed(2)}`);
             }
 
             // Función para renderizar reporte por proveedor
@@ -2229,29 +2290,39 @@
                 let totalMeals = 0;
                 let totalAmount = 0;
                 
-                providerList.forEach(provider => {
-                    const data = providerData[provider] || { meals: 0, amount: 0 };
-                    totalMeals += data.meals;
-                    totalAmount += data.amount;
-                    
-                    const row = document.createElement('tr');
-                    row.className = 'hover:bg-gray-50';
-                    row.innerHTML = `
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 border border-gray-300">
-                            ${provider}
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-center border border-gray-300">
-                            ${data.meals}
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right border border-gray-300">
-                            $${data.amount.toFixed(2)}
-                        </td>
-                    `;
-                    providerReportBody.appendChild(row);
+                // Ordenar proveedores por cantidad de comidas (descendente)
+                const providersSorted = Object.keys(providerData).sort((a, b) => {
+                    return providerData[b].meals - providerData[a].meals;
+                });
+                
+                // Mostrar todos los proveedores que tengan comidas
+                providersSorted.forEach(provider => {
+                    const data = providerData[provider];
+                    if (data.meals > 0) {
+                        totalMeals += data.meals;
+                        totalAmount += data.amount;
+                        
+                        const row = document.createElement('tr');
+                        row.className = 'hover:bg-gray-50';
+                        row.innerHTML = `
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 border border-gray-300">
+                                ${provider}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-center border border-gray-300">
+                                ${data.meals}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right border border-gray-300">
+                                $${data.amount.toFixed(2)}
+                            </td>
+                        `;
+                        providerReportBody.appendChild(row);
+                    }
                 });
                 
                 totalProviderMeals.textContent = totalMeals;
                 totalProviderAmount.textContent = `$${totalAmount.toFixed(2)}`;
+                
+                console.log(`Total proveedores en reporte: ${totalMeals} comidas, $${totalAmount.toFixed(2)}`);
             }
 
             // Función para calcular totales CCS vs MSO
@@ -2280,6 +2351,9 @@
                 msoTotalMeals.textContent = msoMeals;
                 msoTotalAmount.textContent = `$${msoAmount.toFixed(2)}`;
                 grandTotalAmount.textContent = `$${(ccsAmount + msoAmount).toFixed(2)}`;
+                
+                console.log(`CCS: ${ccsMeals} comidas, $${ccsAmount.toFixed(2)}`);
+                console.log(`MSO: ${msoMeals} comidas, $${msoAmount.toFixed(2)}`);
             }
 
             // Función para exportar a Excel
