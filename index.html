@@ -58,54 +58,55 @@
         /* Estilos para el reporte en PDF */
         .report-pdf {
             background-color: white;
-            padding: 20px;
+            padding: 10px;
             font-family: 'Inter', sans-serif;
         }
         
         .pdf-header {
             text-align: center;
-            margin-bottom: 20px;
+            margin-bottom: 10px;
             border-bottom: 2px solid #005BAA;
-            padding-bottom: 15px;
+            padding-bottom: 8px;
         }
         
         .pdf-title {
             color: #005BAA;
-            font-size: 24px;
+            font-size: 16px;
             font-weight: bold;
-            margin-bottom: 5px;
+            margin-bottom: 3px;
         }
         
         .pdf-subtitle {
             color: #666;
-            font-size: 16px;
-            margin-bottom: 10px;
+            font-size: 12px;
+            margin-bottom: 5px;
         }
         
         .pdf-section {
-            margin-bottom: 20px;
+            margin-bottom: 12px;
             page-break-inside: avoid;
         }
         
         .pdf-table {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 10px;
-            font-size: 11px;
+            margin-bottom: 6px;
+            font-size: 7px;
         }
         
         .pdf-table th {
             background-color: #f0f7ff;
             color: #005BAA;
             font-weight: bold;
-            padding: 8px;
+            padding: 4px;
             border: 1px solid #ddd;
             text-align: left;
         }
         
         .pdf-table td {
-            padding: 8px;
+            padding: 4px;
             border: 1px solid #ddd;
+            font-size: 7px;
         }
         
         .pdf-table .total-row {
@@ -115,19 +116,19 @@
         
         .pdf-summary-box {
             border: 1px solid #ddd;
-            padding: 15px;
-            margin-bottom: 15px;
-            border-radius: 5px;
+            padding: 8px;
+            margin-bottom: 8px;
+            border-radius: 4px;
             background-color: #f9f9f9;
         }
         
         .pdf-footer {
             text-align: center;
-            margin-top: 30px;
-            padding-top: 15px;
+            margin-top: 15px;
+            padding-top: 8px;
             border-top: 1px solid #ddd;
             color: #666;
-            font-size: 10px;
+            font-size: 7px;
         }
         
         /* ========== ESTILOS RESPONSIVOS AGREGADOS ========== */
@@ -897,16 +898,55 @@
 
         <!-- NUEVA SECCIÓN: REPORTE MENSUAL DE GASTOS -->
         <section class="mt-6 md:mt-8 p-4 md:p-6 bg-white rounded-lg border border-inter-primary shadow-lg">
-            <h2 class="text-xl md:text-2xl font-bold text-inter-primary mb-3 md:mb-4">Reporte Mensual de Gastos</h2>
+            <h2 class="text-xl md:text-2xl font-bold text-inter-primary mb-3 md:mb-4">Reporte de Gastos</h2>
             
             <div class="mb-4 md:mb-6">
-                <label for="reportMonth" class="block text-sm font-medium text-gray-700 mb-2">
-                    Seleccionar Mes y Año para el Reporte
+                <label for="reportPeriodType" class="block text-sm font-medium text-gray-700 mb-2">
+                    Tipo de Periodo
                 </label>
-                <div class="flex flex-col sm:flex-row flex-wrap items-center gap-3 md:gap-4">
-                    <input type="month" id="reportMonth" 
-                           class="px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-inter-primary focus:border-inter-primary w-full sm:w-auto text-sm md:text-base"
-                           value="">
+                <div class="flex flex-col sm:flex-row flex-wrap items-center gap-3 md:gap-4 mb-4">
+                    <div class="flex items-center space-x-4">
+                        <label class="inline-flex items-center">
+                            <input type="radio" name="periodType" value="monthly" checked
+                                   class="form-radio text-inter-primary h-4 w-4 md:h-4 md:w-4" id="periodMonthly">
+                            <span class="ml-2 text-gray-700 text-sm md:text-base">Mensual</span>
+                        </label>
+                        <label class="inline-flex items-center">
+                            <input type="radio" name="periodType" value="biweekly"
+                                   class="form-radio text-inter-primary h-4 w-4 md:h-4 md:w-4" id="periodBiweekly">
+                            <span class="ml-2 text-gray-700 text-sm md:text-base">Quincenal</span>
+                        </label>
+                    </div>
+                </div>
+                
+                <div id="monthlyFilter" class="filter-section">
+                    <label for="reportMonth" class="block text-sm font-medium text-gray-700 mb-2">
+                        Seleccionar Mes y Año
+                    </label>
+                    <div class="flex flex-col sm:flex-row flex-wrap items-center gap-3 md:gap-4">
+                        <input type="month" id="reportMonth" 
+                               class="px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-inter-primary focus:border-inter-primary w-full sm:w-auto text-sm md:text-base"
+                               value="">
+                    </div>
+                </div>
+                
+                <div id="biweeklyFilter" class="filter-section hidden">
+                    <label for="biweekStartDate" class="block text-sm font-medium text-gray-700 mb-2">
+                        Seleccionar Periodo Quincenal
+                    </label>
+                    <div class="flex flex-col sm:flex-row flex-wrap items-center gap-3 md:gap-4">
+                        <input type="date" id="biweekStartDate" 
+                               class="px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-inter-primary focus:border-inter-primary w-full sm:w-auto text-sm md:text-base"
+                               value="">
+                        <span class="text-gray-700">a</span>
+                        <input type="date" id="biweekEndDate" 
+                               class="px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-inter-primary focus:border-inter-primary w-full sm:w-auto text-sm md:text-base"
+                               value="">
+                    </div>
+                    <p class="text-xs text-gray-500 mt-2">Nota: Seleccione una fecha de inicio y otra de fin para el periodo quincenal (15 días aproximadamente).</p>
+                </div>
+                
+                <div class="mt-4 flex flex-col sm:flex-row flex-wrap items-center gap-3 md:gap-4">
                     <button id="generateReportBtn" 
                             class="bg-inter-primary hover:bg-blue-700 text-white font-bold py-2 px-4 md:px-6 rounded-lg shadow-md transition duration-300 ease-in-out whitespace-nowrap w-full sm:w-auto">
                         Generar Reporte
@@ -1037,7 +1077,7 @@
                     </div>
                     <div class="mt-3 md:mt-4 pt-3 md:pt-4 border-t border-gray-300">
                         <div class="flex justify-between items-center">
-                            <span class="text-base md:text-lg font-bold text-gray-700">GRAN TOTAL MENSUAL:</span>
+                            <span class="text-base md:text-lg font-bold text-gray-700">GRAN TOTAL:</span>
                             <span id="grandTotalAmount" class="text-xl md:text-2xl font-extrabold text-inter-primary">$0.00</span>
                         </div>
                     </div>
@@ -1211,18 +1251,25 @@
 
         document.addEventListener('DOMContentLoaded', async () => {
             // Esperar a que Firebase esté listo
-            if (!window.firebaseDb || !window.firebaseFunctions) {
-                console.error("Firebase no se inicializó correctamente");
-                displayMessage('Error: Firebase no se pudo inicializar', 'error');
-                return;
-            }
+            setTimeout(async () => {
+                if (!window.firebaseDb || !window.firebaseFunctions) {
+                    console.error("Firebase no se inicializó correctamente");
+                    displayMessage('Error: Firebase no se pudo inicializar', 'error');
+                    return;
+                }
 
-            // Asignar las referencias de Firebase
-            db = window.firebaseDb;
-            firebaseFunctions = window.firebaseFunctions;
+                // Asignar las referencias de Firebase
+                db = window.firebaseDb;
+                firebaseFunctions = window.firebaseFunctions;
 
-            console.log("Firebase configurado correctamente en la aplicación");
+                console.log("Firebase configurado correctamente en la aplicación");
 
+                // Inicializar la aplicación
+                await initializeApplication();
+            }, 1000); // Esperar 1 segundo para asegurar que Firebase se cargue
+        });
+
+        async function initializeApplication() {
             const form = document.getElementById('foodRequestForm');
             const departmentSelect = document.getElementById('department');
             const msoObservationsContainer = document.getElementById('msoObservationsContainer');
@@ -1478,6 +1525,12 @@
 
             // --- Elementos del Reporte Mensual ---
             const reportMonthInput = document.getElementById('reportMonth');
+            const periodMonthly = document.getElementById('periodMonthly');
+            const periodBiweekly = document.getElementById('periodBiweekly');
+            const monthlyFilter = document.getElementById('monthlyFilter');
+            const biweeklyFilter = document.getElementById('biweeklyFilter');
+            const biweekStartDate = document.getElementById('biweekStartDate');
+            const biweekEndDate = document.getElementById('biweekEndDate');
             const generateReportBtn = document.getElementById('generateReportBtn');
             const exportReportBtn = document.getElementById('exportReportBtn');
             const exportPdfBtn = document.getElementById('exportPdfBtn');
@@ -1613,6 +1666,54 @@
                 return `${year}-${month}-${day}`;
             }
 
+            // Función para normalizar fecha a formato YYYY-MM-DD
+            function normalizeDate(dateString) {
+                if (!dateString) return null;
+                
+                // Si ya está en formato YYYY-MM-DD, devolverlo
+                if (typeof dateString === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(dateString)) {
+                    return dateString;
+                }
+                
+                try {
+                    // Intentar convertir cualquier formato a YYYY-MM-DD
+                    const date = new Date(dateString);
+                    if (isNaN(date.getTime())) {
+                        return null;
+                    }
+                    
+                    const year = date.getFullYear();
+                    const month = String(date.getMonth() + 1).padStart(2, '0');
+                    const day = String(date.getDate()).padStart(2, '0');
+                    
+                    return `${year}-${month}-${day}`;
+                } catch (error) {
+                    console.error('Error normalizando fecha:', dateString, error);
+                    return null;
+                }
+            }
+
+            // Función para formatear fecha para display
+            function formatDateForDisplay(dateString) {
+                const normalizedDate = normalizeDate(dateString);
+                if (!normalizedDate) return '';
+                
+                const date = new Date(normalizedDate + 'T12:00:00');
+                return date.toLocaleDateString('es-ES', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric'
+                });
+            }
+
+            // Función para formatear fecha para nombres de archivo
+            function formatDateForFilename(dateString) {
+                const normalizedDate = normalizeDate(dateString);
+                if (!normalizedDate) return '';
+                
+                return normalizedDate.replace(/-/g, '');
+            }
+
             // Mostrar/ocultar campo de observaciones para MSO
             departmentSelect.addEventListener('change', function() {
                 if (this.value === 'MSO') {
@@ -1661,8 +1762,8 @@
 
             // Función para formatear fechas a YYYY-MM-DD para el input[type=date]
             function formatDateForInput(dateString) {
-                if (!dateString) return '';
-                return dateString.split('T')[0];
+                const normalizedDate = normalizeDate(dateString);
+                return normalizedDate || '';
             }
             
             // Función para mostrar mensajes de estado
@@ -2388,7 +2489,7 @@
                     "Costo Delivery ($)", 
                     "Costo Total Final ($)"
                 ];
-                
+            
                 let csv = headers.join(";") + "\n";
 
                 foodRequests.forEach(req => {
@@ -2787,11 +2888,30 @@
             // --- Lógica del Reporte Mensual ---
 
             // Establecer mes actual por defecto
-            window.addEventListener('DOMContentLoaded', () => {
-                const now = new Date();
-                const year = now.getFullYear();
-                const month = String(now.getMonth() + 1).padStart(2, '0');
-                reportMonthInput.value = `${year}-${month}`;
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            reportMonthInput.value = `${year}-${month}`;
+            
+            // Establecer fechas quincenales por defecto (primera quincena del mes)
+            const startDate = `${year}-${month}-01`;
+            const endDate = new Date(year, parseInt(month), 15).toISOString().split('T')[0];
+            biweekStartDate.value = startDate;
+            biweekEndDate.value = endDate;
+
+            // Manejar cambio entre filtro mensual y quincenal
+            periodMonthly.addEventListener('change', function() {
+                if (this.checked) {
+                    monthlyFilter.classList.remove('hidden');
+                    biweeklyFilter.classList.add('hidden');
+                }
+            });
+            
+            periodBiweekly.addEventListener('change', function() {
+                if (this.checked) {
+                    monthlyFilter.classList.add('hidden');
+                    biweeklyFilter.classList.remove('hidden');
+                }
             });
 
             // Función para mapear departamentos (versión mejorada)
@@ -2833,30 +2953,118 @@
                 return 'CCS';
             }
 
-            // Función para generar el reporte
+            // Función para obtener nombre del mes
+            function getMonthName(monthNumber) {
+                const months = [
+                    'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+                    'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
+                ];
+                return months[parseInt(monthNumber) - 1];
+            }
+
+            // Función para generar el reporte (CORREGIDA - maneja ambos tipos correctamente)
             function generateReport() {
-                const selectedMonth = reportMonthInput.value;
-                if (!selectedMonth) {
-                    displayMessage('Por favor seleccione un mes para el reporte', 'error');
-                    return;
+                const isMonthly = periodMonthly.checked;
+                let filteredRequests = [];
+                let reportTitle = '';
+                
+                if (isMonthly) {
+                    // Filtro mensual
+                    const selectedMonth = reportMonthInput.value;
+                    if (!selectedMonth) {
+                        displayMessage('Por favor seleccione un mes para el reporte', 'error');
+                        return;
+                    }
+                    
+                    const [year, month] = selectedMonth.split('-');
+                    reportTitle = `Reporte Mensual - ${getMonthName(month)} ${year}`;
+                    
+                    // Filtrar solicitudes del mes seleccionado - CÓDIGO CORREGIDO
+                    filteredRequests = foodRequests.filter(request => {
+                        if (!request.deliveryDate) return false;
+                        
+                        try {
+                            const requestDate = new Date(request.deliveryDate + 'T12:00:00');
+                            if (isNaN(requestDate.getTime())) return false;
+                            
+                            // Obtener año y mes de la fecha de la solicitud
+                            const requestYear = requestDate.getFullYear();
+                            const requestMonth = requestDate.getMonth() + 1;
+                            
+                            return requestYear === parseInt(year) && requestMonth === parseInt(month);
+                        } catch (error) {
+                            console.error('Error procesando fecha:', request.deliveryDate, error);
+                            return false;
+                        }
+                    });
+                    
+                    console.log(`=== GENERANDO REPORTE MENSUAL PARA ${month}/${year} ===`);
+                } else {
+                    // Filtro quincenal - CÓDIGO CORREGIDO
+                    const startDate = biweekStartDate.value;
+                    const endDate = biweekEndDate.value;
+                    
+                    if (!startDate || !endDate) {
+                        displayMessage('Por favor seleccione ambas fechas para el periodo quincenal', 'error');
+                        return;
+                    }
+                    
+                    if (new Date(endDate) < new Date(startDate)) {
+                        displayMessage('La fecha de fin debe ser mayor o igual a la fecha de inicio', 'error');
+                        return;
+                    }
+                    
+                    // Calcular días de diferencia
+                    const diffTime = Math.abs(new Date(endDate) - new Date(startDate));
+                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                    
+                    if (diffDays > 31) {
+                        displayMessage('El periodo quincenal no debe exceder los 31 días', 'error');
+                        return;
+                    }
+                    
+                    reportTitle = `Reporte Quincenal - ${formatDateForDisplay(startDate)} a ${formatDateForDisplay(endDate)}`;
+                    
+                    // Filtrar solicitudes del periodo seleccionado - CÓDIGO CORREGIDO
+                    filteredRequests = foodRequests.filter(request => {
+                        if (!request.deliveryDate) return false;
+                        
+                        try {
+                            // Crear fecha de la solicitud (solo fecha, sin hora)
+                            const requestDateStr = request.deliveryDate; // Formato YYYY-MM-DD
+                            const requestDate = new Date(requestDateStr + 'T00:00:00');
+                            
+                            // Crear fechas de inicio y fin del periodo
+                            const start = new Date(startDate + 'T00:00:00');
+                            const end = new Date(endDate + 'T23:59:59.999'); // Hasta el final del día
+                            
+                            // Comparar fechas
+                            return requestDate >= start && requestDate <= end;
+                        } catch (error) {
+                            console.error('Error procesando fecha:', request.deliveryDate, error);
+                            return false;
+                        }
+                    });
+                    
+                    console.log(`=== GENERANDO REPORTE QUINCENAL DEL ${startDate} AL ${endDate} ===`);
+                    console.log(`Fecha inicio: ${startDate}T00:00:00`);
+                    console.log(`Fecha fin: ${endDate}T23:59:59.999`);
+                    console.log(`Días en el periodo: ${diffDays + 1}`);
+                    console.log(`Solicitudes filtradas: ${filteredRequests.length}`);
                 }
                 
-                const [year, month] = selectedMonth.split('-');
-                
-                // Filtrar solicitudes del mes seleccionado
-                const filteredRequests = foodRequests.filter(request => {
-                    const requestDate = new Date(request.deliveryDate + 'T12:00:00');
-                    return requestDate.getFullYear() === parseInt(year) && 
-                           (requestDate.getMonth() + 1) === parseInt(month);
-                });
+                console.log(`Solicitudes filtradas: ${filteredRequests.length} de ${foodRequests.length} totales`);
                 
                 if (filteredRequests.length === 0) {
-                    displayMessage('No hay datos para el mes seleccionado', 'error');
+                    displayMessage('No hay datos para el periodo seleccionado', 'error');
                     return;
                 }
                 
-                console.log(`=== GENERANDO REPORTE PARA ${month}/${year} ===`);
-                console.log(`Total solicitudes: ${filteredRequests.length}`);
+                // Actualizar título del reporte
+                const reportTitleElement = document.querySelector('#reportContent').previousElementSibling.querySelector('h2');
+                if (reportTitleElement) {
+                    reportTitleElement.textContent = reportTitle;
+                }
                 
                 // Inicializar estructuras de datos
                 const departmentData = {};
@@ -2878,28 +3086,14 @@
                     };
                 });
                 
-                // Contador para depuración
-                let totalComidasCalculadas = 0;
-                let areaComercialComidas = 0;
-                
                 // Procesar datos de las solicitudes
-                filteredRequests.forEach((request, index) => {
+                filteredRequests.forEach((request) => {
                     const departmentKey = mapDepartment(request.department, request.msoDepartment);
                     const providerKey = request.providerName;
                     
                     // Asegurar que totalQuantity sea un número entero
                     const meals = parseInt(request.totalQuantity) || 0;
                     const amount = parseFloat(request.totalCost) || 0;
-                    
-                    // Depuración para Área Comercial
-                    if (departmentKey === 'AREA COMERCIAL') {
-                        areaComercialComidas += meals;
-                        console.log(`Registro ${index + 1} - Área Comercial: ${meals} comidas (ID: ${request.id})`);
-                        console.log(`  - TotalQuantity: ${request.totalQuantity}`);
-                        console.log(`  - Departamento original: ${request.department}`);
-                    }
-                    
-                    totalComidasCalculadas += meals;
                     
                     // Acumular por departamento
                     if (departmentData[departmentKey]) {
@@ -2930,19 +3124,6 @@
                     }
                 });
                 
-                console.log(`=== RESUMEN ===`);
-                console.log(`Total comidas calculadas: ${totalComidasCalculadas}`);
-                console.log(`Comidas Área Comercial: ${areaComercialComidas}`);
-                console.log('Datos por departamento:', JSON.stringify(departmentData, null, 2));
-                
-                // Verificar consistencia
-                let sumaDepartamentos = 0;
-                Object.values(departmentData).forEach(data => {
-                    sumaDepartamentos += data.meals;
-                });
-                
-                console.log(`Suma departamentos: ${sumaDepartamentos}`);
-                
                 // Renderizar reporte por departamento
                 renderDepartmentReport(departmentData);
                 
@@ -2959,11 +3140,7 @@
                 exportReportBtn.classList.remove('hidden');
                 exportPdfBtn.classList.remove('hidden');
                 
-                // Verificación final
-                const comidasAreaComercial = departmentData['AREA COMERCIAL'] ? departmentData['AREA COMERCIAL'].meals : 0;
-                console.log(`✅ Comidas finales Área Comercial en reporte: ${comidasAreaComercial}`);
-                
-                displayMessage(`Reporte generado para ${getMonthName(month)} ${year}. Área Comercial: ${comidasAreaComercial} comidas`, 'success');
+                displayMessage(`Reporte generado: ${filteredRequests.length} solicitudes procesadas`, 'success');
             }
 
             // Función para renderizar reporte por departamento
@@ -2996,8 +3173,6 @@
                 
                 totalDepartmentMeals.textContent = totalMeals;
                 totalDepartmentAmount.textContent = `$${totalAmount.toFixed(2)}`;
-                
-                console.log(`Total departamentos en reporte: ${totalMeals} comidas, $${totalAmount.toFixed(2)}`);
             }
 
             // Función para renderizar reporte por proveedor
@@ -3038,8 +3213,6 @@
                 
                 totalProviderMeals.textContent = totalMeals;
                 totalProviderAmount.textContent = `$${totalAmount.toFixed(2)}`;
-                
-                console.log(`Total proveedores en reporte: ${totalMeals} comidas, $${totalAmount.toFixed(2)}`);
             }
 
             // Función para calcular totales CCS vs MSO
@@ -3068,9 +3241,6 @@
                 msoTotalMeals.textContent = msoMeals;
                 msoTotalAmount.textContent = `$${msoAmount.toFixed(2)}`;
                 grandTotalAmount.textContent = `$${(ccsAmount + msoAmount).toFixed(2)}`;
-                
-                console.log(`CCS: ${ccsMeals} comidas, $${ccsAmount.toFixed(2)}`);
-                console.log(`MSO: ${msoMeals} comidas, $${msoAmount.toFixed(2)}`);
             }
 
             // Función para renderizar el reporte combinado por unidad y proveedor
@@ -3079,20 +3249,6 @@
                 
                 // Crear estructura de datos combinada
                 const unitProviderData = {};
-                
-                // Inicializar estructura
-                const units = ['CCS', 'MSO'];
-                const allProviders = [...new Set(filteredRequests.map(r => r.providerName))];
-                
-                units.forEach(unit => {
-                    unitProviderData[unit] = {};
-                    allProviders.forEach(provider => {
-                        unitProviderData[unit][provider] = {
-                            meals: 0,
-                            amount: 0
-                        };
-                    });
-                });
                 
                 // Procesar cada solicitud
                 filteredRequests.forEach(request => {
@@ -3116,10 +3272,13 @@
                 let totalMeals = 0;
                 let totalAmount = 0;
                 
+                // Definir el orden de las unidades
+                const units = ['CCS', 'MSO'];
+                
                 // Renderizar la tabla
                 units.forEach(unit => {
                     // Verificar si hay datos para esta unidad
-                    const unitHasData = Object.keys(unitProviderData[unit]).some(
+                    const unitHasData = unitProviderData[unit] && Object.keys(unitProviderData[unit]).some(
                         provider => unitProviderData[unit][provider].meals > 0
                     );
                     
@@ -3191,20 +3350,33 @@
                 // Actualizar totales
                 totalUnitProviderMeals.textContent = totalMeals;
                 totalUnitProviderAmount.textContent = `$${totalAmount.toFixed(2)}`;
-                
-                console.log(`Total unidad/proveedor: ${totalMeals} comidas, $${totalAmount.toFixed(2)}`);
             }
 
             // Función para exportar a Excel
             function exportReportToExcel() {
-                const selectedMonth = reportMonthInput.value;
-                if (!selectedMonth) return;
+                const isMonthly = periodMonthly.checked;
+                let fileName = '';
                 
-                const [year, month] = selectedMonth.split('-');
-                const monthName = getMonthName(month);
+                if (isMonthly) {
+                    const selectedMonth = reportMonthInput.value;
+                    if (!selectedMonth) return;
+                    
+                    const [year, month] = selectedMonth.split('-');
+                    const monthName = getMonthName(month);
+                    fileName = `Reporte_Mensual_Comidas_${monthName}_${year}.csv`;
+                } else {
+                    const startDate = biweekStartDate.value;
+                    const endDate = biweekEndDate.value;
+                    
+                    if (!startDate || !endDate) return;
+                    
+                    const startFormatted = formatDateForFilename(startDate);
+                    const endFormatted = formatDateForFilename(endDate);
+                    fileName = `Reporte_Quincenal_Comidas_${startFormatted}_${endFormatted}.csv`;
+                }
                 
                 // Crear datos para el reporte
-                let csv = `Reporte de Gastos de Comida - ${monthName} ${year}\n\n`;
+                let csv = `Reporte de Gastos de Comida\n\n`;
                 
                 // Sección 1: Por Unidad de Operación
                 csv += "SOLICITUD DE COMIDAS POR UNIDAD DE OPERACIONES\n";
@@ -3274,14 +3446,14 @@
                 csv += `UNIDAD CCS Importe Total;${ccsTotalAmount.textContent.replace('$', '').replace('.', ',')}\n`;
                 csv += `UNIDAD MSO Total Comidas;${msoTotalMeals.textContent}\n`;
                 csv += `UNIDAD MSO Importe Total;${msoTotalAmount.textContent.replace('$', '').replace('.', ',')}\n`;
-                csv += `GRAN TOTAL MENSUAL;${grandTotalAmount.textContent.replace('$', '').replace('.', ',')}\n`;
+                csv += `GRAN TOTAL;${grandTotalAmount.textContent.replace('$', '').replace('.', ',')}\n`;
                 
                 // Crear y descargar archivo
                 const blob = new Blob(["\uFEFF", csv], { type: 'text/csv;charset=utf-8;' });
                 const url = URL.createObjectURL(blob);
                 const link = document.createElement('a');
                 link.setAttribute('href', url);
-                link.setAttribute('download', `Reporte_Comidas_${monthName}_${year}.csv`);
+                link.setAttribute('download', fileName);
                 link.style.visibility = 'hidden';
                 document.body.appendChild(link);
                 link.click();
@@ -3290,16 +3462,33 @@
                 displayMessage('Reporte exportado exitosamente', 'success');
             }
 
-            // Función para exportar a PDF
+            // Función para exportar a PDF - MEJORADA PARA UNA SOLA HOJA
             async function exportReportToPDF() {
-                const selectedMonth = reportMonthInput.value;
-                if (!selectedMonth) {
-                    displayMessage('Por favor genere primero un reporte', 'error');
-                    return;
+                const isMonthly = periodMonthly.checked;
+                let periodText = '';
+                
+                if (isMonthly) {
+                    const selectedMonth = reportMonthInput.value;
+                    if (!selectedMonth) {
+                        displayMessage('Por favor genere primero un reporte', 'error');
+                        return;
+                    }
+                    
+                    const [year, month] = selectedMonth.split('-');
+                    const monthName = getMonthName(month);
+                    periodText = `${monthName} ${year}`;
+                } else {
+                    const startDate = biweekStartDate.value;
+                    const endDate = biweekEndDate.value;
+                    
+                    if (!startDate || !endDate) {
+                        displayMessage('Por favor genere primero un reporte', 'error');
+                        return;
+                    }
+                    
+                    periodText = `${formatDateForDisplay(startDate)} a ${formatDateForDisplay(endDate)}`;
                 }
                 
-                const [year, month] = selectedMonth.split('-');
-                const monthName = getMonthName(month);
                 const today = new Date();
                 const todayStr = today.toLocaleDateString('es-ES');
                 
@@ -3307,36 +3496,45 @@
                 displayMessage('Generando PDF...', 'success');
                 
                 try {
-                    // Obtener datos de las tablas
-                    const departmentRows = Array.from(departmentReportBody.querySelectorAll('tr'));
-                    const providerRows = Array.from(providerReportBody.querySelectorAll('tr'));
-                    const unitProviderRows = Array.from(unitProviderReportBody.querySelectorAll('tr'));
-                    
-                    // Crear contenido HTML para el PDF
+                    // Crear contenido HTML para el PDF - TAMAÑOS REDUCIDOS PARA UNA SOLA HOJA
                     let pdfHTML = `
-                        <div class="report-pdf">
-                            <div class="pdf-header">
-                                <h1 class="pdf-title">Reporte de Gastos de Comida</h1>
-                                <div class="pdf-subtitle">${monthName} ${year}</div>
-                                <div class="pdf-subtitle">Fecha de generación: ${todayStr}</div>
+                        <div class="report-pdf" style="font-family: 'Inter', sans-serif; max-width: 600px; margin: 0 auto;">
+                            <div class="pdf-header" style="text-align: center; margin-bottom: 10px; border-bottom: 2px solid #005BAA; padding-bottom: 8px;">
+                                <h1 class="pdf-title" style="color: #005BAA; font-size: 14px; font-weight: bold; margin-bottom: 3px;">
+                                    Reporte de Gastos de Comida
+                                </h1>
+                                <div class="pdf-subtitle" style="color: #666; font-size: 10px; margin-bottom: 2px;">
+                                    ${periodText}
+                                </div>
+                                <div class="pdf-subtitle" style="color: #666; font-size: 9px;">
+                                    Fecha de generación: ${todayStr}
+                                </div>
                             </div>
                             
-                            <div class="pdf-section">
-                                <h2 style="color: #005BAA; font-size: 18px; margin-bottom: 10px; border-bottom: 1px solid #005BAA; padding-bottom: 5px;">
+                            <!-- Sección 1: Solicitud de Comidas por Unidad de Operación -->
+                            <div class="pdf-section" style="margin-bottom: 12px;">
+                                <h2 style="color: #005BAA; font-size: 11px; margin-bottom: 5px; border-bottom: 1px solid #005BAA; padding-bottom: 3px;">
                                     SOLICITUD DE COMIDAS POR UNIDAD DE OPERACIONES
                                 </h2>
-                                <table class="pdf-table">
+                                <table class="pdf-table" style="width: 100%; border-collapse: collapse; font-size: 7px;">
                                     <thead>
                                         <tr>
-                                            <th>UNIDAD DE OPERACION</th>
-                                            <th>CANTIDAD DE COMIDAS SOLICITADAS</th>
-                                            <th>IMPORTE</th>
+                                            <th style="background-color: #f0f7ff; color: #005BAA; font-weight: bold; padding: 4px; border: 1px solid #ddd; text-align: left;">
+                                                UNIDAD DE OPERACION
+                                            </th>
+                                            <th style="background-color: #f0f7ff; color: #005BAA; font-weight: bold; padding: 4px; border: 1px solid #ddd; text-align: center;">
+                                                CANTIDAD
+                                            </th>
+                                            <th style="background-color: #f0f7ff; color: #005BAA; font-weight: bold; padding: 4px; border: 1px solid #ddd; text-align: right;">
+                                                IMPORTE
+                                            </th>
                                         </tr>
                                     </thead>
                                     <tbody>
                     `;
                     
                     // Agregar filas de departamentos
+                    const departmentRows = Array.from(departmentReportBody.querySelectorAll('tr'));
                     departmentRows.forEach(row => {
                         const cells = row.querySelectorAll('td');
                         if (cells.length >= 3) {
@@ -3346,9 +3544,9 @@
                             
                             pdfHTML += `
                                 <tr>
-                                    <td>${dept}</td>
-                                    <td style="text-align: center;">${meals}</td>
-                                    <td style="text-align: right;">${amount}</td>
+                                    <td style="padding: 3px; border: 1px solid #ddd; font-size: 6px;">${dept}</td>
+                                    <td style="padding: 3px; border: 1px solid #ddd; text-align: center; font-size: 6px;">${meals}</td>
+                                    <td style="padding: 3px; border: 1px solid #ddd; text-align: right; font-size: 6px;">${amount}</td>
                                 </tr>
                             `;
                         }
@@ -3356,31 +3554,39 @@
                     
                     // Agregar total de departamentos
                     pdfHTML += `
-                                <tr class="total-row">
-                                    <td><strong>TOTAL</strong></td>
-                                    <td style="text-align: center;"><strong>${totalDepartmentMeals.textContent}</strong></td>
-                                    <td style="text-align: right;"><strong>${totalDepartmentAmount.textContent}</strong></td>
+                                <tr class="total-row" style="font-weight: bold; background-color: #f9f9f9;">
+                                    <td style="padding: 4px; border: 1px solid #ddd; font-size: 7px;">TOTAL</td>
+                                    <td style="padding: 4px; border: 1px solid #ddd; text-align: center; font-size: 7px;">${totalDepartmentMeals.textContent}</td>
+                                    <td style="padding: 4px; border: 1px solid #ddd; text-align: right; font-size: 7px;">${totalDepartmentAmount.textContent}</td>
                                 </tr>
                             </tbody>
                         </table>
                     </div>
                     
-                    <div class="pdf-section">
-                        <h2 style="color: #005BAA; font-size: 18px; margin-bottom: 10px; border-bottom: 1px solid #005BAA; padding-bottom: 5px;">
+                    <!-- Sección 2: Solicitud de Comidas por Proveedor -->
+                    <div class="pdf-section" style="margin-bottom: 12px;">
+                        <h2 style="color: #005BAA; font-size: 11px; margin-bottom: 5px; border-bottom: 1px solid #005BAA; padding-bottom: 3px;">
                             SOLICITUD DE COMIDAS POR PROVEEDOR
                         </h2>
-                        <table class="pdf-table">
+                        <table class="pdf-table" style="width: 100%; border-collapse: collapse; font-size: 7px;">
                             <thead>
                                 <tr>
-                                    <th>PROVEEDOR</th>
-                                    <th>CANTIDAD DE COMIDAS</th>
-                                    <th>IMPORTE</th>
+                                    <th style="background-color: #f0f7ff; color: #005BAA; font-weight: bold; padding: 4px; border: 1px solid #ddd; text-align: left;">
+                                        PROVEEDOR
+                                    </th>
+                                    <th style="background-color: #f0f7ff; color: #005BAA; font-weight: bold; padding: 4px; border: 1px solid #ddd; text-align: center;">
+                                        CANTIDAD
+                                    </th>
+                                    <th style="background-color: #f0f7ff; color: #005BAA; font-weight: bold; padding: 4px; border: 1px solid #ddd; text-align: right;">
+                                        IMPORTE
+                                    </th>
                                 </tr>
                             </thead>
                             <tbody>
                     `;
                     
                     // Agregar filas de proveedores
+                    const providerRows = Array.from(providerReportBody.querySelectorAll('tr'));
                     providerRows.forEach(row => {
                         const cells = row.querySelectorAll('td');
                         if (cells.length >= 3) {
@@ -3390,9 +3596,9 @@
                             
                             pdfHTML += `
                                 <tr>
-                                    <td>${provider}</td>
-                                    <td style="text-align: center;">${meals}</td>
-                                    <td style="text-align: right;">${amount}</td>
+                                    <td style="padding: 3px; border: 1px solid #ddd; font-size: 6px;">${provider}</td>
+                                    <td style="padding: 3px; border: 1px solid #ddd; text-align: center; font-size: 6px;">${meals}</td>
+                                    <td style="padding: 3px; border: 1px solid #ddd; text-align: right; font-size: 6px;">${amount}</td>
                                 </tr>
                             `;
                         }
@@ -3400,118 +3606,135 @@
                     
                     // Agregar total de proveedores
                     pdfHTML += `
-                                <tr class="total-row">
-                                    <td><strong>TOTAL</strong></td>
-                                    <td style="text-align: center;"><strong>${totalProviderMeals.textContent}</strong></td>
-                                    <td style="text-align: right;"><strong>${totalProviderAmount.textContent}</strong></td>
+                                <tr class="total-row" style="font-weight: bold; background-color: #f9f9f9;">
+                                    <td style="padding: 4px; border: 1px solid #ddd; font-size: 7px;">TOTAL</td>
+                                    <td style="padding: 4px; border: 1px solid #ddd; text-align: center; font-size: 7px;">${totalProviderMeals.textContent}</td>
+                                    <td style="padding: 4px; border: 1px solid #ddd; text-align: right; font-size: 7px;">${totalProviderAmount.textContent}</td>
                                 </tr>
                             </tbody>
                         </table>
                     </div>
                     
-                    <div class="pdf-section">
-                        <h2 style="color: #005BAA; font-size: 18px; margin-bottom: 10px; border-bottom: 1px solid #005BAA; padding-bottom: 5px;">
+                    <!-- Sección 3: Resumen por Tipo de Unidad -->
+                    <div class="pdf-section" style="margin-bottom: 12px;">
+                        <h2 style="color: #005BAA; font-size: 11px; margin-bottom: 5px; border-bottom: 1px solid #005BAA; padding-bottom: 3px;">
+                            RESUMEN POR TIPO DE UNIDAD
+                        </h2>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 8px; gap: 10px;">
+                            <div class="pdf-summary-box" style="flex: 1; border: 1px solid #ddd; padding: 6px; border-radius: 3px; background-color: #f9f9f9;">
+                                <h3 style="color: #005BAA; font-size: 10px; margin-bottom: 5px; text-align: center;">UNIDAD CCS</h3>
+                                <div style="margin-bottom: 3px; display: flex; justify-content: space-between;">
+                                    <span style="color: #666; font-size: 8px;">Total Comidas:</span>
+                                    <span style="font-weight: bold; color: #005BAA; font-size: 8px;">${ccsTotalMeals.textContent}</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between;">
+                                    <span style="color: #666; font-size: 8px;">Importe Total:</span>
+                                    <span style="font-weight: bold; color: #005BAA; font-size: 8px;">${ccsTotalAmount.textContent}</span>
+                                </div>
+                            </div>
+                            <div class="pdf-summary-box" style="flex: 1; border: 1px solid #ddd; padding: 6px; border-radius: 3px; background-color: #f9f9f9;">
+                                <h3 style="color: #005BAA; font-size: 10px; margin-bottom: 5px; text-align: center;">UNIDAD MSO</h3>
+                                <div style="margin-bottom: 3px; display: flex; justify-content: space-between;">
+                                    <span style="color: #666; font-size: 8px;">Total Comidas:</span>
+                                    <span style="font-weight: bold; color: #005BAA; font-size: 8px;">${msoTotalMeals.textContent}</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between;">
+                                    <span style="color: #666; font-size: 8px;">Importe Total:</span>
+                                    <span style="font-weight: bold; color: #005BAA; font-size: 8px;">${msoTotalAmount.textContent}</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div style="text-align: center; padding: 8px; background-color: #f0f7ff; border-radius: 3px; border: 1px solid #005BAA; margin-top: 8px;">
+                            <div style="font-size: 10px; font-weight: bold; color: #005BAA; margin-bottom: 3px;">
+                                GRAN TOTAL
+                            </div>
+                            <div style="font-size: 16px; font-weight: bold; color: #005BAA;">
+                                ${grandTotalAmount.textContent}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Sección 4: Servicios por Unidad y Proveedor -->
+                    <div class="pdf-section" style="margin-bottom: 15px;">
+                        <h2 style="color: #005BAA; font-size: 11px; margin-bottom: 5px; border-bottom: 1px solid #005BAA; padding-bottom: 3px;">
                             SERVICIOS POR UNIDAD Y PROVEEDOR
                         </h2>
-                        <table class="pdf-table">
+                        <table class="pdf-table" style="width: 100%; border-collapse: collapse; font-size: 6px;">
                             <thead>
                                 <tr>
-                                    <th>UNIDAD</th>
-                                    <th>PROVEEDOR</th>
-                                    <th>CANTIDAD DE COMIDAS</th>
-                                    <th>IMPORTE</th>
+                                    <th style="background-color: #f0f7ff; color: #005BAA; font-weight: bold; padding: 4px; border: 1px solid #ddd; text-align: left;">
+                                        UNIDAD
+                                    </th>
+                                    <th style="background-color: #f0f7ff; color: #005BAA; font-weight: bold; padding: 4px; border: 1px solid #ddd; text-align: left;">
+                                        PROVEEDOR
+                                    </th>
+                                    <th style="background-color: #f0f7ff; color: #005BAA; font-weight: bold; padding: 4px; border: 1px solid #ddd; text-align: center;">
+                                        CANTIDAD
+                                    </th>
+                                    <th style="background-color: #f0f7ff; color: #005BAA; font-weight: bold; padding: 4px; border: 1px solid #ddd; text-align: right;">
+                                        IMPORTE
+                                    </th>
                                 </tr>
                             </thead>
                             <tbody>
                     `;
                     
-                    // Agregar filas de unidad/proveedor
+                    // Agregar filas de unidad/proveedor (solo las principales, sin subtotales para ahorrar espacio)
+                    const unitProviderRows = Array.from(unitProviderReportBody.querySelectorAll('tr'));
                     let currentUnit = '';
+                    let rowCount = 0;
+                    
                     unitProviderRows.forEach(row => {
                         const cells = row.querySelectorAll('td');
                         
                         if (cells.length === 1 && cells[0].colSpan === 4) {
                             // Es un encabezado de unidad
                             currentUnit = cells[0].textContent;
-                            pdfHTML += `
-                                <tr style="background-color: #f0f7ff; font-weight: bold;">
-                                    <td colspan="4" style="color: #005BAA; font-size: 16px; padding: 8px; border: 1px solid #ddd;">
-                                        ${currentUnit}
-                                    </td>
-                                </tr>
-                            `;
+                            // Solo mostrar encabezado si hay espacio
+                            if (rowCount < 10) {
+                                pdfHTML += `
+                                    <tr style="background-color: #f0f7ff; font-weight: bold;">
+                                        <td colspan="4" style="color: #005BAA; font-size: 9px; padding: 5px; border: 1px solid #ddd;">
+                                            ${currentUnit}
+                                        </td>
+                                    </tr>
+                                `;
+                            }
                         } else if (cells.length === 4) {
                             // Es una fila de proveedor
-                            const unit = cells[0].textContent;
+                            const unit = cells[0].textContent || '';
                             const provider = cells[1].textContent;
                             const meals = cells[2].textContent;
                             const amount = cells[3].textContent;
                             
-                            if (provider.trim()) {
+                            if (provider.trim() && rowCount < 15) {
+                                rowCount++;
                                 pdfHTML += `
                                     <tr>
-                                        <td>${unit}</td>
-                                        <td>${provider}</td>
-                                        <td style="text-align: center;">${meals}</td>
-                                        <td style="text-align: right;">${amount}</td>
+                                        <td style="padding: 3px; border: 1px solid #ddd; font-size: 6px;">${unit}</td>
+                                        <td style="padding: 3px; border: 1px solid #ddd; font-size: 6px;">${provider}</td>
+                                        <td style="padding: 3px; border: 1px solid #ddd; text-align: center; font-size: 6px;">${meals}</td>
+                                        <td style="padding: 3px; border: 1px solid #ddd; text-align: right; font-size: 6px;">${amount}</td>
                                     </tr>
                                 `;
                             }
                         }
                     });
                     
-                    // Agregar total de unidad/proveedor
+                    // Agregar total general
                     pdfHTML += `
-                                <tr class="total-row">
-                                    <td colspan="2"><strong>TOTAL GENERAL</strong></td>
-                                    <td style="text-align: center;"><strong>${totalUnitProviderMeals.textContent}</strong></td>
-                                    <td style="text-align: right;"><strong>${totalUnitProviderAmount.textContent}</strong></td>
+                                <tr class="total-row" style="font-weight: bold; background-color: #f9f9f9;">
+                                    <td colspan="2" style="padding: 4px; border: 1px solid #ddd; font-size: 7px;">TOTAL GENERAL</td>
+                                    <td style="padding: 4px; border: 1px solid #ddd; text-align: center; color: #005BAA; font-size: 7px;">${totalUnitProviderMeals.textContent}</td>
+                                    <td style="padding: 4px; border: 1px solid #ddd; text-align: right; color: #005BAA; font-size: 7px;">${totalUnitProviderAmount.textContent}</td>
                                 </tr>
                             </tbody>
                         </table>
                     </div>
                     
-                    <div class="pdf-section">
-                        <h2 style="color: #005BAA; font-size: 18px; margin-bottom: 10px; border-bottom: 1px solid #005BAA; padding-bottom: 5px;">
-                            RESUMEN POR TIPO DE UNIDAD
-                        </h2>
-                        <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
-                            <div class="pdf-summary-box" style="flex: 1; margin-right: 10px;">
-                                <h3 style="color: #005BAA; font-size: 16px; margin-bottom: 10px;">UNIDAD CCS</h3>
-                                <div style="margin-bottom: 5px;">
-                                    <span>Total Comidas: </span>
-                                    <strong>${ccsTotalMeals.textContent}</strong>
-                                </div>
-                                <div>
-                                    <span>Importe Total: </span>
-                                    <strong>${ccsTotalAmount.textContent}</strong>
-                                </div>
-                            </div>
-                            <div class="pdf-summary-box" style="flex: 1; margin-left: 10px;">
-                                <h3 style="color: #005BAA; font-size: 16px; margin-bottom: 10px;">UNIDAD MSO</h3>
-                                <div style="margin-bottom: 5px;">
-                                    <span>Total Comidas: </span>
-                                    <strong>${msoTotalMeals.textContent}</strong>
-                                </div>
-                                <div>
-                                    <span>Importe Total: </span>
-                                    <strong>${msoTotalAmount.textContent}</strong>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div style="text-align: center; padding: 15px; background-color: #f0f7ff; border-radius: 5px; border: 1px solid #005BAA;">
-                            <div style="font-size: 16px; font-weight: bold; color: #005BAA; margin-bottom: 5px;">
-                                GRAN TOTAL MENSUAL
-                            </div>
-                            <div style="font-size: 24px; font-weight: bold; color: #005BAA;">
-                                ${grandTotalAmount.textContent}
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="pdf-footer">
-                        <div>Reporte generado el ${todayStr}</div>
+                    <div class="pdf-footer" style="text-align: center; margin-top: 15px; padding-top: 8px; border-top: 1px solid #ddd; color: #666; font-size: 7px;">
+                        <div style="margin-bottom: 2px;">Reporte generado el ${todayStr}</div>
                         <div>Control de Solicitud de Comidas - Inter</div>
                     </div>
                 </div>
@@ -3523,17 +3746,23 @@
                     tempDiv.style.position = 'absolute';
                     tempDiv.style.left = '-9999px';
                     tempDiv.style.top = '0';
-                    tempDiv.style.width = '800px';
+                    tempDiv.style.width = '600px';
                     tempDiv.style.backgroundColor = 'white';
-                    tempDiv.style.padding = '20px';
+                    tempDiv.style.padding = '15px';
                     document.body.appendChild(tempDiv);
+                    
+                    // Esperar a que las imágenes se carguen
+                    await new Promise(resolve => setTimeout(resolve, 500));
                     
                     // Usar html2canvas para capturar el contenido
                     const canvas = await html2canvas(tempDiv, {
                         scale: 2,
                         useCORS: true,
                         logging: false,
-                        backgroundColor: '#ffffff'
+                        backgroundColor: '#ffffff',
+                        width: 600,
+                        height: tempDiv.scrollHeight,
+                        windowWidth: 600
                     });
                     
                     // Remover el elemento temporal
@@ -3551,10 +3780,34 @@
                     const imgWidth = 190; // Ancho en mm para A4
                     const imgHeight = (canvas.height * imgWidth) / canvas.width;
                     
-                    pdf.addImage(imgData, 'PNG', 10, 10, imgWidth, imgHeight);
+                    // Calcular si cabe en una sola página
+                    const pageHeight = pdf.internal.pageSize.getHeight();
+                    
+                    if (imgHeight < pageHeight - 20) {
+                        // Si cabe en una sola página, agregarla en posición 10,10
+                        pdf.addImage(imgData, 'PNG', 10, 10, imgWidth, imgHeight);
+                    } else {
+                        // Si no cabe, escalar para que quepa
+                        const scaleFactor = (pageHeight - 20) / imgHeight;
+                        const scaledHeight = imgHeight * scaleFactor;
+                        const scaledWidth = imgWidth * scaleFactor;
+                        pdf.addImage(imgData, 'PNG', 10, 10, scaledWidth, scaledHeight);
+                    }
+                    
+                    // Nombre del archivo PDF
+                    let pdfFileName = '';
+                    if (isMonthly) {
+                        const [year, month] = reportMonthInput.value.split('-');
+                        const monthName = getMonthName(month);
+                        pdfFileName = `Reporte_Mensual_Comidas_${monthName}_${year}.pdf`;
+                    } else {
+                        const startFormatted = formatDateForFilename(biweekStartDate.value);
+                        const endFormatted = formatDateForFilename(biweekEndDate.value);
+                        pdfFileName = `Reporte_Quincenal_Comidas_${startFormatted}_${endFormatted}.pdf`;
+                    }
                     
                     // Guardar el PDF
-                    pdf.save(`Reporte_Comidas_${monthName}_${year}.pdf`);
+                    pdf.save(pdfFileName);
                     
                     displayMessage('PDF generado exitosamente', 'success');
                     
@@ -3562,15 +3815,6 @@
                     console.error('Error generando PDF:', error);
                     displayMessage('Error al generar el PDF: ' + error.message, 'error');
                 }
-            }
-
-            // Función auxiliar para obtener nombre del mes
-            function getMonthName(monthNumber) {
-                const months = [
-                    'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
-                    'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
-                ];
-                return months[parseInt(monthNumber) - 1];
             }
 
             // Event Listeners para reporte
@@ -3598,7 +3842,7 @@
             } catch (error) {
                 console.error("Error al renderizar la página inicial:", error);
             }
-        });
+        }
     </script>
 </body>
 </html>
