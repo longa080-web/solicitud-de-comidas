@@ -635,6 +635,7 @@
                         <option value="Importaciones">Importaciones</option>
                         <option value="RRHH MSO">RRHH MSO</option>
                         <option value="Documentacion de obras">Documentación de obras</option>
+                        <option value="Logistica">Logística</option>
                     </select>
                 </div>
                 
@@ -664,6 +665,7 @@
                         <option value="Feeder y obras">Feeder y obras</option>
                         <option value="Ventas en calle">Ventas en calle</option>
                         <option value="Ventana de mantenimiento">Ventana de mantenimiento</option>
+                        <option value="Transporte y flota">Transporte y flota</option>
                         <option value="Otros">Otros</option>
                     </select>
                 </div>
@@ -2945,7 +2947,8 @@
                     dept.includes('INTERCONEXIONES') ||
                     dept.includes('IMPORTACIONES') ||
                     dept.includes('RRHH MSO') ||
-                    dept.includes('DOCUMENTACION DE OBRAS')) {
+                    dept.includes('DOCUMENTACION DE OBRAS') ||
+                    dept.includes('LOGISTICA')) {
                     return 'MSO';
                 }
                 
