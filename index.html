@@ -778,7 +778,7 @@
                     <select id="providerName" required
                            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-inter-primary focus:border-inter-primary custom-select">
                         <option value="" disabled selected>Selecciona un Proveedor</option>
-                        <option value="Al momento">Al momento</option>
+                        <!-- Eliminado "Al momento" según requerimiento -->
                         <option value="Monteluso">Monteluso</option>
                         <option value="Susi fresh">Susi fresh</option>
                         <option value="Cumbes Barlovento">Cumbes Barlovento</option>
@@ -1343,10 +1343,10 @@
 
             // Constantes y Variables Globales
             const CHART_COLORS = { 
-                'Al momento': '#005BAA',
                 'Monteluso': '#5CE1E6',
                 'Susi fresh': '#00B8D9',
                 'Cumbes Barlovento': '#FF9800',
+                'Al momento': '#005BAA', // Mantenido para registros antiguos
                 'otros': '#667EEA',
                 'fondo': '#E2E8F0' 
             };
@@ -1564,9 +1564,8 @@
                 'MSO'
             ];
 
-            // Definir proveedores
+            // Definir proveedores (sin "Al momento")
             const providerList = [
-                'Al momento',
                 'Monteluso',
                 'Susi fresh',
                 'Cumbes Barlovento'
@@ -2692,7 +2691,7 @@
                                 title: {
                                     display: true,
                                     text: 'Gasto Total (USD $)',
-                                    color: CHART_COLORS['Al momento']
+                                    color: CHART_COLORS['Monteluso']
                                 }
                             }
                         },
@@ -2751,7 +2750,7 @@
                                 title: {
                                     display: true,
                                     text: 'Gasto Total (USD $)',
-                                    color: CHART_COLORS['Al momento']
+                                    color: CHART_COLORS['Monteluso']
                                 }
                             }
                         },
