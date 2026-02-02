@@ -516,7 +516,7 @@
         /* Mejora para selects personalizados en móvil */
         .custom-select {
             appearance: none;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23005BAA'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000 24 24' stroke='%23005BAA'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
             background-repeat: no-repeat;
             background-position: right 0.7rem center;
             background-size: 1.5rem;
@@ -3165,75 +3165,61 @@
                     reportTitleElement.textContent = reportTitle;
                 }
                 
-                // Inicializar estructuras de datos
+                // INICIO DE CORRECCIÓN: Procesar datos de manera unificada
+                // Crear estructuras de datos
                 const departmentData = {};
                 const providerData = {};
+                const unitProviderData = { CCS: {}, MSO: {} };
                 
-                // Inicializar departamentos con 0
-                departmentList.forEach(dept => {
-                    departmentData[dept] = {
-                        meals: 0,
-                        amount: 0
-                    };
-                });
-                
-                // Inicializar proveedores con 0
-                providerList.forEach(provider => {
-                    providerData[provider] = {
-                        meals: 0,
-                        amount: 0
-                    };
-                });
-                
-                // Procesar datos de las solicitudes
-                filteredRequests.forEach((request) => {
+                // Procesar cada solicitud UNA VEZ y acumular en todas las estructuras
+                filteredRequests.forEach(request => {
                     const departmentKey = mapDepartment(request.department, request.msoDepartment);
-                    const providerKey = request.providerName;
-                    
-                    // Asegurar que totalQuantity sea un número entero
+                    const providerKey = request.providerName || 'No especificado';
+                    const unit = classifyUnit(request.department, request.msoDepartment);
                     const meals = parseInt(request.totalQuantity) || 0;
                     const amount = parseFloat(request.totalCost) || 0;
                     
-                    // Acumular por departamento
-                    if (departmentData[departmentKey]) {
-                        departmentData[departmentKey].meals += meals;
-                        departmentData[departmentKey].amount += amount;
-                    } else {
-                        console.warn(`⚠️ Departamento no encontrado en lista: ${departmentKey} (original: ${request.department})`);
-                        // Si no está en la lista, crear una entrada
-                        if (!departmentData[departmentKey]) {
-                            departmentData[departmentKey] = { meals: 0, amount: 0 };
-                        }
-                        departmentData[departmentKey].meals += meals;
-                        departmentData[departmentKey].amount += amount;
+                    // 1. Acumular por departamento
+                    if (!departmentData[departmentKey]) {
+                        departmentData[departmentKey] = { meals: 0, amount: 0 };
                     }
+                    departmentData[departmentKey].meals += meals;
+                    departmentData[departmentKey].amount += amount;
                     
-                    // Acumular por proveedor
-                    if (providerData[providerKey]) {
-                        providerData[providerKey].meals += meals;
-                        providerData[providerKey].amount += amount;
-                    } else {
-                        // Si el proveedor no está en la lista, usar "Otros"
-                        const providerKeyNormalized = providerKey || 'Otros';
-                        if (!providerData[providerKeyNormalized]) {
-                            providerData[providerKeyNormalized] = { meals: 0, amount: 0 };
-                        }
-                        providerData[providerKeyNormalized].meals += meals;
-                        providerData[providerKeyNormalized].amount += amount;
+                    // 2. Acumular por proveedor (usando EXACTAMENTE los mismos valores)
+                    if (!providerData[providerKey]) {
+                        providerData[providerKey] = { meals: 0, amount: 0 };
                     }
+                    providerData[providerKey].meals += meals;
+                    providerData[providerKey].amount += amount;
+                    
+                    // 3. Acumular por unidad y proveedor
+                    if (!unitProviderData[unit][providerKey]) {
+                        unitProviderData[unit][providerKey] = { meals: 0, amount: 0 };
+                    }
+                    unitProviderData[unit][providerKey].meals += meals;
+                    unitProviderData[unit][providerKey].amount += amount;
                 });
                 
-                // Renderizar reporte por departamento
+                // Calcular totales generales
+                let totalMealsAll = 0;
+                let totalAmountAll = 0;
+                
+                Object.values(departmentData).forEach(data => {
+                    totalMealsAll += data.meals;
+                    totalAmountAll += data.amount;
+                });
+                
+                // FIN DE CORRECCIÓN
+                
+                // Renderizar reportes usando los datos procesados
                 renderDepartmentReport(departmentData);
-                
-                // Renderizar reporte por proveedor
                 renderProviderReport(providerData);
-                
-                // Calcular totales
                 calculateTotals(departmentData);
+                renderUnitProviderReport(unitProviderData);
                 
-                // Renderizar reporte por unidad y proveedor
-                renderUnitProviderReport(filteredRequests);
+                // Verificar consistencia
+                verifyConsistency(totalMealsAll, totalAmountAll);
                 
                 // Mostrar botones de exportar
                 exportReportBtn.classList.remove('hidden');
@@ -3242,54 +3228,18 @@
                 displayMessage(`Reporte generado: ${filteredRequests.length} solicitudes procesadas`, 'success');
             }
 
-            // Función para renderizar reporte por departamento
+            // Función para renderizar reporte por departamento - MODIFICADA
             function renderDepartmentReport(departmentData) {
                 departmentReportBody.innerHTML = '';
                 
                 let totalMeals = 0;
                 let totalAmount = 0;
                 
-                departmentList.forEach(dept => {
-                    const data = departmentData[dept] || { meals: 0, amount: 0 };
-                    totalMeals += data.meals;
-                    totalAmount += data.amount;
-                    
-                    const row = document.createElement('tr');
-                    row.className = 'hover:bg-gray-50';
-                    row.innerHTML = `
-                        <td class="px-3 md:px-6 py-2 md:py-4 whitespace-nowrap text-xs md:text-sm text-gray-900 border border-gray-300">
-                            ${dept}
-                        </td>
-                        <td class="px-3 md:px-6 py-2 md:py-4 whitespace-nowrap text-xs md:text-sm text-gray-900 text-center border border-gray-300">
-                            ${data.meals}
-                        </td>
-                        <td class="px-3 md:px-6 py-2 md:py-4 whitespace-nowrap text-xs md:text-sm text-gray-900 text-right border border-gray-300">
-                            $${data.amount.toFixed(2)}
-                        </td>
-                    `;
-                    departmentReportBody.appendChild(row);
-                });
-                
-                totalDepartmentMeals.textContent = totalMeals;
-                totalDepartmentAmount.textContent = `$${totalAmount.toFixed(2)}`;
-            }
-
-            // Función para renderizar reporte por proveedor
-            function renderProviderReport(providerData) {
-                providerReportBody.innerHTML = '';
-                
-                let totalMeals = 0;
-                let totalAmount = 0;
-                
-                // Ordenar proveedores por cantidad de comidas (descendente)
-                const providersSorted = Object.keys(providerData).sort((a, b) => {
-                    return providerData[b].meals - providerData[a].meals;
-                });
-                
-                // Mostrar todos los proveedores que tengan comidas
-                providersSorted.forEach(provider => {
-                    const data = providerData[provider];
-                    if (data.meals > 0) {
+                // Ordenar departamentos por cantidad de comidas
+                Object.keys(departmentData)
+                    .sort((a, b) => departmentData[b].meals - departmentData[a].meals)
+                    .forEach(deptKey => {
+                        const data = departmentData[deptKey];
                         totalMeals += data.meals;
                         totalAmount += data.amount;
                         
@@ -3297,7 +3247,42 @@
                         row.className = 'hover:bg-gray-50';
                         row.innerHTML = `
                             <td class="px-3 md:px-6 py-2 md:py-4 whitespace-nowrap text-xs md:text-sm text-gray-900 border border-gray-300">
-                                ${provider}
+                                ${deptKey}
+                            </td>
+                            <td class="px-3 md:px-6 py-2 md:py-4 whitespace-nowrap text-xs md:text-sm text-gray-900 text-center border border-gray-300">
+                                ${data.meals}
+                            </td>
+                            <td class="px-3 md:px-6 py-2 md:py-4 whitespace-nowrap text-xs md:text-sm text-gray-900 text-right border border-gray-300">
+                                $${data.amount.toFixed(2)}
+                            </td>
+                        `;
+                        departmentReportBody.appendChild(row);
+                    });
+                
+                totalDepartmentMeals.textContent = totalMeals;
+                totalDepartmentAmount.textContent = `$${totalAmount.toFixed(2)}`;
+            }
+
+            // Función para renderizar reporte por proveedor - MODIFICADA
+            function renderProviderReport(providerData) {
+                providerReportBody.innerHTML = '';
+                
+                let totalMeals = 0;
+                let totalAmount = 0;
+                
+                // Ordenar proveedores por cantidad de comidas
+                Object.keys(providerData)
+                    .sort((a, b) => providerData[b].meals - providerData[a].meals)
+                    .forEach(providerKey => {
+                        const data = providerData[providerKey];
+                        totalMeals += data.meals;
+                        totalAmount += data.amount;
+                        
+                        const row = document.createElement('tr');
+                        row.className = 'hover:bg-gray-50';
+                        row.innerHTML = `
+                            <td class="px-3 md:px-6 py-2 md:py-4 whitespace-nowrap text-xs md:text-sm text-gray-900 border border-gray-300">
+                                ${providerKey}
                             </td>
                             <td class="px-3 md:px-6 py-2 md:py-4 whitespace-nowrap text-xs md:text-sm text-gray-900 text-center border border-gray-300">
                                 ${data.meals}
@@ -3307,66 +3292,53 @@
                             </td>
                         `;
                         providerReportBody.appendChild(row);
-                    }
-                });
+                    });
                 
                 totalProviderMeals.textContent = totalMeals;
                 totalProviderAmount.textContent = `$${totalAmount.toFixed(2)}`;
             }
 
-            // Función para calcular totales CCS vs MSO
+            // Función para calcular totales CCS vs MSO - MODIFICADA
             function calculateTotals(departmentData) {
                 let ccsMeals = 0;
                 let ccsAmount = 0;
                 let msoMeals = 0;
                 let msoAmount = 0;
                 
-                // Departamentos CCS (todos excepto MSO)
-                const ccsDepartments = departmentList.filter(dept => dept !== 'MSO');
-                ccsDepartments.forEach(dept => {
-                    const data = departmentData[dept] || { meals: 0, amount: 0 };
-                    ccsMeals += data.meals;
-                    ccsAmount += data.amount;
+                // Calcular totales desde departmentData
+                Object.keys(departmentData).forEach(deptKey => {
+                    const data = departmentData[deptKey];
+                    const dept = deptKey.toUpperCase();
+                    
+                    if (dept.includes('MSO')) {
+                        msoMeals += data.meals;
+                        msoAmount += data.amount;
+                    } else {
+                        ccsMeals += data.meals;
+                        ccsAmount += data.amount;
+                    }
                 });
-                
-                // Departamento MSO
-                const msoData = departmentData['MSO'] || { meals: 0, amount: 0 };
-                msoMeals = msoData.meals;
-                msoAmount = msoData.amount;
                 
                 // Actualizar totales
                 ccsTotalMeals.textContent = ccsMeals;
                 ccsTotalAmount.textContent = `$${ccsAmount.toFixed(2)}`;
                 msoTotalMeals.textContent = msoMeals;
                 msoTotalAmount.textContent = `$${msoAmount.toFixed(2)}`;
-                grandTotalAmount.textContent = `$${(ccsAmount + msoAmount).toFixed(2)}`;
+                
+                // Calcular gran total
+                const grandTotalMeals = ccsMeals + msoMeals;
+                const grandTotalAmountValue = ccsAmount + msoAmount;
+                
+                grandTotalAmount.textContent = `$${grandTotalAmountValue.toFixed(2)}`;
+                
+                console.log(`CCS: ${ccsMeals} comidas, $${ccsAmount.toFixed(2)}`);
+                console.log(`MSO: ${msoMeals} comidas, $${msoAmount.toFixed(2)}`);
+                console.log(`Gran Total: ${grandTotalMeals} comidas, $${grandTotalAmountValue.toFixed(2)}`);
             }
 
-            // Función para renderizar el reporte combinado por unidad y proveedor
-            function renderUnitProviderReport(filteredRequests) {
+            // Función para renderizar el reporte combinado por unidad y proveedor - MODIFICADA
+            function renderUnitProviderReport(unitProviderData) {
                 unitProviderReportBody.innerHTML = '';
-                
-                // Crear estructura de datos combinada
-                const unitProviderData = {};
-                
-                // Procesar cada solicitud
-                filteredRequests.forEach(request => {
-                    const unit = classifyUnit(request.department, request.msoDepartment);
-                    const provider = request.providerName || 'No especificado';
-                    const meals = parseInt(request.totalQuantity) || 0;
-                    const amount = parseFloat(request.totalCost) || 0;
-                    
-                    if (!unitProviderData[unit]) {
-                        unitProviderData[unit] = {};
-                    }
-                    
-                    if (!unitProviderData[unit][provider]) {
-                        unitProviderData[unit][provider] = { meals: 0, amount: 0 };
-                    }
-                    
-                    unitProviderData[unit][provider].meals += meals;
-                    unitProviderData[unit][provider].amount += amount;
-                });
                 
                 let totalMeals = 0;
                 let totalAmount = 0;
@@ -3376,12 +3348,8 @@
                 
                 // Renderizar la tabla
                 units.forEach(unit => {
-                    // Verificar si hay datos para esta unidad
-                    const unitHasData = unitProviderData[unit] && Object.keys(unitProviderData[unit]).some(
-                        provider => unitProviderData[unit][provider].meals > 0
-                    );
-                    
-                    if (unitHasData) {
+                    const unitData = unitProviderData[unit];
+                    if (unitData && Object.keys(unitData).length > 0) {
                         // Fila de encabezado de unidad
                         const headerRow = document.createElement('tr');
                         headerRow.className = 'bg-blue-50 font-bold';
@@ -3393,11 +3361,11 @@
                         unitProviderReportBody.appendChild(headerRow);
                         
                         // Filas de proveedores para esta unidad
-                        Object.keys(unitProviderData[unit])
-                            .filter(provider => unitProviderData[unit][provider].meals > 0)
-                            .sort((a, b) => unitProviderData[unit][b].meals - unitProviderData[unit][a].meals)
+                        Object.keys(unitData)
+                            .filter(provider => unitData[provider].meals > 0)
+                            .sort((a, b) => unitData[b].meals - unitData[a].meals)
                             .forEach(provider => {
-                                const data = unitProviderData[unit][provider];
+                                const data = unitData[provider];
                                 totalMeals += data.meals;
                                 totalAmount += data.amount;
                                 
@@ -3419,10 +3387,10 @@
                             });
                         
                         // Fila de subtotal por unidad
-                        const unitMeals = Object.keys(unitProviderData[unit])
-                            .reduce((sum, provider) => sum + unitProviderData[unit][provider].meals, 0);
-                        const unitAmount = Object.keys(unitProviderData[unit])
-                            .reduce((sum, provider) => sum + unitProviderData[unit][provider].amount, 0);
+                        const unitMeals = Object.keys(unitData)
+                            .reduce((sum, provider) => sum + unitData[provider].meals, 0);
+                        const unitAmount = Object.keys(unitData)
+                            .reduce((sum, provider) => sum + unitData[provider].amount, 0);
                         
                         const subtotalRow = document.createElement('tr');
                         subtotalRow.className = 'bg-gray-100 font-bold';
@@ -3449,6 +3417,34 @@
                 // Actualizar totales
                 totalUnitProviderMeals.textContent = totalMeals;
                 totalUnitProviderAmount.textContent = `$${totalAmount.toFixed(2)}`;
+            }
+
+            // Función para verificar consistencia de los datos
+            function verifyConsistency(expectedMeals, expectedAmount) {
+                const deptMeals = parseInt(totalDepartmentMeals.textContent) || 0;
+                const deptAmount = parseFloat(totalDepartmentAmount.textContent.replace('$', '')) || 0;
+                const provMeals = parseInt(totalProviderMeals.textContent) || 0;
+                const provAmount = parseFloat(totalProviderAmount.textContent.replace('$', '')) || 0;
+                const unitProvMeals = parseInt(totalUnitProviderMeals.textContent) || 0;
+                const unitProvAmount = parseFloat(totalUnitProviderAmount.textContent.replace('$', '')) || 0;
+                
+                console.log('=== VERIFICACIÓN DE CONSISTENCIA ===');
+                console.log(`Departamento: ${deptMeals} comidas, $${deptAmount.toFixed(2)}`);
+                console.log(`Proveedor: ${provMeals} comidas, $${provAmount.toFixed(2)}`);
+                console.log(`Unidad/Proveedor: ${unitProvMeals} comidas, $${unitProvAmount.toFixed(2)}`);
+                console.log(`Esperado: ${expectedMeals} comidas, $${expectedAmount.toFixed(2)}`);
+                
+                // Verificar que todos coincidan
+                const allMealsMatch = deptMeals === provMeals && deptMeals === unitProvMeals && deptMeals === expectedMeals;
+                const allAmountsMatch = Math.abs(deptAmount - provAmount) < 0.01 && 
+                                        Math.abs(deptAmount - unitProvAmount) < 0.01 &&
+                                        Math.abs(deptAmount - expectedAmount) < 0.01;
+                
+                if (!allMealsMatch || !allAmountsMatch) {
+                    console.warn('⚠️ Advertencia: Los totales no coinciden completamente');
+                } else {
+                    console.log('✅ Todos los totales coinciden correctamente');
+                }
             }
 
             // Función para exportar a Excel
