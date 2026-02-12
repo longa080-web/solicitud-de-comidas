@@ -130,460 +130,7 @@
             color: #666;
             font-size: 7px;
         }
-        
-        /* ========== ESTILOS RESPONSIVOS AGREGADOS ========== */
-        
-        /* Ajustes generales para dispositivos móviles */
-        @media (max-width: 768px) {
-            .container-responsive {
-                padding: 8px !important;
-            }
-            
-            /* Ajuste del header */
-            header h1 {
-                font-size: 1.5rem !important;
-                line-height: 1.3 !important;
-            }
-            
-            header p.absolute {
-                font-size: 1rem !important;
-            }
-            
-            /* Formulario responsive */
-            #foodRequestForm {
-                display: flex !important;
-                flex-direction: column !important;
-                gap: 16px !important;
-            }
-            
-            #foodRequestForm > div {
-                width: 100% !important;
-            }
-            
-            /* Campos del formulario */
-            input, select, textarea {
-                font-size: 16px !important; /* Previene zoom en iOS */
-                min-height: 44px !important; /* Tamaño táctil mínimo */
-            }
-            
-            /* Personal externo e Inter en columnas en móvil */
-            .col-span-1 {
-                grid-column: 1 / -1 !important;
-            }
-            
-            /* Botones del formulario */
-            #formActions {
-                flex-direction: column !important;
-                gap: 12px !important;
-            }
-            
-            #formActions button {
-                width: 100% !important;
-                margin-bottom: 8px !important;
-            }
-            
-            /* Resumen de gastos */
-            .grid-cols-1 {
-                grid-template-columns: 1fr !important;
-                gap: 12px !important;
-            }
-            
-            .text-3xl {
-                font-size: 1.75rem !important;
-            }
-            
-            /* NUEVO DISEÑO DE TABLA - SIN SCROLL HORIZONTAL */
-            .table-responsive-cards {
-                display: block !important;
-            }
-            
-            .table-responsive-cards table {
-                display: none !important;
-            }
-            
-            .table-card {
-                background: white;
-                border: 1px solid #e5e7eb;
-                border-radius: 8px;
-                padding: 16px;
-                margin-bottom: 12px;
-                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-            }
-            
-            .table-card-row {
-                display: flex;
-                justify-content: space-between;
-                margin-bottom: 8px;
-                padding-bottom: 8px;
-                border-bottom: 1px solid #f3f4f6;
-            }
-            
-            .table-card-row:last-child {
-                border-bottom: none;
-                margin-bottom: 0;
-                padding-bottom: 0;
-            }
-            
-            .table-card-label {
-                font-weight: 600;
-                color: #374151;
-                font-size: 0.875rem;
-                min-width: 120px;
-            }
-            
-            .table-card-value {
-                color: #6b7280;
-                font-size: 0.875rem;
-                text-align: right;
-                flex: 1;
-                word-break: break-word;
-            }
-            
-            .table-card-actions {
-                display: flex;
-                justify-content: flex-end;
-                gap: 8px;
-                margin-top: 12px;
-                padding-top: 12px;
-                border-top: 1px solid #f3f4f6;
-            }
-            
-            /* Texto más pequeño en móvil */
-            .text-xs {
-                font-size: 0.7rem !important;
-            }
-            
-            .text-sm {
-                font-size: 0.8rem !important;
-            }
-            
-            /* Botones en sección de filtros */
-            .flex-wrap {
-                gap: 8px !important;
-            }
-            
-            .flex-wrap button {
-                flex: 1 1 calc(50% - 8px) !important;
-                min-width: 0 !important;
-                padding-left: 12px !important;
-                padding-right: 12px !important;
-                font-size: 0.8rem !important;
-            }
-            
-            /* Reporte mensual */
-            #reportContent table {
-                font-size: 0.7rem !important;
-            }
-            
-            #reportContent th, #reportContent td {
-                padding: 4px 6px !important;
-            }
-            
-            .grid-cols-1.md\:grid-cols-2 {
-                grid-template-columns: 1fr !important;
-            }
-            
-            /* Gráficos */
-            .h-64, .h-96 {
-                height: 300px !important;
-            }
-            
-            .max-w-xl {
-                max-width: 100% !important;
-            }
-            
-            /* Modal de confirmación */
-            .max-w-md {
-                max-width: 90% !important;
-                margin: 0 16px !important;
-            }
-            
-            /* Scroll suave */
-            html {
-                scroll-behavior: smooth;
-            }
-        }
-        
-        /* Tablets */
-        @media (min-width: 769px) and (max-width: 1024px) {
-            .w-full.max-w-5xl {
-                max-width: 95% !important;
-            }
-            
-            /* Formulario en 2 columnas */
-            #foodRequestForm {
-                grid-template-columns: repeat(2, 1fr) !important;
-            }
-            
-            #foodRequestForm .col-span-1.md\:col-span-2,
-            #foodRequestForm .col-span-1.md\:col-span-3 {
-                grid-column: 1 / -1 !important;
-            }
-            
-            /* NUEVO: Tabla compacta para tablets */
-            table {
-                font-size: 0.75rem !important;
-            }
-            
-            .px-6 {
-                padding-left: 8px !important;
-                padding-right: 8px !important;
-            }
-            
-            .py-3, .py-4 {
-                padding-top: 6px !important;
-                padding-bottom: 6px !important;
-            }
-            
-            /* Reducir ancho de columnas menos importantes */
-            .compact-column {
-                max-width: 80px !important;
-                overflow: hidden;
-                text-overflow: ellipsis;
-            }
-            
-            /* Gráficos más compactos */
-            .h-64 {
-                height: 250px !important;
-            }
-            
-            .h-96 {
-                height: 350px !important;
-            }
-        }
-        
-        /* Pantallas grandes - mostrar tabla normal */
-        @media (min-width: 1025px) {
-            .table-responsive-cards {
-                display: none !important;
-            }
-            
-            .table-responsive-cards table {
-                display: table !important;
-            }
-        }
-        
-        /* Pantallas pequeñas (móviles muy pequeños) */
-        @media (max-width: 480px) {
-            /* Header más compacto */
-            header.py-6 {
-                padding-top: 20px !important;
-                padding-bottom: 20px !important;
-            }
-            
-            header h1 {
-                font-size: 1.25rem !important;
-            }
-            
-            /* Botones full width */
-            button {
-                width: 100% !important;
-                justify-content: center !important;
-            }
-            
-            /* Input de búsqueda full width */
-            #filterInput {
-                width: 100% !important;
-                margin-bottom: 8px !important;
-            }
-            
-            /* Personal Inter - lista seleccionada */
-            #interStaffSelected li {
-                font-size: 0.8rem !important;
-                padding: 6px !important;
-            }
-            
-            /* Tabla en cards más compacta */
-            .table-card {
-                padding: 12px !important;
-            }
-            
-            .table-card-label {
-                min-width: 100px !important;
-                font-size: 0.75rem !important;
-            }
-            
-            .table-card-value {
-                font-size: 0.75rem !important;
-            }
-            
-            /* Modal más pequeño */
-            .max-w-md {
-                max-width: 95% !important;
-                margin: 0 8px !important;
-            }
-        }
-        
-        /* Orientación landscape en móviles */
-        @media (max-height: 600px) and (orientation: landscape) {
-            /* Header más pequeño */
-            header.py-6 {
-                padding-top: 12px !important;
-                padding-bottom: 12px !important;
-            }
-            
-            /* Secciones con menos margen */
-            section.mb-8 {
-                margin-bottom: 16px !important;
-            }
-            
-            /* Menor altura en gráficos */
-            .h-64 {
-                height: 200px !important;
-            }
-            
-            .h-96 {
-                height: 250px !important;
-            }
-        }
-        
-        /* Mejoras de accesibilidad táctil */
-        @media (hover: none) and (pointer: coarse) {
-            /* Elementos interactivos más grandes */
-            button, 
-            input[type="checkbox"], 
-            input[type="radio"] {
-                min-height: 44px !important;
-                min-width: 44px !important;
-            }
-            
-            /* Aumentar área táctil */
-            .form-checkbox {
-                transform: scale(1.3);
-                margin-right: 8px;
-            }
-            
-            /* Links y botones más espaciados */
-            a, button {
-                margin: 4px 0;
-            }
-            
-            /* Prevenir zoom en inputs */
-            input, select, textarea {
-                font-size: 16px !important;
-            }
-        }
-        
-        /* Dark mode opcional (si se implementa) */
-        @media (prefers-color-scheme: dark) {
-            body {
-                background-color: #1a202c;
-                color: #e2e8f0;
-            }
-            
-            .bg-white {
-                background-color: #2d3748 !important;
-            }
-            
-            .bg-gray-100 {
-                background-color: #4a5568 !important;
-            }
-            
-            .text-gray-700 {
-                color: #e2e8f0 !important;
-            }
-            
-            .text-gray-500 {
-                color: #a0aec0 !important;
-            }
-            
-            .border-gray-300 {
-                border-color: #4a5568 !important;
-            }
-            
-            .bg-blue-50 {
-                background-color: #2c5282 !important;
-            }
-            
-            .table-card {
-                background-color: #2d3748 !important;
-                border-color: #4a5568 !important;
-            }
-            
-            .table-card-row {
-                border-color: #4a5568 !important;
-            }
-            
-            .table-card-label {
-                color: #e2e8f0 !important;
-            }
-            
-            .table-card-value {
-                color: #a0aec0 !important;
-            }
-        }
-        
-        /* Mejora para selects personalizados en móvil */
-        .custom-select {
-            appearance: none;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23005BAA'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: right 0.7rem center;
-            background-size: 1.5rem;
-            padding-right: 2.5rem !important;
-        }
-        
-        /* NUEVO: Estilos para la tabla compacta en desktop */
-        .compact-view {
-            font-size: 0.75rem;
-        }
-        
-        .compact-view th,
-        .compact-view td {
-            padding: 4px 6px;
-        }
-        
-        .truncate-cell {
-            max-width: 120px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-        
-        .expandable-cell {
-            position: relative;
-            cursor: pointer;
-        }
-        
-        .expandable-cell:hover::after {
-            content: attr(title);
-            position: absolute;
-            left: 0;
-            top: 100%;
-            background: #005BAA;
-            color: white;
-            padding: 8px;
-            border-radius: 4px;
-            white-space: normal;
-            width: 300px;
-            z-index: 1000;
-            font-size: 0.875rem;
-        }
-        
-        /* Alternar entre vista compacta y normal */
-        .toggle-view-btn {
-            background: #005BAA;
-            color: white;
-            border: none;
-            padding: 4px 8px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 0.75rem;
-            margin-left: 8px;
-        }
-        
-        .toggle-view-btn:hover {
-            background: #004488;
-        }
-        
-        /* NUEVO: Contenedor para botones de vista */
-        .view-controls {
-            display: flex;
-            justify-content: flex-end;
-            margin-bottom: 8px;
-            gap: 8px;
-        }
-        
+
         /* Estilos para pestañas de navegación */
         .tab-navigation {
             display: flex;
@@ -671,6 +218,7 @@
                             <option value="C.O El Rosal">C.O El Rosal</option>
                             <option value="C.O La Naya">C.O La Naya</option>
                             <option value="C.O Los Ruices">C.O Los Ruices</option>
+                            <option value="C.O Paraiso-Catia">C.O Paraiso-Catia</option>
                             <option value="Gerencia Senior">Gerencia Senior</option>
                             <option value="Head End">Head End</option>
                             <option value="MSO">MSO</option>
@@ -836,7 +384,6 @@
                         <select id="providerName" required
                                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-inter-primary focus:border-inter-primary custom-select">
                             <option value="" disabled selected>Selecciona un Proveedor</option>
-                            <!-- Eliminado "Al momento" según requerimiento -->
                             <option value="Monteluso">Monteluso</option>
                             <option value="Susi fresh">Susi fresh</option>
                             <option value="Cumbes Barlovento">Cumbes Barlovento</option>
@@ -881,11 +428,6 @@
             <section class="p-4 md:p-6 bg-white rounded-lg border border-inter-primary shadow-lg">
                 <div class="flex justify-between items-center mb-3 md:mb-4">
                     <h2 class="text-xl md:text-2xl font-bold text-inter-primary">Historial de Solicitudes de Comida</h2>
-                    <div class="view-controls">
-                        <button id="toggleCompactView" class="toggle-view-btn">
-                            Vista Compacta
-                        </button>
-                    </div>
                 </div>
 
                 <div class="mb-4 p-4 bg-blue-50 rounded-lg flex flex-col md:flex-row items-center gap-3 md:gap-4">
@@ -926,17 +468,17 @@
 
                 <!-- Vista normal de tabla para desktop -->
                 <div id="tableView" class="overflow-x-auto rounded-lg shadow-md hidden md:block">
-                    <table id="foodTable" class="min-w-full divide-y divide-gray-200 compact-view">
+                    <table id="foodTable" class="min-w-full divide-y divide-gray-200">
                         <thead class="bg-blue-50">
                             <tr>
                                 <th class="px-4 py-3 text-left text-xs font-medium text-inter-primary uppercase tracking-wider">
                                     <input type="checkbox" id="selectAllCheckboxes" class="form-checkbox h-4 w-4 text-inter-primary rounded">
                                 </th>
                                 <th class="px-4 py-3 text-left text-xs font-medium text-inter-primary uppercase tracking-wider">Fecha</th>
-                                <th class="px-4 py-3 text-left text-xs font-medium text-inter-primary uppercase tracking-wider truncate-cell" title="Departamento">Depto</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-inter-primary uppercase tracking-wider">Depto</th>
                                 <th class="px-4 py-3 text-left text-xs font-medium text-inter-primary uppercase tracking-wider">Tipo</th>
-                                <th class="px-4 py-3 text-left text-xs font-medium text-inter-primary uppercase tracking-wider truncate-cell" title="Personal Externo">Ext.</th>
-                                <th class="px-4 py-3 text-left text-xs font-medium text-inter-primary uppercase tracking-wider truncate-cell" title="Personal Inter">Inter</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-inter-primary uppercase tracking-wider">Ext.</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-inter-primary uppercase tracking-wider">Inter</th>
                                 <th class="px-4 py-3 text-right text-xs font-medium text-inter-primary uppercase tracking-wider">Total</th>
                                 <th class="px-4 py-3 text-right text-xs font-medium text-inter-primary uppercase tracking-wider">Costo</th>
                                 <th class="px-4 py-3 text-center text-xs font-medium text-inter-primary uppercase tracking-wider">Acciones</th>
@@ -946,11 +488,6 @@
                             <!-- Los datos se llenarán dinámicamente -->
                         </tbody>
                     </table>
-                </div>
-
-                <!-- Vista de tarjetas para móviles -->
-                <div id="cardsView" class="table-responsive-cards md:hidden">
-                    <!-- Las tarjetas se generarán dinámicamente aquí -->
                 </div>
 
                 <p id="noRequestsMessage" class="text-center text-gray-500 mt-4 hidden">No hay solicitudes de comida registradas aún.</p>
@@ -1140,13 +677,13 @@
                         </div>
                         <div class="mt-3 md:mt-4 pt-3 md:pt-4 border-t border-gray-300">
                             <div class="flex justify-between items-center">
-                                <span class="text-base md:text-lg font-bold text-gray-700">GRAN TOTAL:</span>
+                                <span class="text-base md:text-lg font-bold text-gray-700">Total:</span>
                                 <span id="grandTotalAmount" class="text-xl md:text-2xl font-extrabold text-inter-primary">$0.00</span>
                             </div>
                         </div>
                     </div>
 
-                    <!-- NUEVA SECCIÓN: Servicios por Unidad y Proveedor -->
+                    <!-- Sección 4: Servicios por Unidad y Proveedor -->
                     <div class="bg-gray-50 p-3 md:p-4 rounded-lg mt-4 md:mt-6">
                         <h3 class="text-lg md:text-xl font-bold text-inter-primary mb-3 md:mb-4">
                             SERVICIOS POR UNIDAD Y PROVEEDOR
@@ -1406,11 +943,9 @@
 
             // Referencias de la tabla e interfaz
             const tableBody = document.getElementById('foodTableBody');
-            const cardsView = document.getElementById('cardsView');
             const noRequestsMessage = document.getElementById('noRequestsMessage');
             const messageBox = document.getElementById('messageBox');
             const tableView = document.getElementById('tableView');
-            const toggleCompactViewBtn = document.getElementById('toggleCompactView');
             
             // Referencias para el filtro avanzado
             const filterInput = document.getElementById('filterInput');
@@ -1651,24 +1186,51 @@
             const totalUnitProviderMeals = document.getElementById('totalUnitProviderMeals');
             const totalUnitProviderAmount = document.getElementById('totalUnitProviderAmount');
 
-            // Definir las unidades de operación (departamentos)
-            const departmentList = [
-                'C.O EL ROSAL',
-                'C.O LOS RUICES', 
-                'C.O LA NAYA',
-                'C.O PARAISO-CATIA',
-                'DPTO DE OBRAS',
-                'AREA COMERCIAL',
-                'G. SENIOR',
-                'MSO'
-            ];
+            // --- FUNCIONES DE FORMATO PARA DEPARTAMENTOS ---
+            function formatDepartmentName(deptKey) {
+                if (!deptKey) return '';
+                
+                // Mantener C.O en mayúsculas
+                if (deptKey.includes('C.O')) {
+                    const parts = deptKey.split(' ');
+                    if (parts.length >= 3) {
+                        const co = 'C.O';
+                        const rest = parts.slice(2).join(' ').toLowerCase();
+                        const formattedRest = rest.split(' ').map(word => 
+                            word.charAt(0).toUpperCase() + word.slice(1)
+                        ).join(' ');
+                        return `${co} ${formattedRest}`;
+                    }
+                    return deptKey;
+                }
+                
+                // Mantener siglas en mayúsculas
+                const specialCaps = ['MSO', 'CCS', 'DPTO', 'G', 'RRHH'];
+                const words = deptKey.split(' ');
+                const formatted = words.map(word => {
+                    if (specialCaps.includes(word.toUpperCase())) {
+                        return word.toUpperCase();
+                    }
+                    return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+                }).join(' ');
+                
+                return formatted;
+            }
 
-            // Definir proveedores (sin "Al momento")
-            const providerList = [
-                'Monteluso',
-                'Susi fresh',
-                'Cumbes Barlovento'
-            ];
+            // Lista completa de todos los departamentos posibles
+            const ALL_DEPARTMENTS = [
+                'Administración',
+                'Área Comercial',
+                'C.O El Rosal',
+                'C.O La Naya',
+                'C.O Los Ruices',
+                'C.O Paraiso-Catia',
+                'Gerencia Senior',
+                'Head End',
+                'MSO',
+                'Ocad',
+                'Obras'
+            ].map(formatDepartmentName).sort((a, b) => a.localeCompare(b, 'es'));
 
             // --- Funciones de Firebase ---
 
@@ -1688,7 +1250,6 @@
             // Función para actualizar una solicitud en Firestore
             async function updateRequestInFirestore(requestId, updatedData) {
                 try {
-                    // Buscar el documento por el ID personalizado
                     const requestsRef = firebaseFunctions.collection(db, 'foodRequests');
                     const q = firebaseFunctions.query(requestsRef, firebaseFunctions.where('id', '==', requestId));
                     const querySnapshot = await firebaseFunctions.getDocs(q);
@@ -1709,7 +1270,6 @@
                 try {
                     const requestsRef = firebaseFunctions.collection(db, 'foodRequests');
                     
-                    // Para cada ID, buscar y eliminar el documento correspondiente
                     const deletePromises = requestIds.map(async (requestId) => {
                         const q = firebaseFunctions.query(requestsRef, firebaseFunctions.where('id', '==', requestId));
                         const querySnapshot = await firebaseFunctions.getDocs(q);
@@ -1755,7 +1315,6 @@
 
             // --- Funciones de Utilidad ---
 
-            // Función para obtener la fecha y hora actual en formato YYYY-MM-DD
             function getCurrentDate() {
                 const now = new Date();
                 const year = now.getFullYear();
@@ -1764,17 +1323,14 @@
                 return `${year}-${month}-${day}`;
             }
 
-            // Función para normalizar fecha a formato YYYY-MM-DD
             function normalizeDate(dateString) {
                 if (!dateString) return null;
                 
-                // Si ya está en formato YYYY-MM-DD, devolverlo
                 if (typeof dateString === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(dateString)) {
                     return dateString;
                 }
                 
                 try {
-                    // Intentar convertir cualquier formato a YYYY-MM-DD
                     const date = new Date(dateString);
                     if (isNaN(date.getTime())) {
                         return null;
@@ -1791,7 +1347,6 @@
                 }
             }
 
-            // Función para formatear fecha para display
             function formatDateForDisplay(dateString) {
                 const normalizedDate = normalizeDate(dateString);
                 if (!normalizedDate) return '';
@@ -1804,7 +1359,6 @@
                 });
             }
 
-            // Función para formatear fecha para nombres de archivo
             function formatDateForFilename(dateString) {
                 const normalizedDate = normalizeDate(dateString);
                 if (!normalizedDate) return '';
@@ -1812,7 +1366,6 @@
                 return normalizedDate.replace(/-/g, '');
             }
 
-            // Mostrar/ocultar campo de observaciones para MSO
             departmentSelect.addEventListener('change', function() {
                 if (this.value === 'MSO') {
                     msoObservationsContainer.classList.remove('hidden');
@@ -1822,7 +1375,6 @@
                 }
             });
 
-            // Inicializar campos al cargar la página
             function initializeForm() {
                 deliveryDateTimeInput.value = getCurrentDate();
                 unitCostInput.value = '0.00';
@@ -1830,14 +1382,12 @@
                 costInput.value = '0.00';
                 totalQuantityInput.value = '0';
                 
-                // Reiniciar estado de edición
                 editingRequestId = null;
                 submitButton.textContent = 'Registrar Solicitud';
                 submitButton.classList.remove('bg-green-600', 'hover:bg-green-700');
                 submitButton.classList.add('bg-inter-primary', 'hover:bg-blue-700');
                 removeCancelEditButton();
 
-                // Limpiar personal externo
                 document.querySelectorAll('input[name="externalStaff"]').forEach(checkbox => {
                     checkbox.checked = false;
                     const quantityInput = document.getElementById(`quantity${checkbox.value}`);
@@ -1847,24 +1397,20 @@
                     }
                 });
                 
-                // Limpiar personal Inter
                 selectedInterStaff = [];
                 renderSelectedStaff();
                 
-                // Ocultar campo MSO si no está seleccionado
                 if (departmentSelect.value !== 'MSO') {
                     msoObservationsContainer.classList.add('hidden');
                     msoObservationsSelect.value = '';
                 }
             }
 
-            // Función para formatear fechas a YYYY-MM-DD para el input[type=date]
             function formatDateForInput(dateString) {
                 const normalizedDate = normalizeDate(dateString);
                 return normalizedDate || '';
             }
             
-            // Función para mostrar mensajes de estado
             function displayMessage(message, type = 'success') {
                 messageBox.textContent = message;
                 messageBox.classList.remove('hidden', 'bg-red-100', 'text-red-700', 'bg-green-100', 'text-green-700');
@@ -1878,9 +1424,6 @@
                 }, 5000);
             }
 
-            // --- Lógica del Calculo de Costos/Cantidad ---
-            
-            // Recalcula la cantidad total de comidas (Inter + Externos)
             function calculateTotalQuantity() {
                 let externalQuantity = 0;
                 document.querySelectorAll('input[type="number"][id^="quantity"]').forEach(input => {
@@ -1893,7 +1436,6 @@
                 return total;
             }
 
-            // Recalcula el costo total
             function calculateTotalCost() {
                 const totalQuantity = calculateTotalQuantity();
                 const unitCost = parseFloat(unitCostInput.value) || 0;
@@ -1903,9 +1445,6 @@
                 costInput.value = totalCost.toFixed(2);
             }
 
-            // --- Lógica de Personal Externo ---
-
-            // Manejar la visibilidad de los campos de cantidad para personal externo
             document.querySelectorAll('input[name="externalStaff"]').forEach(checkbox => {
                 checkbox.addEventListener('change', (e) => {
                     const quantityInput = document.getElementById(`quantity${e.target.value}`);
@@ -1922,7 +1461,6 @@
                 });
             });
 
-            // Manejar la entrada de cantidad para personal externo
             document.querySelectorAll('input[type="number"][id^="quantity"]').forEach(input => {
                 input.addEventListener('input', () => {
                     if (parseInt(input.value) < 0 || input.value === '') {
@@ -1942,9 +1480,6 @@
                 });
             });
 
-            // --- Lógica de Personal Inter ---
-
-            // Renderiza la lista de personal de Inter seleccionado
             function renderSelectedStaff() {
                 interStaffSelectedList.innerHTML = '';
                 selectedInterStaff.forEach((staffName, index) => {
@@ -1962,7 +1497,6 @@
                 calculateTotalCost();
             }
 
-            // Manejar la búsqueda y filtrado
             interStaffSearchInput.addEventListener('input', () => {
                 const query = interStaffSearchInput.value.trim().toUpperCase();
                 interStaffSearchResults.innerHTML = '';
@@ -1996,14 +1530,12 @@
                 }
             });
 
-            // Ocultar resultados de búsqueda al perder el foco
             document.addEventListener('click', (e) => {
                 if (!interStaffSearchInput.contains(e.target) && !interStaffSearchResults.contains(e.target)) {
                     interStaffSearchResults.classList.add('hidden');
                 }
             });
 
-            // Manejar la eliminación de personal Inter seleccionado
             interStaffSelectedList.addEventListener('click', (e) => {
                 if (e.target.classList.contains('remove-staff-btn')) {
                     const staffName = e.target.getAttribute('data-name');
@@ -2012,9 +1544,6 @@
                 }
             });
 
-            // --- Lógica del Formulario y Edición ---
-
-            // Toggle para el costo de delivery
             document.querySelectorAll('input[name="deliveryOption"]').forEach(radio => {
                 radio.addEventListener('change', () => {
                     if (deliveryCostOption.checked) {
@@ -2027,11 +1556,9 @@
                 });
             });
 
-            // Event listeners para recalcular el costo
             unitCostInput.addEventListener('input', calculateTotalCost);
             deliveryCostInput.addEventListener('input', calculateTotalCost);
 
-            // Función para añadir el botón de Cancelar Edición
             function addCancelEditButton() {
                 let cancelBtn = document.getElementById('cancelEditBtn');
                 if (!cancelBtn) {
@@ -2045,7 +1572,6 @@
                 }
             }
 
-            // Función para eliminar el botón de Cancelar Edición
             function removeCancelEditButton() {
                 const cancelBtn = document.getElementById('cancelEditBtn');
                 if (cancelBtn) {
@@ -2053,7 +1579,6 @@
                 }
             }
 
-            // Función para resetear el formulario y el modo de edición
             function resetFormAndEditing() {
                 form.reset();
                 initializeForm();
@@ -2064,14 +1589,12 @@
                 deliveryCostInput.classList.add('hidden');
             }
 
-            // Función para cargar una solicitud en el formulario para edición
             window.editRequest = (id) => {
                 const requestToEdit = foodRequests.find(req => req.id === id);
                 if (!requestToEdit) return;
 
                 editingRequestId = id;
                 
-                // 1. Cargar datos básicos y de costo
                 departmentSelect.value = requestToEdit.department;
                 mealTypeSelect.value = requestToEdit.mealType;
                 eventSelect.value = requestToEdit.event || '';
@@ -2081,7 +1604,6 @@
                 providerNameSelect.value = requestToEdit.providerName;
                 reasonTextarea.value = requestToEdit.reason;
 
-                // 2. Cargar campo MSO si corresponde
                 if (requestToEdit.department === 'MSO' && requestToEdit.msoDepartment) {
                     msoObservationsContainer.classList.remove('hidden');
                     msoObservationsSelect.value = requestToEdit.msoDepartment;
@@ -2090,7 +1612,6 @@
                     msoObservationsSelect.value = '';
                 }
 
-                // 3. Cargar personal externo
                 document.querySelectorAll('input[name="externalStaff"]').forEach(checkbox => {
                     checkbox.checked = false;
                     const quantityInput = document.getElementById(`quantity${checkbox.value}`);
@@ -2113,11 +1634,9 @@
                     });
                 }
 
-                // 4. Cargar personal Inter
                 selectedInterStaff = requestToEdit.interStaff.slice();
                 renderSelectedStaff();
 
-                // 5. Cargar costo de delivery
                 const deliveryCostValue = parseFloat(requestToEdit.deliveryCost);
                 if (deliveryCostValue > 0) {
                     deliveryCostOption.checked = true;
@@ -2133,21 +1652,17 @@
                 
                 calculateTotalCost();
 
-                // 6. Ajustar interfaz a modo Edición
                 submitButton.textContent = 'Guardar Cambios';
                 submitButton.classList.remove('bg-inter-primary', 'hover:bg-blue-700');
                 submitButton.classList.add('bg-green-600', 'hover:bg-green-700');
                 addCancelEditButton();
 
-                // Desplazarse al formulario
                 window.scrollTo({ top: 0, behavior: 'smooth' });
             };
 
-            // Manejar el envío del formulario
             form.addEventListener('submit', async (e) => {
                 e.preventDefault();
 
-                // Recopilar datos de personal externo
                 const externalStaffData = {};
                 document.querySelectorAll('input[name="externalStaff"]:checked').forEach(checkbox => {
                     const quantityInput = document.getElementById(`quantity${checkbox.value}`);
@@ -2194,17 +1709,14 @@
                     registrationDate: new Date().toISOString()
                 };
 
-                // Agregar observaciones MSO si corresponde
                 if (departmentSelect.value === 'MSO' && msoObservationsSelect.value) {
                     newRequest.msoDepartment = msoObservationsSelect.value;
                 }
 
                 try {
                     if (editingRequestId) {
-                        // Modo Edición: actualizar en Firestore
                         await updateRequestInFirestore(editingRequestId, newRequest);
                         
-                        // Actualizar localmente
                         const index = foodRequests.findIndex(req => req.id === editingRequestId);
                         if (index !== -1) {
                             foodRequests[index] = newRequest;
@@ -2213,7 +1725,6 @@
                         displayMessage('Solicitud actualizada con éxito.', 'success');
                         resetFormAndEditing();
                     } else {
-                        // Modo Registro: añadir nuevo registro a Firestore
                         const requestWithFirestoreId = await addRequestToFirestore(newRequest);
                         foodRequests.push(requestWithFirestoreId);
                         displayMessage('Solicitud registrada con éxito.', 'success');
@@ -2225,7 +1736,6 @@
                     updateSummaryTotals();
                     updateCharts();
                     
-                    // Actualizar reporte si hay un mes seleccionado
                     if (reportMonthInput.value) {
                         generateReport();
                     }
@@ -2235,26 +1745,19 @@
                 }
             });
 
-            // --- Lógica del Historial (Tabla) ---
-
-            // Formatea el costo a una cadena con dos decimales y el símbolo $
             function formatCost(cost) {
                 return `$${parseFloat(cost || 0).toFixed(2)}`;
             }
             
-            // Función para renderizar la tabla de historial con filtros
             function renderTable() {
                 let filteredRequests = foodRequests.slice();
                 
-                // Aplicar filtros activos
                 if (activeFilters.length > 0) {
                     filteredRequests = filteredRequests.filter(request => {
                         return activeFilters.every(filter => {
                             const searchTerm = filter.term.toLowerCase();
                             
-                            // Buscar en diferentes campos
                             if (filter.field === 'all') {
-                                // Búsqueda en todos los campos
                                 return (
                                     request.department.toLowerCase().includes(searchTerm) ||
                                     request.mealType.toLowerCase().includes(searchTerm) ||
@@ -2278,7 +1781,6 @@
                     });
                 }
                 
-                // Ordenar por fecha
                 filteredRequests.sort((a, b) => {
                     const dateA = new Date(a.deliveryDate + 'T12:00:00');
                     const dateB = new Date(b.deliveryDate + 'T12:00:00');
@@ -2286,7 +1788,6 @@
                 });
 
                 tableBody.innerHTML = '';
-                cardsView.innerHTML = '';
                 
                 if (filteredRequests.length === 0) {
                     noRequestsMessage.classList.remove('hidden');
@@ -2297,7 +1798,6 @@
                 noRequestsMessage.classList.add('hidden');
                 tableView.classList.remove('hidden');
 
-                // Renderizar para desktop (tablet y escritorio)
                 filteredRequests.forEach(request => {
                     const externalStaffText = Object.keys(request.externalStaff)
                         .map(key => `${key} (${request.externalStaff[key]})`)
@@ -2311,12 +1811,10 @@
                         day: '2-digit',
                     });
 
-                    // Mostrar departamento MSO específico si existe
                     const displayDepartment = request.department === 'MSO' && request.msoDepartment 
                         ? `${request.department} (${request.msoDepartment})`
                         : request.department;
 
-                    // Vista de tabla para desktop
                     const row = tableBody.insertRow();
                     row.className = 'hover:bg-gray-50 transition duration-150';
                     
@@ -2327,16 +1825,16 @@
                         <td class="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900" title="${displayDate}">
                             ${displayDate}
                         </td>
-                        <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500 truncate-cell expandable-cell" title="${displayDepartment}">
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500 truncate-cell" title="${displayDepartment}">
                             ${displayDepartment}
                         </td>
                         <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500" title="${request.mealType}">
                             ${request.mealType}
                         </td>
-                        <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500 truncate-cell expandable-cell" title="${externalStaffText}">
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500 truncate-cell" title="${externalStaffText}">
                             ${externalStaffText || 'N/A'}
                         </td>
-                        <td class="px-4 py-3 max-w-xs overflow-hidden truncate-cell expandable-cell text-sm text-gray-500" title="${interStaffText}">
+                        <td class="px-4 py-3 max-w-xs overflow-hidden truncate-cell text-sm text-gray-500" title="${interStaffText}">
                             ${interStaffText || 'N/A'}
                         </td>
                         <td class="px-4 py-3 whitespace-nowrap text-sm text-right font-medium text-inter-primary">
@@ -2351,74 +1849,10 @@
                             </button>
                         </td>
                     `;
-
-                    // Vista de tarjetas para móviles
-                    const card = document.createElement('div');
-                    card.className = 'table-card';
-                    card.innerHTML = `
-                        <div class="table-card-row">
-                            <span class="table-card-label">Fecha:</span>
-                            <span class="table-card-value">${displayDate}</span>
-                        </div>
-                        <div class="table-card-row">
-                            <span class="table-card-label">Departamento:</span>
-                            <span class="table-card-value">${displayDepartment}</span>
-                        </div>
-                        <div class="table-card-row">
-                            <span class="table-card-label">Tipo:</span>
-                            <span class="table-card-value">${request.mealType}</span>
-                        </div>
-                        <div class="table-card-row">
-                            <span class="table-card-label">Personal Ext.:</span>
-                            <span class="table-card-value">${externalStaffText || 'N/A'}</span>
-                        </div>
-                        <div class="table-card-row">
-                            <span class="table-card-label">Personal Inter:</span>
-                            <span class="table-card-value">${interStaffText || 'N/A'}</span>
-                        </div>
-                        <div class="table-card-row">
-                            <span class="table-card-label">Total Comidas:</span>
-                            <span class="table-card-value font-medium text-inter-primary">${request.totalQuantity}</span>
-                        </div>
-                        <div class="table-card-row">
-                            <span class="table-card-label">Costo Total:</span>
-                            <span class="table-card-value font-bold text-inter-primary">${formatCost(request.totalCost)}</span>
-                        </div>
-                        <div class="table-card-actions">
-                            <input type="checkbox" data-id="${request.id}" class="row-checkbox form-checkbox h-4 w-4 text-inter-primary rounded mr-2">
-                            <button onclick="editRequest(${request.id})" class="bg-blue-500 hover:bg-blue-600 text-white py-1 px-3 rounded-md text-xs transition duration-150">
-                                Editar
-                            </button>
-                        </div>
-                    `;
-                    cardsView.appendChild(card);
                 });
 
                 selectAllCheckboxes.checked = false;
             }
-
-            // Función para alternar entre vista compacta y normal
-            function toggleCompactView() {
-                compactView = !compactView;
-                const table = document.getElementById('foodTable');
-                const btn = document.getElementById('toggleCompactView');
-                
-                if (compactView) {
-                    table.classList.add('compact-view');
-                    btn.textContent = 'Vista Normal';
-                    // Ocultar algunas columnas adicionales si es necesario
-                } else {
-                    table.classList.remove('compact-view');
-                    btn.textContent = 'Vista Compacta';
-                }
-                
-                renderTable();
-            }
-
-            // Event listener para el botón de vista compacta
-            toggleCompactViewBtn.addEventListener('click', toggleCompactView);
-
-            // --- Lógica de Filtros Avanzados ---
 
             function renderActiveFilters() {
                 activeFiltersContainer.innerHTML = '';
@@ -2437,7 +1871,6 @@
                     activeFiltersContainer.appendChild(filterTag);
                 });
                 
-                // Agregar evento para eliminar filtros
                 document.querySelectorAll('.filter-tag-remove').forEach(btn => {
                     btn.addEventListener('click', function() {
                         const index = parseInt(this.getAttribute('data-index'));
@@ -2455,24 +1888,19 @@
                     return;
                 }
                 
-                // Intentar detectar el tipo de búsqueda
                 let field = 'all';
                 const termLower = searchTerm.toLowerCase();
                 
-                // Verificar si es un tipo de comida específico
                 const mealTypes = ['desayuno', 'almuerzo', 'cena', 'refrigerios'];
                 if (mealTypes.some(type => termLower.includes(type))) {
                     field = 'mealType';
                 }
-                // Verificar si es un proveedor específico
                 else if (termLower.includes('monteluso') || termLower.includes('susi') || termLower.includes('cumbes') || termLower.includes('al momento')) {
                     field = 'provider';
                 }
-                // Verificar si parece ser un nombre de personal
                 else if (termLower.split(' ').length >= 2) {
                     field = 'staff';
                 }
-                // Verificar si parece ser un departamento
                 else if (termLower.includes('admin') || termLower.includes('comercial') || termLower.includes('gerencia') || 
                          termLower.includes('head') || termLower.includes('mso') || termLower.includes('ocad') || 
                          termLower.includes('obras') || termLower.includes('rosal') || termLower.includes('naya') || 
@@ -2500,7 +1928,6 @@
                 renderActiveFilters();
             }
 
-            // Event listeners para filtros
             addFilterBtn.addEventListener('click', addFilter);
             
             filterInput.addEventListener('keypress', function(e) {
@@ -2511,14 +1938,12 @@
             
             clearAllFiltersBtn.addEventListener('click', clearAllFilters);
             
-            // Seleccionar/Deseleccionar todos los checkboxes
             selectAllCheckboxes.addEventListener('change', (e) => {
                 document.querySelectorAll('.row-checkbox').forEach(checkbox => {
                     checkbox.checked = e.target.checked;
                 });
             });
 
-            // Botón Eliminar Seleccionados
             deleteSelectedBtn.addEventListener('click', async () => {
                 const selectedIds = Array.from(document.querySelectorAll('.row-checkbox:checked'))
                     .map(cb => parseInt(cb.getAttribute('data-id')));
@@ -2541,7 +1966,6 @@
                         updateSummaryTotals();
                         updateCharts();
                         
-                        // Actualizar reporte si hay un mes seleccionado
                         if (reportMonthInput.value) {
                             generateReport();
                         }
@@ -2559,7 +1983,6 @@
                 };
             });
 
-            // Exportar a CSV
             exportCsvBtn.addEventListener('click', () => {
                 if (foodRequests.length === 0) {
                     displayMessage('No hay datos para exportar.', 'error');
@@ -2630,8 +2053,6 @@
                 displayMessage('Datos exportados a CSV con éxito.', 'success');
             });
 
-            // --- Lógica del Resumen de Gastos ---
-
             function updateSummaryTotals() {
                 const now = new Date();
                 const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
@@ -2666,8 +2087,6 @@
                 monthlyTotalEl.textContent = formatCost(monthlyTotal);
             }
             
-            // --- Lógica de Gráficos ---
-
             function getChartColor(index) {
                 const colors = ['#005BAA', '#5CE1E6', '#00B8D9', '#FF9800', '#667EEA', '#F6AD55', '#E53E3E', '#38B2AC'];
                 return colors[index % colors.length];
@@ -2678,19 +2097,16 @@
                 const currentMonth = now.getMonth();
                 const currentYear = now.getFullYear();
                 
-                // Filtrar solicitudes del mes actual para gráfica mensual
                 const currentMonthRequests = foodRequests.filter(req => {
                     const reqDate = new Date(req.deliveryDate + 'T12:00:00');
                     return reqDate.getMonth() === currentMonth && reqDate.getFullYear() === currentYear;
                 });
                 
-                // Filtrar solicitudes del año actual para gráfica anual
                 const currentYearRequests = foodRequests.filter(req => {
                     const reqDate = new Date(req.deliveryDate + 'T12:00:00');
                     return reqDate.getFullYear() === currentYear;
                 });
 
-                // 1. Gráfica de Gastos Mensuales por Proveedor (mes actual)
                 const monthlyProviderData = currentMonthRequests.reduce((acc, req) => {
                     const provider = req.providerName;
                     const cost = parseFloat(req.totalCost) || 0;
@@ -2743,7 +2159,6 @@
                     }
                 });
 
-                // 2. Gráfica de Gastos Anuales por Proveedor
                 const annualProviderData = currentYearRequests.reduce((acc, req) => {
                     const date = new Date(req.deliveryDate + 'T12:00:00');
                     const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
@@ -2802,7 +2217,6 @@
                     }
                 });
 
-                // 3. Gráfica de Comportamiento Mensual por Departamento
                 const departmentMonthlyData = currentYearRequests.reduce((acc, req) => {
                     const date = new Date(req.deliveryDate + 'T12:00:00');
                     const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
@@ -2861,7 +2275,6 @@
                     }
                 });
 
-                // 4. Preparar datos de Solicitudes por Empleado de Inter
                 const staffRequests = currentYearRequests.reduce((acc, req) => {
                     req.interStaff.forEach(staff => {
                         acc[staff] = (acc[staff] || 0) + 1;
@@ -2922,7 +2335,6 @@
                     }
                 });
 
-                // 5. Preparar datos de Solicitudes por Departamento
                 const departmentCounts = currentYearRequests.reduce((acc, req) => {
                     acc[req.department] = (acc[req.department] || 0) + 1;
                     return acc;
@@ -2983,21 +2395,16 @@
                 });
             }
 
-            // --- Lógica del Reporte Mensual ---
-
-            // Establecer mes actual por defecto
             const now = new Date();
             const year = now.getFullYear();
             const month = String(now.getMonth() + 1).padStart(2, '0');
             reportMonthInput.value = `${year}-${month}`;
             
-            // Establecer fechas quincenales por defecto (primera quincena del mes)
             const startDate = `${year}-${month}-01`;
             const endDate = new Date(year, parseInt(month), 15).toISOString().split('T')[0];
             biweekStartDate.value = startDate;
             biweekEndDate.value = endDate;
 
-            // Manejar cambio entre filtro mensual y quincenal
             periodMonthly.addEventListener('change', function() {
                 if (this.checked) {
                     monthlyFilter.classList.remove('hidden');
@@ -3012,37 +2419,29 @@
                 }
             });
 
-            // Función para mapear departamentos (versión mejorada)
             function mapDepartment(department, msoDepartment) {
                 if (!department) return 'NO ESPECIFICADO';
                 
                 const dept = department.toString().trim().toUpperCase();
                 
-                // Mapeos específicos
-                if (dept.includes('EL ROSAL') || dept === 'C.O EL ROSAL') return 'C.O EL ROSAL';
-                if (dept.includes('LOS RUICES') || dept === 'C.O LOS RUICES') return 'C.O LOS RUICES';
-                if (dept.includes('LA NAYA') || dept === 'C.O LA NAYA') return 'C.O LA NAYA';
-                if (dept.includes('PARAISO') || dept === 'C.O PARAISO-CATIA') return 'C.O PARAISO-CATIA';
-                if (dept.includes('OBRAS') || dept === 'DPTO DE OBRAS') return 'DPTO DE OBRAS';
-                if (dept.includes('COMERCIAL') || dept === 'AREA COMERCIAL' || dept === 'ÁREA COMERCIAL') return 'AREA COMERCIAL';
-                if (dept.includes('GERENCIA SENIOR') || dept === 'G. SENIOR') return 'G. SENIOR';
-                if (dept.includes('MSO') || dept === 'MSO') {
-                    // Si tiene departamento MSO específico, incluirlo
-                    if (msoDepartment) {
-                        return `MSO (${msoDepartment.toUpperCase()})`;
-                    }
-                    return 'MSO';
-                }
+                if (dept.includes('EL ROSAL') || dept === 'C.O EL ROSAL') return 'C.O El Rosal';
+                if (dept.includes('LOS RUICES') || dept === 'C.O LOS RUICES') return 'C.O Los Ruices';
+                if (dept.includes('LA NAYA') || dept === 'C.O LA NAYA') return 'C.O La Naya';
+                if (dept.includes('PARAISO') || dept === 'C.O PARAISO-CATIA') return 'C.O Paraiso-Catia';
+                if (dept.includes('OBRAS') || dept === 'DPTO DE OBRAS' || dept === 'OBRAS') return 'Obras';
+                if (dept.includes('COMERCIAL') || dept === 'AREA COMERCIAL' || dept === 'ÁREA COMERCIAL') return 'Área Comercial';
+                if (dept.includes('GERENCIA SENIOR') || dept === 'G. SENIOR' || dept === 'GERENCIA SENIOR') return 'Gerencia Senior';
+                if (dept.includes('MSO') || dept === 'MSO') return 'MSO';
+                if (dept.includes('HEAD END')) return 'Head End';
+                if (dept.includes('ADMINISTRACION') || dept === 'ADMINISTRACIÓN') return 'Administración';
+                if (dept.includes('OCAD')) return 'Ocad';
                 
-                // Si no coincide, devolver el original normalizado
-                return dept;
+                return formatDepartmentName(department);
             }
 
-            // Función para clasificar si es CCS o MSO
             function classifyUnit(department, msoDepartment) {
                 const dept = department.toString().trim().toUpperCase();
                 
-                // Si es MSO o contiene "PRESIDENCIA", "MARKETING", etc., es MSO
                 if (dept === 'MSO' || 
                     dept.includes('PRESIDENCIA') || 
                     dept.includes('MARKETING') || 
@@ -3054,11 +2453,9 @@
                     return 'MSO';
                 }
                 
-                // Si es cualquier otro departamento, es CCS
                 return 'CCS';
             }
 
-            // Función para obtener nombre del mes
             function getMonthName(monthNumber) {
                 const months = [
                     'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
@@ -3067,14 +2464,12 @@
                 return months[parseInt(monthNumber) - 1];
             }
 
-            // Función para generar el reporte (CORREGIDA - maneja ambos tipos correctamente)
             function generateReport() {
                 const isMonthly = periodMonthly.checked;
                 let filteredRequests = [];
                 let reportTitle = '';
                 
                 if (isMonthly) {
-                    // Filtro mensual
                     const selectedMonth = reportMonthInput.value;
                     if (!selectedMonth) {
                         displayMessage('Por favor seleccione un mes para el reporte', 'error');
@@ -3084,7 +2479,6 @@
                     const [year, month] = selectedMonth.split('-');
                     reportTitle = `Reporte Mensual - ${getMonthName(month)} ${year}`;
                     
-                    // Filtrar solicitudes del mes seleccionado - CÓDIGO CORREGIDO
                     filteredRequests = foodRequests.filter(request => {
                         if (!request.deliveryDate) return false;
                         
@@ -3092,7 +2486,6 @@
                             const requestDate = new Date(request.deliveryDate + 'T12:00:00');
                             if (isNaN(requestDate.getTime())) return false;
                             
-                            // Obtener año y mes de la fecha de la solicitud
                             const requestYear = requestDate.getFullYear();
                             const requestMonth = requestDate.getMonth() + 1;
                             
@@ -3105,7 +2498,6 @@
                     
                     console.log(`=== GENERANDO REPORTE MENSUAL PARA ${month}/${year} ===`);
                 } else {
-                    // Filtro quincenal - CÓDIGO CORREGIDO
                     const startDate = biweekStartDate.value;
                     const endDate = biweekEndDate.value;
                     
@@ -3119,7 +2511,6 @@
                         return;
                     }
                     
-                    // Calcular días de diferencia
                     const diffTime = Math.abs(new Date(endDate) - new Date(startDate));
                     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
                     
@@ -3130,20 +2521,16 @@
                     
                     reportTitle = `Reporte Quincenal - ${formatDateForDisplay(startDate)} a ${formatDateForDisplay(endDate)}`;
                     
-                    // Filtrar solicitudes del periodo seleccionado - CÓDIGO CORREGIDO
                     filteredRequests = foodRequests.filter(request => {
                         if (!request.deliveryDate) return false;
                         
                         try {
-                            // Crear fecha de la solicitud (solo fecha, sin hora)
-                            const requestDateStr = request.deliveryDate; // Formato YYYY-MM-DD
+                            const requestDateStr = request.deliveryDate;
                             const requestDate = new Date(requestDateStr + 'T00:00:00');
                             
-                            // Crear fechas de inicio y fin del periodo
                             const start = new Date(startDate + 'T00:00:00');
-                            const end = new Date(endDate + 'T23:59:59.999'); // Hasta el final del día
+                            const end = new Date(endDate + 'T23:59:59.999');
                             
-                            // Comparar fechas
                             return requestDate >= start && requestDate <= end;
                         } catch (error) {
                             console.error('Error procesando fecha:', request.deliveryDate, error);
@@ -3152,103 +2539,88 @@
                     });
                     
                     console.log(`=== GENERANDO REPORTE QUINCENAL DEL ${startDate} AL ${endDate} ===`);
-                    console.log(`Fecha inicio: ${startDate}T00:00:00`);
-                    console.log(`Fecha fin: ${endDate}T23:59:59.999`);
-                    console.log(`Días en el periodo: ${diffDays + 1}`);
-                    console.log(`Solicitudes filtradas: ${filteredRequests.length}`);
                 }
                 
                 console.log(`Solicitudes filtradas: ${filteredRequests.length} de ${foodRequests.length} totales`);
                 
-                if (filteredRequests.length === 0) {
-                    displayMessage('No hay datos para el periodo seleccionado', 'error');
-                    return;
-                }
-                
-                // Actualizar título del reporte
-                const reportTitleElement = document.querySelector('#reportContent').previousElementSibling.querySelector('h2');
-                if (reportTitleElement) {
-                    reportTitleElement.textContent = reportTitle;
-                }
-                
-                // Inicializar estructuras de datos
+                // Inicializar todas las estructuras de datos con todos los departamentos en 0
                 const departmentData = {};
+                ALL_DEPARTMENTS.forEach(dept => {
+                    departmentData[dept] = { meals: 0, amount: 0 };
+                });
+                
                 const providerData = {};
+                const unitProviderData = { 
+                    CCS: {}, 
+                    MSO: {} 
+                };
                 
-                // Inicializar departamentos con 0
-                departmentList.forEach(dept => {
-                    departmentData[dept] = {
-                        meals: 0,
-                        amount: 0
-                    };
-                });
+                // Estructura para MSO por departamento específico
+                const msoDepartmentData = {};
                 
-                // Inicializar proveedores con 0
-                providerList.forEach(provider => {
-                    providerData[provider] = {
-                        meals: 0,
-                        amount: 0
-                    };
-                });
-                
-                // Procesar datos de las solicitudes
-                filteredRequests.forEach((request) => {
-                    const departmentKey = mapDepartment(request.department, request.msoDepartment);
-                    const providerKey = request.providerName;
-                    
-                    // Asegurar que totalQuantity sea un número entero
+                // Procesar solicitudes existentes
+                filteredRequests.forEach(request => {
+                    const departmentKey = formatDepartmentName(mapDepartment(request.department, request.msoDepartment));
+                    const providerKey = request.providerName || 'No especificado';
+                    const unit = classifyUnit(request.department, request.msoDepartment);
                     const meals = parseInt(request.totalQuantity) || 0;
                     const amount = parseFloat(request.totalCost) || 0;
                     
-                    // Acumular por departamento
+                    // Solo sumar si el departamento está en nuestra lista
                     if (departmentData[departmentKey]) {
-                        departmentData[departmentKey].meals += meals;
-                        departmentData[departmentKey].amount += amount;
-                    } else {
-                        console.warn(`⚠️ Departamento no encontrado en lista: ${departmentKey} (original: ${request.department})`);
-                        // Si no está en la lista, crear una entrada
-                        if (!departmentData[departmentKey]) {
-                            departmentData[departmentKey] = { meals: 0, amount: 0 };
-                        }
                         departmentData[departmentKey].meals += meals;
                         departmentData[departmentKey].amount += amount;
                     }
                     
-                    // Acumular por proveedor
-                    if (providerData[providerKey]) {
-                        providerData[providerKey].meals += meals;
-                        providerData[providerKey].amount += amount;
-                    } else {
-                        // Si el proveedor no está en la lista, usar "Otros"
-                        const providerKeyNormalized = providerKey || 'Otros';
-                        if (!providerData[providerKeyNormalized]) {
-                            providerData[providerKeyNormalized] = { meals: 0, amount: 0 };
+                    if (!providerData[providerKey]) {
+                        providerData[providerKey] = { meals: 0, amount: 0 };
+                    }
+                    providerData[providerKey].meals += meals;
+                    providerData[providerKey].amount += amount;
+                    
+                    // Para MSO, guardar también por departamento específico
+                    if (unit === 'MSO') {
+                        let msoSpecificKey = 'MSO';
+                        if (request.msoDepartment) {
+                            msoSpecificKey = `MSO (${request.msoDepartment})`;
                         }
-                        providerData[providerKeyNormalized].meals += meals;
-                        providerData[providerKeyNormalized].amount += amount;
+                        
+                        if (!unitProviderData['MSO'][msoSpecificKey]) {
+                            unitProviderData['MSO'][msoSpecificKey] = { meals: 0, amount: 0 };
+                        }
+                        unitProviderData['MSO'][msoSpecificKey].meals += meals;
+                        unitProviderData['MSO'][msoSpecificKey].amount += amount;
+                    } else {
+                        if (!unitProviderData['CCS'][providerKey]) {
+                            unitProviderData['CCS'][providerKey] = { meals: 0, amount: 0 };
+                        }
+                        unitProviderData['CCS'][providerKey].meals += meals;
+                        unitProviderData['CCS'][providerKey].amount += amount;
                     }
                 });
                 
-                // Renderizar reporte por departamento
+                // Calcular totales generales
+                let totalMealsAll = 0;
+                let totalAmountAll = 0;
+                
+                Object.values(departmentData).forEach(data => {
+                    totalMealsAll += data.meals;
+                    totalAmountAll += data.amount;
+                });
+                
                 renderDepartmentReport(departmentData);
-                
-                // Renderizar reporte por proveedor
                 renderProviderReport(providerData);
-                
-                // Calcular totales
                 calculateTotals(departmentData);
+                renderUnitProviderReport(unitProviderData);
                 
-                // Renderizar reporte por unidad y proveedor
-                renderUnitProviderReport(filteredRequests);
+                verifyConsistency(totalMealsAll, totalAmountAll);
                 
-                // Mostrar botones de exportar
                 exportReportBtn.classList.remove('hidden');
                 exportPdfBtn.classList.remove('hidden');
                 
                 displayMessage(`Reporte generado: ${filteredRequests.length} solicitudes procesadas`, 'success');
             }
 
-            // Función para renderizar reporte por departamento
             function renderDepartmentReport(departmentData) {
                 departmentReportBody.innerHTML = '';
                 
@@ -3256,49 +2628,10 @@
                 let totalAmount = 0;
                 
                 // Ordenar departamentos alfabéticamente
-                const sortedDepartments = Object.keys(departmentData).sort();
-                
-                sortedDepartments.forEach(dept => {
-                    const data = departmentData[dept] || { meals: 0, amount: 0 };
-                    totalMeals += data.meals;
-                    totalAmount += data.amount;
-                    
-                    const row = document.createElement('tr');
-                    row.className = 'hover:bg-gray-50';
-                    row.innerHTML = `
-                        <td class="px-3 md:px-6 py-2 md:py-4 whitespace-nowrap text-xs md:text-sm text-gray-900 border border-gray-300">
-                            ${dept}
-                        </td>
-                        <td class="px-3 md:px-6 py-2 md:py-4 whitespace-nowrap text-xs md:text-sm text-gray-900 text-center border border-gray-300">
-                            ${data.meals}
-                        </td>
-                        <td class="px-3 md:px-6 py-2 md:py-4 whitespace-nowrap text-xs md:text-sm text-gray-900 text-right border border-gray-300">
-                            $${data.amount.toFixed(2)}
-                        </td>
-                    `;
-                    departmentReportBody.appendChild(row);
-                });
-                
-                totalDepartmentMeals.textContent = totalMeals;
-                totalDepartmentAmount.textContent = `$${totalAmount.toFixed(2)}`;
-            }
-
-            // Función para renderizar reporte por proveedor
-            function renderProviderReport(providerData) {
-                providerReportBody.innerHTML = '';
-                
-                let totalMeals = 0;
-                let totalAmount = 0;
-                
-                // Ordenar proveedores por cantidad de comidas (descendente)
-                const providersSorted = Object.keys(providerData).sort((a, b) => {
-                    return providerData[b].meals - providerData[a].meals;
-                });
-                
-                // Mostrar todos los proveedores que tengan comidas
-                providersSorted.forEach(provider => {
-                    const data = providerData[provider];
-                    if (data.meals > 0) {
+                Object.keys(departmentData)
+                    .sort((a, b) => a.localeCompare(b, 'es'))
+                    .forEach(deptKey => {
+                        const data = departmentData[deptKey];
                         totalMeals += data.meals;
                         totalAmount += data.amount;
                         
@@ -3306,7 +2639,40 @@
                         row.className = 'hover:bg-gray-50';
                         row.innerHTML = `
                             <td class="px-3 md:px-6 py-2 md:py-4 whitespace-nowrap text-xs md:text-sm text-gray-900 border border-gray-300">
-                                ${provider}
+                                ${deptKey}
+                            </td>
+                            <td class="px-3 md:px-6 py-2 md:py-4 whitespace-nowrap text-xs md:text-sm text-gray-900 text-center border border-gray-300">
+                                ${data.meals}
+                            </td>
+                            <td class="px-3 md:px-6 py-2 md:py-4 whitespace-nowrap text-xs md:text-sm text-gray-900 text-right border border-gray-300">
+                                $${data.amount.toFixed(2)}
+                            </td>
+                        `;
+                        departmentReportBody.appendChild(row);
+                    });
+                
+                totalDepartmentMeals.textContent = totalMeals;
+                totalDepartmentAmount.textContent = `$${totalAmount.toFixed(2)}`;
+            }
+
+            function renderProviderReport(providerData) {
+                providerReportBody.innerHTML = '';
+                
+                let totalMeals = 0;
+                let totalAmount = 0;
+                
+                Object.keys(providerData)
+                    .sort((a, b) => providerData[b].meals - providerData[a].meals)
+                    .forEach(providerKey => {
+                        const data = providerData[providerKey];
+                        totalMeals += data.meals;
+                        totalAmount += data.amount;
+                        
+                        const row = document.createElement('tr');
+                        row.className = 'hover:bg-gray-50';
+                        row.innerHTML = `
+                            <td class="px-3 md:px-6 py-2 md:py-4 whitespace-nowrap text-xs md:text-sm text-gray-900 border border-gray-300">
+                                ${providerKey}
                             </td>
                             <td class="px-3 md:px-6 py-2 md:py-4 whitespace-nowrap text-xs md:text-sm text-gray-900 text-center border border-gray-300">
                                 ${data.meals}
@@ -3316,24 +2682,22 @@
                             </td>
                         `;
                         providerReportBody.appendChild(row);
-                    }
-                });
+                    });
                 
                 totalProviderMeals.textContent = totalMeals;
                 totalProviderAmount.textContent = `$${totalAmount.toFixed(2)}`;
             }
 
-            // Función para calcular totales CCS vs MSO
             function calculateTotals(departmentData) {
                 let ccsMeals = 0;
                 let ccsAmount = 0;
                 let msoMeals = 0;
                 let msoAmount = 0;
                 
-                // Identificar departamentos CCS y MSO
-                Object.keys(departmentData).forEach(dept => {
-                    const data = departmentData[dept] || { meals: 0, amount: 0 };
-                    if (dept.startsWith('MSO')) {
+                Object.keys(departmentData).forEach(deptKey => {
+                    const data = departmentData[deptKey];
+                    
+                    if (deptKey.includes('MSO')) {
                         msoMeals += data.meals;
                         msoAmount += data.amount;
                     } else {
@@ -3342,128 +2706,106 @@
                     }
                 });
                 
-                // Actualizar totales
                 ccsTotalMeals.textContent = ccsMeals;
                 ccsTotalAmount.textContent = `$${ccsAmount.toFixed(2)}`;
                 msoTotalMeals.textContent = msoMeals;
                 msoTotalAmount.textContent = `$${msoAmount.toFixed(2)}`;
-                grandTotalAmount.textContent = `$${(ccsAmount + msoAmount).toFixed(2)}`;
+                
+                const grandTotalAmountValue = ccsAmount + msoAmount;
+                grandTotalAmount.textContent = `$${grandTotalAmountValue.toFixed(2)}`;
             }
 
-            // Función para renderizar el reporte combinado por unidad y proveedor
-            function renderUnitProviderReport(filteredRequests) {
+            function renderUnitProviderReport(unitProviderData) {
                 unitProviderReportBody.innerHTML = '';
-                
-                // Crear estructura de datos combinada
-                const unitProviderData = {};
-                
-                // Procesar cada solicitud
-                filteredRequests.forEach(request => {
-                    // Obtener unidad con detalle de MSO
-                    let unit;
-                    if (request.department === 'MSO' && request.msoDepartment) {
-                        unit = `MSO (${request.msoDepartment})`;
-                    } else if (request.department === 'MSO') {
-                        unit = 'MSO';
-                    } else {
-                        unit = classifyUnit(request.department, request.msoDepartment);
-                    }
-                    
-                    const provider = request.providerName || 'No especificado';
-                    const meals = parseInt(request.totalQuantity) || 0;
-                    const amount = parseFloat(request.totalCost) || 0;
-                    
-                    if (!unitProviderData[unit]) {
-                        unitProviderData[unit] = {};
-                    }
-                    
-                    if (!unitProviderData[unit][provider]) {
-                        unitProviderData[unit][provider] = { meals: 0, amount: 0 };
-                    }
-                    
-                    unitProviderData[unit][provider].meals += meals;
-                    unitProviderData[unit][provider].amount += amount;
-                });
                 
                 let totalMeals = 0;
                 let totalAmount = 0;
                 
-                // Separar unidades CCS y MSO
-                const ccsUnits = {};
-                const msoUnits = {};
+                const units = ['CCS', 'MSO'];
                 
-                Object.keys(unitProviderData).forEach(unit => {
-                    if (unit.startsWith('MSO')) {
-                        msoUnits[unit] = unitProviderData[unit];
-                    } else {
-                        ccsUnits[unit] = unitProviderData[unit];
-                    }
-                });
-                
-                // Función para renderizar una categoría de unidades
-                const renderUnits = (units, title) => {
-                    if (Object.keys(units).length > 0) {
-                        // Fila de encabezado de unidad
+                units.forEach(unit => {
+                    const unitData = unitProviderData[unit];
+                    if (unitData && Object.keys(unitData).length > 0) {
                         const headerRow = document.createElement('tr');
                         headerRow.className = 'bg-blue-50 font-bold';
                         headerRow.innerHTML = `
                             <td colspan="4" class="px-3 md:px-6 py-2 md:py-3 text-sm md:text-lg text-inter-primary border border-gray-300">
-                                ${title}
+                                UNIDAD ${unit}
                             </td>
                         `;
                         unitProviderReportBody.appendChild(headerRow);
                         
-                        // Filas de proveedores para estas unidades
-                        Object.keys(units)
-                            .sort()
-                            .forEach(unit => {
-                                Object.keys(units[unit])
-                                    .filter(provider => units[unit][provider].meals > 0)
-                                    .sort((a, b) => units[unit][b].meals - units[unit][a].meals)
-                                    .forEach(provider => {
-                                        const data = units[unit][provider];
-                                        totalMeals += data.meals;
-                                        totalAmount += data.amount;
-                                        
-                                        const row = document.createElement('tr');
-                                        row.className = 'hover:bg-gray-50';
-                                        row.innerHTML = `
-                                            <td class="px-3 md:px-6 py-2 md:py-4 text-xs md:text-sm text-gray-900 border border-gray-300">
-                                                ${unit}
-                                            </td>
-                                            <td class="px-3 md:px-6 py-2 md:py-4 text-xs md:text-sm text-gray-900 border border-gray-300">
-                                                ${provider}
-                                            </td>
-                                            <td class="px-3 md:px-6 py-2 md:py-4 text-xs md:text-sm text-gray-900 text-center border border-gray-300">
-                                                ${data.meals}
-                                            </td>
-                                            <td class="px-3 md:px-6 py-2 md:py-4 text-xs md:text-sm text-gray-900 text-right border border-gray-300">
-                                                $${data.amount.toFixed(2)}
-                                            </td>
-                                        `;
-                                        unitProviderReportBody.appendChild(row);
-                                    });
+                        // Ordenar proveedores por cantidad de comidas
+                        Object.keys(unitData)
+                            .filter(provider => unitData[provider].meals > 0)
+                            .sort((a, b) => unitData[b].meals - unitData[a].meals)
+                            .forEach(provider => {
+                                const data = unitData[provider];
+                                totalMeals += data.meals;
+                                totalAmount += data.amount;
+                                
+                                const row = document.createElement('tr');
+                                row.className = 'hover:bg-gray-50';
+                                row.innerHTML = `
+                                    <td class="px-3 md:px-6 py-2 md:py-4 text-xs md:text-sm text-gray-900 border border-gray-300"></td>
+                                    <td class="px-3 md:px-6 py-2 md:py-4 text-xs md:text-sm text-gray-900 border border-gray-300">
+                                        ${provider}
+                                    </td>
+                                    <td class="px-3 md:px-6 py-2 md:py-4 text-xs md:text-sm text-gray-900 text-center border border-gray-300">
+                                        ${data.meals}
+                                    </td>
+                                    <td class="px-3 md:px-6 py-2 md:py-4 text-xs md:text-sm text-gray-900 text-right border border-gray-300">
+                                        $${data.amount.toFixed(2)}
+                                    </td>
+                                `;
+                                unitProviderReportBody.appendChild(row);
                             });
                         
-                        // Fila en blanco para separación
+                        const unitMeals = Object.keys(unitData)
+                            .reduce((sum, provider) => sum + unitData[provider].meals, 0);
+                        const unitAmount = Object.keys(unitData)
+                            .reduce((sum, provider) => sum + unitData[provider].amount, 0);
+                        
+                        const subtotalRow = document.createElement('tr');
+                        subtotalRow.className = 'bg-gray-100 font-bold';
+                        subtotalRow.innerHTML = `
+                            <td colspan="2" class="px-3 md:px-6 py-2 md:py-3 text-xs md:text-sm text-gray-900 border border-gray-300 text-right">
+                                Subtotal ${unit}
+                            </td>
+                            <td class="px-3 md:px-6 py-2 md:py-3 text-xs md:text-sm text-inter-primary text-center border border-gray-300">
+                                ${unitMeals}
+                            </td>
+                            <td class="px-3 md:px-6 py-2 md:py-3 text-xs md:text-sm text-inter-primary text-right border border-gray-300">
+                                $${unitAmount.toFixed(2)}
+                            </td>
+                        `;
+                        unitProviderReportBody.appendChild(subtotalRow);
+                        
                         const spacerRow = document.createElement('tr');
                         spacerRow.innerHTML = '<td colspan="4" class="py-2"></td>';
                         unitProviderReportBody.appendChild(spacerRow);
                     }
-                };
+                });
                 
-                // Renderizar CCS primero
-                renderUnits(ccsUnits, 'UNIDAD CCS');
-                
-                // Renderizar MSO después
-                renderUnits(msoUnits, 'UNIDAD MSO (DETALLADO POR DEPARTAMENTO)');
-                
-                // Actualizar totales
                 totalUnitProviderMeals.textContent = totalMeals;
                 totalUnitProviderAmount.textContent = `$${totalAmount.toFixed(2)}`;
             }
 
-            // Función para exportar a Excel
+            function verifyConsistency(expectedMeals, expectedAmount) {
+                const deptMeals = parseInt(totalDepartmentMeals.textContent) || 0;
+                const deptAmount = parseFloat(totalDepartmentAmount.textContent.replace('$', '')) || 0;
+                const provMeals = parseInt(totalProviderMeals.textContent) || 0;
+                const provAmount = parseFloat(totalProviderAmount.textContent.replace('$', '')) || 0;
+                const unitProvMeals = parseInt(totalUnitProviderMeals.textContent) || 0;
+                const unitProvAmount = parseFloat(totalUnitProviderAmount.textContent.replace('$', '')) || 0;
+                
+                console.log('=== VERIFICACIÓN DE CONSISTENCIA ===');
+                console.log(`Departamento: ${deptMeals} comidas, $${deptAmount.toFixed(2)}`);
+                console.log(`Proveedor: ${provMeals} comidas, $${provAmount.toFixed(2)}`);
+                console.log(`Unidad/Proveedor: ${unitProvMeals} comidas, $${unitProvAmount.toFixed(2)}`);
+                console.log(`Esperado: ${expectedMeals} comidas, $${expectedAmount.toFixed(2)}`);
+            }
+
             function exportReportToExcel() {
                 const isMonthly = periodMonthly.checked;
                 let fileName = '';
@@ -3486,10 +2828,8 @@
                     fileName = `Reporte_Quincenal_Comidas_${startFormatted}_${endFormatted}.csv`;
                 }
                 
-                // Crear datos para el reporte
                 let csv = `Reporte de Gastos de Comida\n\n`;
                 
-                // Sección 1: Por Unidad de Operación
                 csv += "SOLICITUD DE COMIDAS POR UNIDAD DE OPERACIONES\n";
                 csv += "UNIDAD DE OPERACION;CANTIDAD DE COMIDAS SOLICITADAS;IMPORTE\n";
                 
@@ -3506,7 +2846,6 @@
                 
                 csv += `TOTAL;${totalDepartmentMeals.textContent};${totalDepartmentAmount.textContent.replace('$', '').replace('.', ',')}\n\n`;
                 
-                // Sección 2: Por Proveedor
                 csv += "SOLICITUD DE COMIDAS POR PROVEEDOR\n";
                 csv += "PROVEEDOR;CANTIDAD DE COMIDAS;IMPORTE\n";
                 
@@ -3523,7 +2862,6 @@
                 
                 csv += `TOTAL;${totalProviderMeals.textContent};${totalProviderAmount.textContent.replace('$', '').replace('.', ',')}\n\n`;
                 
-                // Sección 3: Servicios por Unidad y Proveedor
                 csv += "SERVICIOS POR UNIDAD Y PROVEEDOR\n";
                 csv += "UNIDAD;PROVEEDOR;CANTIDAD DE COMIDAS;IMPORTE\n";
                 
@@ -3531,7 +2869,7 @@
                 unitProviderRows.forEach(row => {
                     const cells = row.querySelectorAll('td');
                     if (cells.length === 4) {
-                        const unit = cells[0].textContent.replace(';', ',');
+                        const unit = cells[0].textContent || '';
                         const provider = cells[1].textContent.replace(';', ',');
                         const meals = cells[2].textContent;
                         const amount = cells[3].textContent.replace('$', '').replace('.', ',');
@@ -3540,26 +2878,20 @@
                             csv += `${unit};${provider};${meals};${amount}\n`;
                         }
                     } else if (cells.length === 1 && cells[0].colSpan === 4) {
-                        // Es un encabezado de unidad
                         const unit = cells[0].textContent.replace(';', ',');
                         csv += `${unit};;;;\n`;
-                    } else if (cells.length === 1 && cells[0].className.includes('py-2')) {
-                        // Es un separador
-                        csv += `;;;;\n`;
                     }
                 });
                 
                 csv += `TOTAL GENERAL;;${totalUnitProviderMeals.textContent};${totalUnitProviderAmount.textContent.replace('$', '').replace('.', ',')}\n\n`;
                 
-                // Sección 4: Resumen
                 csv += "RESUMEN POR TIPO DE UNIDAD\n";
                 csv += `UNIDAD CCS Total Comidas;${ccsTotalMeals.textContent}\n`;
                 csv += `UNIDAD CCS Importe Total;${ccsTotalAmount.textContent.replace('$', '').replace('.', ',')}\n`;
                 csv += `UNIDAD MSO Total Comidas;${msoTotalMeals.textContent}\n`;
                 csv += `UNIDAD MSO Importe Total;${msoTotalAmount.textContent.replace('$', '').replace('.', ',')}\n`;
-                csv += `GRAN TOTAL;${grandTotalAmount.textContent.replace('$', '').replace('.', ',')}\n`;
+                csv += `Total;${grandTotalAmount.textContent.replace('$', '').replace('.', ',')}\n`;
                 
-                // Crear y descargar archivo
                 const blob = new Blob(["\uFEFF", csv], { type: 'text/csv;charset=utf-8;' });
                 const url = URL.createObjectURL(blob);
                 const link = document.createElement('a');
@@ -3573,7 +2905,6 @@
                 displayMessage('Reporte exportado exitosamente', 'success');
             }
 
-            // Función para exportar a PDF - MEJORADA PARA UNA SOLA HOJA
             async function exportReportToPDF() {
                 const isMonthly = periodMonthly.checked;
                 let periodText = '';
@@ -3603,16 +2934,141 @@
                 const today = new Date();
                 const todayStr = today.toLocaleDateString('es-ES');
                 
-                // Mostrar mensaje de procesamiento
                 displayMessage('Generando PDF...', 'success');
                 
                 try {
-                    // Crear contenido HTML para el PDF - TAMAÑOS REDUCIDOS PARA UNA SOLA HOJA
+                    const departmentData = {};
+                    ALL_DEPARTMENTS.forEach(dept => {
+                        departmentData[dept] = { meals: 0, amount: 0 };
+                    });
+                    
+                    let filteredRequests = [];
+                    
+                    if (isMonthly) {
+                        const selectedMonth = reportMonthInput.value;
+                        const [year, month] = selectedMonth.split('-');
+                        
+                        filteredRequests = foodRequests.filter(request => {
+                            if (!request.deliveryDate) return false;
+                            const requestDate = new Date(request.deliveryDate + 'T12:00:00');
+                            if (isNaN(requestDate.getTime())) return false;
+                            const requestYear = requestDate.getFullYear();
+                            const requestMonth = requestDate.getMonth() + 1;
+                            return requestYear === parseInt(year) && requestMonth === parseInt(month);
+                        });
+                    } else {
+                        const startDate = biweekStartDate.value;
+                        const endDate = biweekEndDate.value;
+                        
+                        filteredRequests = foodRequests.filter(request => {
+                            if (!request.deliveryDate) return false;
+                            const requestDate = new Date(request.deliveryDate + 'T00:00:00');
+                            const start = new Date(startDate + 'T00:00:00');
+                            const end = new Date(endDate + 'T23:59:59.999');
+                            return requestDate >= start && requestDate <= end;
+                        });
+                    }
+                    
+                    filteredRequests.forEach(request => {
+                        const departmentKey = formatDepartmentName(mapDepartment(request.department, request.msoDepartment));
+                        const meals = parseInt(request.totalQuantity) || 0;
+                        const amount = parseFloat(request.totalCost) || 0;
+                        
+                        if (departmentData[departmentKey]) {
+                            departmentData[departmentKey].meals += meals;
+                            departmentData[departmentKey].amount += amount;
+                        }
+                    });
+                    
+                    let totalMeals = 0;
+                    let totalAmount = 0;
+                    
+                    let departmentRows = '';
+                    Object.keys(departmentData)
+                        .sort((a, b) => a.localeCompare(b, 'es'))
+                        .forEach(dept => {
+                            const data = departmentData[dept];
+                            totalMeals += data.meals;
+                            totalAmount += data.amount;
+                            
+                            departmentRows += `
+                                <tr>
+                                    <td style="padding: 3px; border: 1px solid #ddd; font-size: 6px;">${dept}</td>
+                                    <td style="padding: 3px; border: 1px solid #ddd; text-align: center; font-size: 6px;">${data.meals}</td>
+                                    <td style="padding: 3px; border: 1px solid #ddd; text-align: right; font-size: 6px;">$${data.amount.toFixed(2)}</td>
+                                </tr>
+                            `;
+                        });
+                    
+                    let providerRows = '';
+                    const providerRowsElements = Array.from(providerReportBody.querySelectorAll('tr'));
+                    providerRowsElements.forEach(row => {
+                        const cells = row.querySelectorAll('td');
+                        if (cells.length >= 3) {
+                            const provider = cells[0].textContent;
+                            const meals = cells[1].textContent;
+                            const amount = cells[2].textContent;
+                            
+                            providerRows += `
+                                <tr>
+                                    <td style="padding: 3px; border: 1px solid #ddd; font-size: 6px;">${provider}</td>
+                                    <td style="padding: 3px; border: 1px solid #ddd; text-align: center; font-size: 6px;">${meals}</td>
+                                    <td style="padding: 3px; border: 1px solid #ddd; text-align: right; font-size: 6px;">${amount}</td>
+                                </tr>
+                            `;
+                        }
+                    });
+                    
+                    let unitProviderRows = '';
+                    const unitProviderRowsElements = Array.from(unitProviderReportBody.querySelectorAll('tr'));
+                    unitProviderRowsElements.forEach(row => {
+                        const cells = row.querySelectorAll('td');
+                        
+                        if (cells.length === 1 && cells[0].colSpan === 4) {
+                            const unit = cells[0].textContent;
+                            unitProviderRows += `
+                                <tr style="background-color: #f0f7ff; font-weight: bold;">
+                                    <td colspan="4" style="color: #005BAA; font-size: 8px; padding: 4px; border: 1px solid #ddd;">
+                                        ${unit}
+                                    </td>
+                                </tr>
+                            `;
+                        } else if (cells.length === 4) {
+                            const unit = cells[0].textContent || '';
+                            const provider = cells[1].textContent;
+                            const meals = cells[2].textContent;
+                            const amount = cells[3].textContent;
+                            
+                            if (provider.trim()) {
+                                unitProviderRows += `
+                                    <tr>
+                                        <td style="padding: 3px; border: 1px solid #ddd; font-size: 6px;">${unit}</td>
+                                        <td style="padding: 3px; border: 1px solid #ddd; font-size: 6px;">${provider}</td>
+                                        <td style="padding: 3px; border: 1px solid #ddd; text-align: center; font-size: 6px;">${meals}</td>
+                                        <td style="padding: 3px; border: 1px solid #ddd; text-align: right; font-size: 6px;">${amount}</td>
+                                    </tr>
+                                `;
+                            }
+                        } else if (cells.length === 4 && cells[0].colSpan === 2) {
+                            const label = cells[0].textContent;
+                            const meals = cells[1].textContent;
+                            const amount = cells[2].textContent;
+                            
+                            unitProviderRows += `
+                                <tr style="background-color: #f9f9f9; font-weight: bold;">
+                                    <td colspan="2" style="padding: 3px; border: 1px solid #ddd; font-size: 6px; text-align: right;">${label}</td>
+                                    <td style="padding: 3px; border: 1px solid #ddd; text-align: center; color: #005BAA; font-size: 6px;">${meals}</td>
+                                    <td style="padding: 3px; border: 1px solid #ddd; text-align: right; color: #005BAA; font-size: 6px;">${amount}</td>
+                                </tr>
+                            `;
+                        }
+                    });
+                    
                     let pdfHTML = `
                         <div class="report-pdf" style="font-family: 'Inter', sans-serif; max-width: 600px; margin: 0 auto;">
                             <div class="pdf-header" style="text-align: center; margin-bottom: 10px; border-bottom: 2px solid #005BAA; padding-bottom: 8px;">
                                 <h1 class="pdf-title" style="color: #005BAA; font-size: 14px; font-weight: bold; margin-bottom: 3px;">
-                                    Reporte de Gastos de Comida
+                                    Gastos de comida
                                 </h1>
                                 <div class="pdf-subtitle" style="color: #666; font-size: 10px; margin-bottom: 2px;">
                                     ${periodText}
@@ -3642,215 +3098,126 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                    `;
-                    
-                    // Agregar filas de departamentos
-                    const departmentRows = Array.from(departmentReportBody.querySelectorAll('tr'));
-                    departmentRows.forEach(row => {
-                        const cells = row.querySelectorAll('td');
-                        if (cells.length >= 3) {
-                            const dept = cells[0].textContent;
-                            const meals = cells[1].textContent;
-                            const amount = cells[2].textContent;
+                                        ${departmentRows}
+                                        <tr class="total-row" style="font-weight: bold; background-color: #f9f9f9;">
+                                            <td style="padding: 4px; border: 1px solid #ddd; font-size: 7px;">TOTAL</td>
+                                            <td style="padding: 4px; border: 1px solid #ddd; text-align: center; font-size: 7px;">${totalMeals}</td>
+                                            <td style="padding: 4px; border: 1px solid #ddd; text-align: right; font-size: 7px;">$${totalAmount.toFixed(2)}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
                             
-                            pdfHTML += `
-                                <tr>
-                                    <td style="padding: 3px; border: 1px solid #ddd; font-size: 6px;">${dept}</td>
-                                    <td style="padding: 3px; border: 1px solid #ddd; text-align: center; font-size: 6px;">${meals}</td>
-                                    <td style="padding: 3px; border: 1px solid #ddd; text-align: right; font-size: 6px;">${amount}</td>
-                                </tr>
-                            `;
-                        }
-                    });
-                    
-                    // Agregar total de departamentos
-                    pdfHTML += `
-                                <tr class="total-row" style="font-weight: bold; background-color: #f9f9f9;">
-                                    <td style="padding: 4px; border: 1px solid #ddd; font-size: 7px;">TOTAL</td>
-                                    <td style="padding: 4px; border: 1px solid #ddd; text-align: center; font-size: 7px;">${totalDepartmentMeals.textContent}</td>
-                                    <td style="padding: 4px; border: 1px solid #ddd; text-align: right; font-size: 7px;">${totalDepartmentAmount.textContent}</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    
-                    <!-- Sección 2: Solicitud de Comidas por Proveedor -->
-                    <div class="pdf-section" style="margin-bottom: 12px;">
-                        <h2 style="color: #005BAA; font-size: 11px; margin-bottom: 5px; border-bottom: 1px solid #005BAA; padding-bottom: 3px;">
-                            SOLICITUD DE COMIDAS POR PROVEEDOR
-                        </h2>
-                        <table class="pdf-table" style="width: 100%; border-collapse: collapse; font-size: 7px;">
-                            <thead>
-                                <tr>
-                                    <th style="background-color: #f0f7ff; color: #005BAA; font-weight: bold; padding: 4px; border: 1px solid #ddd; text-align: left;">
-                                        PROVEEDOR
-                                    </th>
-                                    <th style="background-color: #f0f7ff; color: #005BAA; font-weight: bold; padding: 4px; border: 1px solid #ddd; text-align: center;">
-                                        CANTIDAD
-                                    </th>
-                                    <th style="background-color: #f0f7ff; color: #005BAA; font-weight: bold; padding: 4px; border: 1px solid #ddd; text-align: right;">
-                                        IMPORTE
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                    `;
-                    
-                    // Agregar filas de proveedores
-                    const providerRows = Array.from(providerReportBody.querySelectorAll('tr'));
-                    providerRows.forEach(row => {
-                        const cells = row.querySelectorAll('td');
-                        if (cells.length >= 3) {
-                            const provider = cells[0].textContent;
-                            const meals = cells[1].textContent;
-                            const amount = cells[2].textContent;
+                            <!-- Sección 2: Solicitud de Comidas por Proveedor -->
+                            <div class="pdf-section" style="margin-bottom: 12px;">
+                                <h2 style="color: #005BAA; font-size: 11px; margin-bottom: 5px; border-bottom: 1px solid #005BAA; padding-bottom: 3px;">
+                                    SOLICITUD DE COMIDAS POR PROVEEDOR
+                                </h2>
+                                <table class="pdf-table" style="width: 100%; border-collapse: collapse; font-size: 7px;">
+                                    <thead>
+                                        <tr>
+                                            <th style="background-color: #f0f7ff; color: #005BAA; font-weight: bold; padding: 4px; border: 1px solid #ddd; text-align: left;">
+                                                PROVEEDOR
+                                            </th>
+                                            <th style="background-color: #f0f7ff; color: #005BAA; font-weight: bold; padding: 4px; border: 1px solid #ddd; text-align: center;">
+                                                CANTIDAD
+                                            </th>
+                                            <th style="background-color: #f0f7ff; color: #005BAA; font-weight: bold; padding: 4px; border: 1px solid #ddd; text-align: right;">
+                                                IMPORTE
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        ${providerRows}
+                                        <tr class="total-row" style="font-weight: bold; background-color: #f9f9f9;">
+                                            <td style="padding: 4px; border: 1px solid #ddd; font-size: 7px;">TOTAL</td>
+                                            <td style="padding: 4px; border: 1px solid #ddd; text-align: center; font-size: 7px;">${totalProviderMeals.textContent}</td>
+                                            <td style="padding: 4px; border: 1px solid #ddd; text-align: right; font-size: 7px;">${totalProviderAmount.textContent}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
                             
-                            pdfHTML += `
-                                <tr>
-                                    <td style="padding: 3px; border: 1px solid #ddd; font-size: 6px;">${provider}</td>
-                                    <td style="padding: 3px; border: 1px solid #ddd; text-align: center; font-size: 6px;">${meals}</td>
-                                    <td style="padding: 3px; border: 1px solid #ddd; text-align: right; font-size: 6px;">${amount}</td>
-                                </tr>
-                            `;
-                        }
-                    });
-                    
-                    // Agregar total de proveedores
-                    pdfHTML += `
-                                <tr class="total-row" style="font-weight: bold; background-color: #f9f9f9;">
-                                    <td style="padding: 4px; border: 1px solid #ddd; font-size: 7px;">TOTAL</td>
-                                    <td style="padding: 4px; border: 1px solid #ddd; text-align: center; font-size: 7px;">${totalProviderMeals.textContent}</td>
-                                    <td style="padding: 4px; border: 1px solid #ddd; text-align: right; font-size: 7px;">${totalProviderAmount.textContent}</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    
-                    <!-- Sección 3: Resumen por Tipo de Unidad -->
-                    <div class="pdf-section" style="margin-bottom: 12px;">
-                        <h2 style="color: #005BAA; font-size: 11px; margin-bottom: 5px; border-bottom: 1px solid #005BAA; padding-bottom: 3px;">
-                            RESUMEN POR TIPO DE UNIDAD
-                        </h2>
-                        <div style="display: flex; justify-content: space-between; margin-bottom: 8px; gap: 10px;">
-                            <div class="pdf-summary-box" style="flex: 1; border: 1px solid #ddd; padding: 6px; border-radius: 3px; background-color: #f9f9f9;">
-                                <h3 style="color: #005BAA; font-size: 10px; margin-bottom: 5px; text-align: center;">UNIDAD CCS</h3>
-                                <div style="margin-bottom: 3px; display: flex; justify-content: space-between;">
-                                    <span style="color: #666; font-size: 8px;">Total Comidas:</span>
-                                    <span style="font-weight: bold; color: #005BAA; font-size: 8px;">${ccsTotalMeals.textContent}</span>
+                            <!-- Sección 3: Resumen por Tipo de Unidad -->
+                            <div class="pdf-section" style="margin-bottom: 12px;">
+                                <h2 style="color: #005BAA; font-size: 11px; margin-bottom: 5px; border-bottom: 1px solid #005BAA; padding-bottom: 3px;">
+                                    RESUMEN POR TIPO DE UNIDAD
+                                </h2>
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 8px; gap: 10px;">
+                                    <div class="pdf-summary-box" style="flex: 1; border: 1px solid #ddd; padding: 6px; border-radius: 3px; background-color: #f9f9f9;">
+                                        <h3 style="color: #005BAA; font-size: 10px; margin-bottom: 5px; text-align: center;">UNIDAD CCS</h3>
+                                        <div style="margin-bottom: 3px; display: flex; justify-content: space-between;">
+                                            <span style="color: #666; font-size: 8px;">Total Comidas:</span>
+                                            <span style="font-weight: bold; color: #005BAA; font-size: 8px;">${ccsTotalMeals.textContent}</span>
+                                        </div>
+                                        <div style="display: flex; justify-content: space-between;">
+                                            <span style="color: #666; font-size: 8px;">Importe Total:</span>
+                                            <span style="font-weight: bold; color: #005BAA; font-size: 8px;">${ccsTotalAmount.textContent}</span>
+                                        </div>
+                                    </div>
+                                    <div class="pdf-summary-box" style="flex: 1; border: 1px solid #ddd; padding: 6px; border-radius: 3px; background-color: #f9f9f9;">
+                                        <h3 style="color: #005BAA; font-size: 10px; margin-bottom: 5px; text-align: center;">UNIDAD MSO</h3>
+                                        <div style="margin-bottom: 3px; display: flex; justify-content: space-between;">
+                                            <span style="color: #666; font-size: 8px;">Total Comidas:</span>
+                                            <span style="font-weight: bold; color: #005BAA; font-size: 8px;">${msoTotalMeals.textContent}</span>
+                                        </div>
+                                        <div style="display: flex; justify-content: space-between;">
+                                            <span style="color: #666; font-size: 8px;">Importe Total:</span>
+                                            <span style="font-weight: bold; color: #005BAA; font-size: 8px;">${msoTotalAmount.textContent}</span>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div style="display: flex; justify-content: space-between;">
-                                    <span style="color: #666; font-size: 8px;">Importe Total:</span>
-                                    <span style="font-weight: bold; color: #005BAA; font-size: 8px;">${ccsTotalAmount.textContent}</span>
+                                
+                                <div style="text-align: center; padding: 8px; background-color: #f0f7ff; border-radius: 3px; border: 1px solid #005BAA; margin-top: 8px;">
+                                    <div style="font-size: 10px; font-weight: bold; color: #005BAA; margin-bottom: 3px;">
+                                        Total
+                                    </div>
+                                    <div style="font-size: 16px; font-weight: bold; color: #005BAA;">
+                                        ${grandTotalAmount.textContent}
+                                    </div>
                                 </div>
                             </div>
-                            <div class="pdf-summary-box" style="flex: 1; border: 1px solid #ddd; padding: 6px; border-radius: 3px; background-color: #f9f9f9;">
-                                <h3 style="color: #005BAA; font-size: 10px; margin-bottom: 5px; text-align: center;">UNIDAD MSO</h3>
-                                <div style="margin-bottom: 3px; display: flex; justify-content: space-between;">
-                                    <span style="color: #666; font-size: 8px;">Total Comidas:</span>
-                                    <span style="font-weight: bold; color: #005BAA; font-size: 8px;">${msoTotalMeals.textContent}</span>
-                                </div>
-                                <div style="display: flex; justify-content: space-between;">
-                                    <span style="color: #666; font-size: 8px;">Importe Total:</span>
-                                    <span style="font-weight: bold; color: #005BAA; font-size: 8px;">${msoTotalAmount.textContent}</span>
-                                </div>
+                            
+                            <!-- Sección 4: Servicios por Unidad y Proveedor -->
+                            <div class="pdf-section" style="margin-bottom: 15px;">
+                                <h2 style="color: #005BAA; font-size: 11px; margin-bottom: 5px; border-bottom: 1px solid #005BAA; padding-bottom: 3px;">
+                                    SERVICIOS POR UNIDAD Y PROVEEDOR
+                                </h2>
+                                <table class="pdf-table" style="width: 100%; border-collapse: collapse; font-size: 6px;">
+                                    <thead>
+                                        <tr>
+                                            <th style="background-color: #f0f7ff; color: #005BAA; font-weight: bold; padding: 4px; border: 1px solid #ddd; text-align: left;">
+                                                UNIDAD
+                                            </th>
+                                            <th style="background-color: #f0f7ff; color: #005BAA; font-weight: bold; padding: 4px; border: 1px solid #ddd; text-align: left;">
+                                                PROVEEDOR
+                                            </th>
+                                            <th style="background-color: #f0f7ff; color: #005BAA; font-weight: bold; padding: 4px; border: 1px solid #ddd; text-align: center;">
+                                                CANTIDAD
+                                            </th>
+                                            <th style="background-color: #f0f7ff; color: #005BAA; font-weight: bold; padding: 4px; border: 1px solid #ddd; text-align: right;">
+                                                IMPORTE
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        ${unitProviderRows}
+                                        <tr class="total-row" style="font-weight: bold; background-color: #f9f9f9;">
+                                            <td colspan="2" style="padding: 4px; border: 1px solid #ddd; font-size: 7px;">TOTAL GENERAL</td>
+                                            <td style="padding: 4px; border: 1px solid #ddd; text-align: center; color: #005BAA; font-size: 7px;">${totalUnitProviderMeals.textContent}</td>
+                                            <td style="padding: 4px; border: 1px solid #ddd; text-align: right; color: #005BAA; font-size: 7px;">${totalUnitProviderAmount.textContent}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            
+                            <div class="pdf-footer" style="text-align: center; margin-top: 15px; padding-top: 8px; border-top: 1px solid #ddd; color: #666; font-size: 7px;">
+                                <div style="margin-bottom: 2px;">Reporte generado el ${todayStr}</div>
+                                <div>Control de Solicitud de Comidas - Inter</div>
                             </div>
                         </div>
-                        
-                        <div style="text-align: center; padding: 8px; background-color: #f0f7ff; border-radius: 3px; border: 1px solid #005BAA; margin-top: 8px;">
-                            <div style="font-size: 10px; font-weight: bold; color: #005BAA; margin-bottom: 3px;">
-                                GRAN TOTAL
-                            </div>
-                            <div style="font-size: 16px; font-weight: bold; color: #005BAA;">
-                                ${grandTotalAmount.textContent}
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Sección 4: Servicios por Unidad y Proveedor -->
-                    <div class="pdf-section" style="margin-bottom: 15px;">
-                        <h2 style="color: #005BAA; font-size: 11px; margin-bottom: 5px; border-bottom: 1px solid #005BAA; padding-bottom: 3px;">
-                            SERVICIOS POR UNIDAD Y PROVEEDOR
-                        </h2>
-                        <table class="pdf-table" style="width: 100%; border-collapse: collapse; font-size: 6px;">
-                            <thead>
-                                <tr>
-                                    <th style="background-color: #f0f7ff; color: #005BAA; font-weight: bold; padding: 4px; border: 1px solid #ddd; text-align: left;">
-                                        UNIDAD
-                                    </th>
-                                    <th style="background-color: #f0f7ff; color: #005BAA; font-weight: bold; padding: 4px; border: 1px solid #ddd; text-align: left;">
-                                        PROVEEDOR
-                                    </th>
-                                    <th style="background-color: #f0f7ff; color: #005BAA; font-weight: bold; padding: 4px; border: 1px solid #ddd; text-align: center;">
-                                        CANTIDAD
-                                    </th>
-                                    <th style="background-color: #f0f7ff; color: #005BAA; font-weight: bold; padding: 4px; border: 1px solid #ddd; text-align: right;">
-                                        IMPORTE
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody>
                     `;
                     
-                    // Agregar filas de unidad/proveedor (solo las principales, sin subtotales para ahorrar espacio)
-                    const unitProviderRows = Array.from(unitProviderReportBody.querySelectorAll('tr'));
-                    let rowCount = 0;
-                    
-                    unitProviderRows.forEach(row => {
-                        const cells = row.querySelectorAll('td');
-                        
-                        if (cells.length === 1 && cells[0].colSpan === 4) {
-                            // Es un encabezado de unidad
-                            const unitHeader = cells[0].textContent;
-                            // Solo mostrar encabezado si hay espacio
-                            if (rowCount < 10) {
-                                pdfHTML += `
-                                    <tr style="background-color: #f0f7ff; font-weight: bold;">
-                                        <td colspan="4" style="color: #005BAA; font-size: 9px; padding: 5px; border: 1px solid #ddd;">
-                                            ${unitHeader}
-                                        </td>
-                                    </tr>
-                                `;
-                            }
-                        } else if (cells.length === 4) {
-                            // Es una fila de proveedor
-                            const unit = cells[0].textContent || '';
-                            const provider = cells[1].textContent;
-                            const meals = cells[2].textContent;
-                            const amount = cells[3].textContent;
-                            
-                            if (provider.trim() && rowCount < 15) {
-                                rowCount++;
-                                pdfHTML += `
-                                    <tr>
-                                        <td style="padding: 3px; border: 1px solid #ddd; font-size: 6px;">${unit}</td>
-                                        <td style="padding: 3px; border: 1px solid #ddd; font-size: 6px;">${provider}</td>
-                                        <td style="padding: 3px; border: 1px solid #ddd; text-align: center; font-size: 6px;">${meals}</td>
-                                        <td style="padding: 3px; border: 1px solid #ddd; text-align: right; font-size: 6px;">${amount}</td>
-                                    </tr>
-                                `;
-                            }
-                        }
-                    });
-                    
-                    // Agregar total general
-                    pdfHTML += `
-                                <tr class="total-row" style="font-weight: bold; background-color: #f9f9f9;">
-                                    <td colspan="2" style="padding: 4px; border: 1px solid #ddd; font-size: 7px;">TOTAL GENERAL</td>
-                                    <td style="padding: 4px; border: 1px solid #ddd; text-align: center; color: #005BAA; font-size: 7px;">${totalUnitProviderMeals.textContent}</td>
-                                    <td style="padding: 4px; border: 1px solid #ddd; text-align: right; color: #005BAA; font-size: 7px;">${totalUnitProviderAmount.textContent}</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    
-                    <div class="pdf-footer" style="text-align: center; margin-top: 15px; padding-top: 8px; border-top: 1px solid #ddd; color: #666; font-size: 7px;">
-                        <div style="margin-bottom: 2px;">Reporte generado el ${todayStr}</div>
-                        <div>Control de Solicitud de Comidas - Inter</div>
-                    </div>
-                </div>
-                    `;
-                    
-                    // Crear elemento temporal para el contenido del PDF
                     const tempDiv = document.createElement('div');
                     tempDiv.innerHTML = pdfHTML;
                     tempDiv.style.position = 'absolute';
@@ -3861,10 +3228,8 @@
                     tempDiv.style.padding = '15px';
                     document.body.appendChild(tempDiv);
                     
-                    // Esperar a que las imágenes se carguen
                     await new Promise(resolve => setTimeout(resolve, 500));
                     
-                    // Usar html2canvas para capturar el contenido
                     const canvas = await html2canvas(tempDiv, {
                         scale: 2,
                         useCORS: true,
@@ -3875,48 +3240,40 @@
                         windowWidth: 600
                     });
                     
-                    // Remover el elemento temporal
                     document.body.removeChild(tempDiv);
                     
-                    // Crear PDF
                     const pdf = new jsPDF({
                         orientation: 'portrait',
                         unit: 'mm',
                         format: 'a4'
                     });
                     
-                    // Agregar imagen del canvas al PDF
                     const imgData = canvas.toDataURL('image/png');
-                    const imgWidth = 190; // Ancho en mm para A4
+                    const imgWidth = 190;
                     const imgHeight = (canvas.height * imgWidth) / canvas.width;
                     
-                    // Calcular si cabe en una sola página
                     const pageHeight = pdf.internal.pageSize.getHeight();
                     
                     if (imgHeight < pageHeight - 20) {
-                        // Si cabe en una sola página, agregarla en posición 10,10
                         pdf.addImage(imgData, 'PNG', 10, 10, imgWidth, imgHeight);
                     } else {
-                        // Si no cabe, escalar para que quepa
                         const scaleFactor = (pageHeight - 20) / imgHeight;
                         const scaledHeight = imgHeight * scaleFactor;
                         const scaledWidth = imgWidth * scaleFactor;
                         pdf.addImage(imgData, 'PNG', 10, 10, scaledWidth, scaledHeight);
                     }
                     
-                    // Nombre del archivo PDF
                     let pdfFileName = '';
                     if (isMonthly) {
                         const [year, month] = reportMonthInput.value.split('-');
                         const monthName = getMonthName(month);
-                        pdfFileName = `Reporte_Mensual_Comidas_${monthName}_${year}.pdf`;
+                        pdfFileName = `Gastos_Comida_${monthName}_${year}.pdf`;
                     } else {
                         const startFormatted = formatDateForFilename(biweekStartDate.value);
                         const endFormatted = formatDateForFilename(biweekEndDate.value);
-                        pdfFileName = `Reporte_Quincenal_Comidas_${startFormatted}_${endFormatted}.pdf`;
+                        pdfFileName = `Gastos_Comida_${startFormatted}_${endFormatted}.pdf`;
                     }
                     
-                    // Guardar el PDF
                     pdf.save(pdfFileName);
                     
                     displayMessage('PDF generado exitosamente', 'success');
@@ -3927,23 +3284,18 @@
                 }
             }
 
-            // Event Listeners para reporte
             generateReportBtn.addEventListener('click', generateReport);
             exportReportBtn.addEventListener('click', exportReportToExcel);
             exportPdfBtn.addEventListener('click', exportReportToPDF);
 
-            // --- Inicio de la Aplicación ---
-
             initializeForm();
 
-            // Cargar los datos y renderizar todo al inicio
             try {
                 foodRequests = await loadRequests();
                 renderTable();
                 updateSummaryTotals();
                 updateCharts();
                 
-                // Generar reporte inicial
                 if (reportMonthInput.value) {
                     generateReport();
                 }
