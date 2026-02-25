@@ -180,10 +180,186 @@
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
+
+        /* Estilos para el selector de perfil */
+        .profile-selector {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+            padding: 10px;
+            background-color: #f8fafc;
+            border-radius: 8px;
+        }
+        
+        .profile-selector label {
+            font-weight: 600;
+            color: #005BAA;
+        }
+        
+        .profile-selector select {
+            padding: 8px 12px;
+            border: 1px solid #005BAA;
+            border-radius: 6px;
+            background-color: white;
+            color: #333;
+            font-weight: 500;
+            cursor: pointer;
+        }
+        
+        .profile-selector select:focus {
+            outline: none;
+            ring: 2px solid #005BAA;
+        }
+
+        /* Estilos para el login */
+        .login-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        
+        .login-box {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            width: 90%;
+            max-width: 400px;
+        }
+        
+        .login-title {
+            color: #005BAA;
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .login-input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        
+        .login-input:focus {
+            outline: none;
+            border-color: #005BAA;
+            ring: 2px solid #005BAA;
+        }
+        
+        .login-button {
+            width: 100%;
+            padding: 12px;
+            background-color: #005BAA;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .login-button:hover {
+            background-color: #004080;
+        }
+        
+        .remember-me {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .remember-me input {
+            margin-right: 8px;
+        }
+        
+        .error-message {
+            color: #dc2626;
+            font-size: 14px;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        /* Ocultar elementos según perfil */
+        .admin-only, .presidencia-only {
+            display: none;
+        }
+        
+        body[data-profile="admin"] .admin-only {
+            display: block;
+        }
+        
+        body[data-profile="admin"] .admin-only-inline {
+            display: inline-block;
+        }
+        
+        body[data-profile="presidencia"] .presidencia-only {
+            display: block;
+        }
+        
+        body[data-profile="presidencia"] .presidencia-only-inline {
+            display: inline-block;
+        }
+        
+        /* Ambos perfiles pueden ver y usar acciones de tabla */
+        .action-cell {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+        }
     </style>
 </head>
-<body class="bg-gray-100 p-4 min-h-screen flex flex-col items-center">
+<body class="bg-gray-100 p-4 min-h-screen flex flex-col items-center" data-profile="admin">
+    <!-- Login Modal -->
+    <div id="loginModal" class="login-container">
+        <div class="login-box">
+            <div class="login-title">Control de Solicitud de Comidas</div>
+            <div class="mb-4 text-center text-gray-600">Seleccione su perfil y ingrese su contraseña</div>
+            
+            <select id="loginProfile" class="login-input">
+                <option value="admin">Administrador</option>
+                <option value="presidencia">Presidencia</option>
+            </select>
+            
+            <input type="password" id="loginPassword" class="login-input" placeholder="Contraseña" autocomplete="current-password">
+            
+            <div class="remember-me">
+                <input type="checkbox" id="rememberMe">
+                <label for="rememberMe">Recordar mi sesión</label>
+            </div>
+            
+            <div id="loginError" class="error-message hidden"></div>
+            
+            <button id="loginButton" class="login-button">Ingresar</button>
+        </div>
+    </div>
+
     <div class="w-full max-w-5xl bg-white rounded-xl shadow-lg p-4 md:p-8 mb-8 container-responsive">
+        <!-- Selector de Perfil (solo visible después del login) -->
+        <div class="profile-selector" id="profileSelector" style="display: none;">
+            <label for="profileSelect">Perfil de Usuario:</label>
+            <select id="profileSelect" class="border border-inter-primary rounded-md px-3 py-2">
+                <option value="admin">Administrador</option>
+                <option value="presidencia">Presidencia</option>
+            </select>
+            <button id="logoutBtn" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg transition duration-300">
+                Cerrar Sesión
+            </button>
+        </div>
+
         <header class="text-center mb-4 md:mb-6 bg-inter-primary rounded-t-xl py-4 md:py-6 relative overflow-hidden">
             <h1 class="text-2xl md:text-4xl font-extrabold text-white mb-1 md:mb-2 relative z-10 px-2">
                 Control de Solicitud de Comidas
@@ -195,9 +371,9 @@
         </header>
 
         <!-- Pestañas de navegación -->
-        <nav class="tab-navigation mb-6">
+        <nav class="tab-navigation">
             <button class="tab-button active" data-tab="dashboard">Dashboard</button>
-            <button class="tab-button" data-tab="financial-reports">Reportes Financieros</button>
+            <button class="tab-button admin-only" data-tab="financial-reports">Reportes Financieros</button>
         </nav>
 
         <!-- Contenido de Dashboard -->
@@ -206,7 +382,7 @@
                 <h2 class="text-xl md:text-2xl font-bold text-inter-primary mb-3 md:mb-4">Registrar Nueva Solicitud de Comida</h2>
                 <form id="foodRequestForm" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
                     
-                    <div>
+                    <div id="departmentField">
                         <label for="department" class="block text-sm font-medium text-gray-700 mb-1">
                             Departamento/Área
                         </label>
@@ -242,6 +418,7 @@
                             <option value="RRHH MSO">RRHH MSO</option>
                             <option value="Documentacion de obras">Documentación de obras</option>
                             <option value="Logistica">Logística</option>
+                            <option value="Personal Visitante">Personal Visitante</option>
                         </select>
                     </div>
                     
@@ -276,7 +453,8 @@
                         </select>
                     </div>
 
-                    <div class="col-span-1">
+                    <!-- Personal Externo - Solo visible para admin -->
+                    <div class="col-span-1 admin-only">
                         <label class="block text-sm font-medium text-gray-700 mb-1">Personal Externo</label>
                         <div class="space-y-1 md:space-y-2">
                             <div class="flex items-center justify-between">
@@ -309,7 +487,8 @@
                         </div>
                     </div>
 
-                    <div class="col-span-1">
+                    <!-- Personal Inter - Solo visible para admin -->
+                    <div class="col-span-1 admin-only">
                         <label class="block text-sm font-medium text-gray-700 mb-1">Personal Inter</label>
                         <div class="relative">
                             <input type="text" id="interStaffSearch" placeholder="Buscar personal de Inter..."
@@ -320,12 +499,13 @@
                             </ul>
                     </div>
 
+                    <!-- Contador de comidas - Visible para todos los perfiles -->
                     <div class="col-span-1">
                         <label for="totalQuantity" class="block text-sm font-medium text-gray-700 mb-1">
                             Total de Comidas
                         </label>
-                        <input type="number" id="totalQuantity" min="0" value="0" readonly
-                               class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-100 cursor-not-allowed text-sm md:text-base">
+                        <input type="number" id="totalQuantity" min="0" value="0" 
+                               class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-inter-primary focus:border-inter-primary text-sm md:text-base">
                     </div>
                     
                     <div class="col-span-1 md:col-span-2">
@@ -458,6 +638,7 @@
                                     class="bg-inter-accent-light hover:bg-cyan-600 text-white font-bold py-2 px-4 rounded-lg shadow-md transition duration-300 ease-in-out whitespace-nowrap w-full sm:w-auto">
                                 Exportar a Excel (CSV)
                             </button>
+                            <!-- Botón Eliminar Seleccionados - AHORA VISIBLE PARA AMBOS PERFILES -->
                             <button id="deleteSelectedBtn"
                                     class="bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded-lg shadow-md transition duration-300 ease-in-out whitespace-nowrap w-full sm:w-auto">
                                 Eliminar Seleccionados
@@ -471,17 +652,20 @@
                     <table id="foodTable" class="min-w-full divide-y divide-gray-200">
                         <thead class="bg-blue-50">
                             <tr>
+                                <!-- Checkbox de selección - AHORA VISIBLE PARA AMBOS PERFILES -->
                                 <th class="px-4 py-3 text-left text-xs font-medium text-inter-primary uppercase tracking-wider">
                                     <input type="checkbox" id="selectAllCheckboxes" class="form-checkbox h-4 w-4 text-inter-primary rounded">
                                 </th>
                                 <th class="px-4 py-3 text-left text-xs font-medium text-inter-primary uppercase tracking-wider">Fecha</th>
                                 <th class="px-4 py-3 text-left text-xs font-medium text-inter-primary uppercase tracking-wider">Depto</th>
                                 <th class="px-4 py-3 text-left text-xs font-medium text-inter-primary uppercase tracking-wider">Tipo</th>
-                                <th class="px-4 py-3 text-left text-xs font-medium text-inter-primary uppercase tracking-wider">Ext.</th>
-                                <th class="px-4 py-3 text-left text-xs font-medium text-inter-primary uppercase tracking-wider">Inter</th>
+                                <!-- Columnas de personal - Solo visibles para admin -->
+                                <th class="px-4 py-3 text-left text-xs font-medium text-inter-primary uppercase tracking-wider admin-only">Ext.</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-inter-primary uppercase tracking-wider admin-only">Inter</th>
                                 <th class="px-4 py-3 text-right text-xs font-medium text-inter-primary uppercase tracking-wider">Total</th>
                                 <th class="px-4 py-3 text-right text-xs font-medium text-inter-primary uppercase tracking-wider">Costo</th>
                                 <th class="px-4 py-3 text-center text-xs font-medium text-inter-primary uppercase tracking-wider">Acciones</th>
+                                <th class="px-4 py-3 text-center text-xs font-medium text-inter-primary uppercase tracking-wider">Aprobado por</th>
                             </tr>
                         </thead>
                         <tbody id="foodTableBody" class="bg-white divide-y divide-gray-200">
@@ -494,8 +678,8 @@
             </section>
         </div>
 
-        <!-- Contenido de Reportes Financieros -->
-        <div id="financial-reports-tab" class="tab-content">
+        <!-- Contenido de Reportes Financieros (solo visible para admin) -->
+        <div id="financial-reports-tab" class="tab-content admin-only">
             <!-- NUEVA SECCIÓN: REPORTE MENSUAL DE GASTOS -->
             <section class="mb-6 md:mb-8 p-4 md:p-6 bg-white rounded-lg border border-inter-primary shadow-lg">
                 <h2 class="text-xl md:text-2xl font-bold text-inter-primary mb-3 md:mb-4">Reporte de Gastos</h2>
@@ -847,33 +1031,149 @@
         // Referencias a jsPDF (disponible globalmente)
         const { jsPDF } = window.jspdf;
 
-        // Variable para controlar la vista compacta
-        let compactView = false;
+        // Variable para controlar el perfil actual
+        let currentProfile = 'admin';
+        let isLoggedIn = false;
 
-        document.addEventListener('DOMContentLoaded', async () => {
-            // Esperar a que Firebase esté listo
-            setTimeout(async () => {
-                if (!window.firebaseDb || !window.firebaseFunctions) {
-                    console.error("Firebase no se inicializó correctamente");
-                    displayMessage('Error: Firebase no se pudo inicializar', 'error');
-                    return;
-                }
+        // Contraseñas por perfil
+        const PASSWORDS = {
+            admin: 'Admin1234',
+            presidencia: 'Inter1234'
+        };
 
-                // Asignar las referencias de Firebase
-                db = window.firebaseDb;
-                firebaseFunctions = window.firebaseFunctions;
-
-                console.log("Firebase configurado correctamente en la aplicación");
-
-                // Inicializar la aplicación
-                await initializeApplication();
+        document.addEventListener('DOMContentLoaded', () => {
+            // Verificar si hay sesión guardada
+            const savedProfile = localStorage.getItem('savedProfile');
+            if (savedProfile) {
+                // Auto-login
+                currentProfile = savedProfile;
+                document.body.setAttribute('data-profile', currentProfile);
+                document.getElementById('loginModal').style.display = 'none';
+                document.getElementById('profileSelector').style.display = 'flex';
+                document.getElementById('profileSelect').value = currentProfile;
                 
-                // Configurar navegación por pestañas
-                setupTabNavigation();
-            }, 1000); // Esperar 1 segundo para asegurar que Firebase se cargue
+                // Inicializar la aplicación después del login
+                setTimeout(async () => {
+                    await initializeApplication();
+                }, 100);
+            } else {
+                // Mostrar modal de login
+                document.getElementById('loginModal').style.display = 'flex';
+            }
+
+            // Configurar evento de login
+            document.getElementById('loginButton').addEventListener('click', handleLogin);
+            
+            // Configurar evento de Enter en el campo de contraseña
+            document.getElementById('loginPassword').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    handleLogin();
+                }
+            });
+
+            // Configurar evento de logout
+            document.getElementById('logoutBtn').addEventListener('click', handleLogout);
+
+            // Configurar selector de perfil - AHORA SOLICITA CONTRASEÑA
+            document.getElementById('profileSelect').addEventListener('change', function() {
+                if (isLoggedIn) {
+                    const newProfile = this.value;
+                    const currentProfileValue = currentProfile;
+                    
+                    // Si selecciona un perfil diferente al actual, cerrar sesión
+                    if (newProfile !== currentProfileValue) {
+                        if (confirm('¿Desea cambiar de perfil? Se cerrará su sesión actual y deberá iniciar sesión nuevamente.')) {
+                            handleLogout();
+                        } else {
+                            // Revertir la selección al perfil actual
+                            this.value = currentProfileValue;
+                        }
+                    }
+                }
+            });
         });
 
-        // Función para configurar la navegación por pestañas
+        function handleLogin() {
+            const profile = document.getElementById('loginProfile').value;
+            const password = document.getElementById('loginPassword').value;
+            const rememberMe = document.getElementById('rememberMe').checked;
+            const errorElement = document.getElementById('loginError');
+
+            // Validar contraseña
+            if (password === PASSWORDS[profile]) {
+                // Login exitoso
+                isLoggedIn = true;
+                currentProfile = profile;
+                document.body.setAttribute('data-profile', profile);
+                
+                // Guardar sesión si se seleccionó "Recordar"
+                if (rememberMe) {
+                    localStorage.setItem('savedProfile', profile);
+                } else {
+                    localStorage.removeItem('savedProfile');
+                }
+
+                // Ocultar modal de login
+                document.getElementById('loginModal').style.display = 'none';
+                document.getElementById('profileSelector').style.display = 'flex';
+                
+                // Establecer valor del selector de perfil
+                document.getElementById('profileSelect').value = profile;
+
+                // Inicializar la aplicación
+                setTimeout(async () => {
+                    await initializeApplication();
+                }, 100);
+
+                errorElement.classList.add('hidden');
+            } else {
+                // Login fallido
+                errorElement.textContent = 'Contraseña incorrecta';
+                errorElement.classList.remove('hidden');
+            }
+        }
+
+        function handleLogout() {
+            isLoggedIn = false;
+            currentProfile = 'admin';
+            localStorage.removeItem('savedProfile');
+            
+            // Mostrar modal de login
+            document.getElementById('loginModal').style.display = 'flex';
+            document.getElementById('profileSelector').style.display = 'none';
+            
+            // Limpiar campos
+            document.getElementById('loginPassword').value = '';
+            document.getElementById('loginError').classList.add('hidden');
+            
+            // Establecer el perfil por defecto en el login
+            document.getElementById('loginProfile').value = 'admin';
+            
+            // Recargar la página para limpiar todos los datos
+            location.reload();
+        }
+
+        async function initializeApplication() {
+            // Esperar a que Firebase esté listo
+            if (!window.firebaseDb || !window.firebaseFunctions) {
+                console.error("Firebase no se inicializó correctamente");
+                displayMessage('Error: Firebase no se pudo inicializar', 'error');
+                return;
+            }
+
+            // Asignar las referencias de Firebase
+            db = window.firebaseDb;
+            firebaseFunctions = window.firebaseFunctions;
+
+            console.log("Firebase configurado correctamente en la aplicación");
+
+            // Configurar navegación por pestañas
+            setupTabNavigation();
+            
+            // Inicializar el resto de la aplicación
+            await initializeAppContent();
+        }
+
         function setupTabNavigation() {
             const tabButtons = document.querySelectorAll('.tab-button');
             const tabContents = document.querySelectorAll('.tab-content');
@@ -895,8 +1195,8 @@
                         tabContent.classList.add('active');
                     }
                     
-                    // Si es la pestaña de reportes, generar los gráficos si no están creados
-                    if (tabId === 'financial-reports') {
+                    // Si es la pestaña de reportes y es admin, generar los gráficos
+                    if (tabId === 'financial-reports' && currentProfile === 'admin') {
                         setTimeout(() => {
                             if (typeof updateCharts === 'function') {
                                 updateCharts();
@@ -907,7 +1207,7 @@
             });
         }
 
-        async function initializeApplication() {
+        async function initializeAppContent() {
             const form = document.getElementById('foodRequestForm');
             const departmentSelect = document.getElementById('department');
             const msoObservationsContainer = document.getElementById('msoObservationsContainer');
@@ -980,7 +1280,7 @@
                 'Monteluso': '#5CE1E6',
                 'Susi fresh': '#00B8D9',
                 'Cumbes Barlovento': '#FF9800',
-                'Al momento': '#005BAA', // Mantenido para registros antiguos
+                'Al momento': '#005BAA',
                 'otros': '#667EEA',
                 'fondo': '#E2E8F0' 
             };
@@ -990,7 +1290,7 @@
             let editingRequestId = null;
             let activeFilters = [];
             
-            // LISTA ACTUALIZADA DE PERSONAL INTER - BASADA EN EL EXCEL PROPORCIONADO
+            // LISTA DE PERSONAL INTER
             const staffList = [
                 { id: 1, name: "GALEA CESAR" },
                 { id: 2, name: "CASTILLO TIBET" },
@@ -1180,8 +1480,6 @@
             const msoTotalAmount = document.getElementById('msoTotalAmount');
             const grandTotalAmount = document.getElementById('grandTotalAmount');
             const pdfContent = document.getElementById('pdfContent');
-
-            // --- NUEVAS REFERENCIAS PARA SERVICIOS POR UNIDAD Y PROVEEDOR ---
             const unitProviderReportBody = document.getElementById('unitProviderReportBody');
             const totalUnitProviderMeals = document.getElementById('totalUnitProviderMeals');
             const totalUnitProviderAmount = document.getElementById('totalUnitProviderAmount');
@@ -1190,7 +1488,6 @@
             function formatDepartmentName(deptKey) {
                 if (!deptKey) return '';
                 
-                // Mantener C.O en mayúsculas
                 if (deptKey.includes('C.O')) {
                     const parts = deptKey.split(' ');
                     if (parts.length >= 3) {
@@ -1204,7 +1501,6 @@
                     return deptKey;
                 }
                 
-                // Mantener siglas en mayúsculas
                 const specialCaps = ['MSO', 'CCS', 'DPTO', 'G', 'RRHH'];
                 const words = deptKey.split(' ');
                 const formatted = words.map(word => {
@@ -1215,6 +1511,14 @@
                 }).join(' ');
                 
                 return formatted;
+            }
+
+            // Función para determinar quién aprueba la solicitud
+            function getApprover(department, msoDepartment) {
+                if (department === 'MSO' || (msoDepartment && msoDepartment !== '')) {
+                    return 'Mario Fernández';
+                }
+                return 'Jorge Basualdo';
             }
 
             // Lista completa de todos los departamentos posibles
@@ -1234,7 +1538,6 @@
 
             // --- Funciones de Firebase ---
 
-            // Función para agregar una nueva solicitud a Firestore
             async function addRequestToFirestore(request) {
                 try {
                     const requestsRef = firebaseFunctions.collection(db, 'foodRequests');
@@ -1247,7 +1550,6 @@
                 }
             }
 
-            // Función para actualizar una solicitud en Firestore
             async function updateRequestInFirestore(requestId, updatedData) {
                 try {
                     const requestsRef = firebaseFunctions.collection(db, 'foodRequests');
@@ -1265,7 +1567,6 @@
                 }
             }
 
-            // Función para eliminar solicitudes de Firestore
             async function deleteRequestsFromFirestore(requestIds) {
                 try {
                     const requestsRef = firebaseFunctions.collection(db, 'foodRequests');
@@ -1288,7 +1589,6 @@
                 }
             }
 
-            // Función para cargar los datos de Firestore
             async function loadRequests() {
                 try {
                     const requestsRef = firebaseFunctions.collection(db, 'foodRequests');
@@ -1388,12 +1688,15 @@
                 submitButton.classList.add('bg-inter-primary', 'hover:bg-blue-700');
                 removeCancelEditButton();
 
+                // Solo limpiar campos de personal externo si existen (para admin)
                 document.querySelectorAll('input[name="externalStaff"]').forEach(checkbox => {
-                    checkbox.checked = false;
-                    const quantityInput = document.getElementById(`quantity${checkbox.value}`);
-                    if (quantityInput) {
-                        quantityInput.value = '0';
-                        quantityInput.classList.add('hidden-quantity');
+                    if (checkbox) {
+                        checkbox.checked = false;
+                        const quantityInput = document.getElementById(`quantity${checkbox.value}`);
+                        if (quantityInput) {
+                            quantityInput.value = '0';
+                            quantityInput.classList.add('hidden-quantity');
+                        }
                     }
                 });
                 
@@ -1404,6 +1707,26 @@
                     msoObservationsContainer.classList.add('hidden');
                     msoObservationsSelect.value = '';
                 }
+            }
+
+            // Mover renderSelectedStaff FUERA del bloque condicional para que esté disponible para todos los perfiles
+            function renderSelectedStaff() {
+                if (!interStaffSelectedList) return;
+                
+                interStaffSelectedList.innerHTML = '';
+                selectedInterStaff.forEach((staffName, index) => {
+                    const li = document.createElement('li');
+                    li.className = 'flex items-center justify-between text-sm bg-blue-50 p-2 rounded';
+                    li.innerHTML = `
+                        <span class="text-gray-700 truncate" style="max-width: 80%;">${staffName}</span>
+                        <button type="button" data-name="${staffName}"
+                                class="remove-staff-btn text-red-500 hover:text-red-700 ml-2 font-bold transition duration-150">
+                            &times;
+                        </button>
+                    `;
+                    interStaffSelectedList.appendChild(li);
+                });
+                calculateTotalCost();
             }
 
             function formatDateForInput(dateString) {
@@ -1424,10 +1747,19 @@
                 }, 5000);
             }
 
+            // --- FUNCIÓN CORREGIDA ---
             function calculateTotalQuantity() {
+                // Si el perfil es 'presidencia', simplemente devolvemos el valor del campo totalQuantity
+                if (currentProfile === 'presidencia') {
+                    return parseInt(totalQuantityInput.value) || 0;
+                }
+
+                // Si es admin, hacemos el cálculo normal
                 let externalQuantity = 0;
                 document.querySelectorAll('input[type="number"][id^="quantity"]').forEach(input => {
-                    externalQuantity += parseInt(input.value) || 0;
+                    if (input) {
+                        externalQuantity += parseInt(input.value) || 0;
+                    }
                 });
 
                 const interQuantity = selectedInterStaff.length;
@@ -1437,7 +1769,7 @@
             }
 
             function calculateTotalCost() {
-                const totalQuantity = calculateTotalQuantity();
+                const totalQuantity = parseFloat(totalQuantityInput.value) || 0;
                 const unitCost = parseFloat(unitCostInput.value) || 0;
                 const deliveryCost = deliveryFree.checked ? 0 : (parseFloat(deliveryCostInput.value) || 0);
 
@@ -1445,104 +1777,93 @@
                 costInput.value = totalCost.toFixed(2);
             }
 
-            document.querySelectorAll('input[name="externalStaff"]').forEach(checkbox => {
-                checkbox.addEventListener('change', (e) => {
-                    const quantityInput = document.getElementById(`quantity${e.target.value}`);
-                    if (quantityInput) {
-                        if (e.target.checked) {
-                            quantityInput.classList.remove('hidden-quantity');
-                            quantityInput.value = 1;
-                        } else {
-                            quantityInput.classList.add('hidden-quantity');
-                            quantityInput.value = 0;
+            // Solo configurar eventos de personal externo si es admin
+            if (currentProfile === 'admin') {
+                document.querySelectorAll('input[name="externalStaff"]').forEach(checkbox => {
+                    checkbox.addEventListener('change', (e) => {
+                        const quantityInput = document.getElementById(`quantity${e.target.value}`);
+                        if (quantityInput) {
+                            if (e.target.checked) {
+                                quantityInput.classList.remove('hidden-quantity');
+                                quantityInput.value = 1;
+                            } else {
+                                quantityInput.classList.add('hidden-quantity');
+                                quantityInput.value = 0;
+                            }
                         }
-                    }
-                    calculateTotalCost();
+                        calculateTotalCost();
+                    });
                 });
-            });
 
-            document.querySelectorAll('input[type="number"][id^="quantity"]').forEach(input => {
-                input.addEventListener('input', () => {
-                    if (parseInt(input.value) < 0 || input.value === '') {
-                        input.value = '0';
-                    }
-                    const checkboxId = input.id.replace('quantity', 'check');
-                    const checkbox = document.getElementById(checkboxId);
-                    if (checkbox) {
-                        checkbox.checked = parseInt(input.value) > 0;
-                        if (parseInt(input.value) === 0) {
-                             input.classList.add('hidden-quantity');
-                        } else {
-                            input.classList.remove('hidden-quantity');
+                document.querySelectorAll('input[type="number"][id^="quantity"]').forEach(input => {
+                    input.addEventListener('input', () => {
+                        if (parseInt(input.value) < 0 || input.value === '') {
+                            input.value = '0';
                         }
-                    }
-                    calculateTotalCost();
+                        const checkboxId = input.id.replace('quantity', 'check');
+                        const checkbox = document.getElementById(checkboxId);
+                        if (checkbox) {
+                            checkbox.checked = parseInt(input.value) > 0;
+                            if (parseInt(input.value) === 0) {
+                                 input.classList.add('hidden-quantity');
+                            } else {
+                                input.classList.remove('hidden-quantity');
+                            }
+                        }
+                        calculateTotalCost();
+                    });
                 });
-            });
 
-            function renderSelectedStaff() {
-                interStaffSelectedList.innerHTML = '';
-                selectedInterStaff.forEach((staffName, index) => {
-                    const li = document.createElement('li');
-                    li.className = 'flex items-center justify-between text-sm bg-blue-50 p-2 rounded';
-                    li.innerHTML = `
-                        <span class="text-gray-700 truncate" style="max-width: 80%;">${staffName}</span>
-                        <button type="button" data-name="${staffName}"
-                                class="remove-staff-btn text-red-500 hover:text-red-700 ml-2 font-bold transition duration-150">
-                            &times;
-                        </button>
-                    `;
-                    interStaffSelectedList.appendChild(li);
+                interStaffSearchInput.addEventListener('input', () => {
+                    const query = interStaffSearchInput.value.trim().toUpperCase();
+                    interStaffSearchResults.innerHTML = '';
+
+                    if (query.length < 2) {
+                        interStaffSearchResults.classList.add('hidden');
+                        return;
+                    }
+
+                    const filteredStaff = staffList.filter(staff => 
+                        staff.name.includes(query) && !selectedInterStaff.includes(staff.name)
+                    ).slice(0, 10);
+
+                    if (filteredStaff.length > 0) {
+                        filteredStaff.forEach(staff => {
+                            const li = document.createElement('li');
+                            li.className = 'p-2 hover:bg-inter-accent-light hover:text-white cursor-pointer transition duration-150 text-sm md:text-base';
+                            li.textContent = staff.name;
+                            li.setAttribute('data-name', staff.name);
+                            li.addEventListener('click', (e) => {
+                                selectedInterStaff.push(e.target.getAttribute('data-name'));
+                                interStaffSearchInput.value = '';
+                                interStaffSearchResults.classList.add('hidden');
+                                renderSelectedStaff();
+                            });
+                            interStaffSearchResults.appendChild(li);
+                        });
+                        interStaffSearchResults.classList.remove('hidden');
+                    } else {
+                        interStaffSearchResults.classList.add('hidden');
+                    }
                 });
-                calculateTotalCost();
+
+                document.addEventListener('click', (e) => {
+                    if (!interStaffSearchInput.contains(e.target) && !interStaffSearchResults.contains(e.target)) {
+                        interStaffSearchResults.classList.add('hidden');
+                    }
+                });
+
+                interStaffSelectedList.addEventListener('click', (e) => {
+                    if (e.target.classList.contains('remove-staff-btn')) {
+                        const staffName = e.target.getAttribute('data-name');
+                        selectedInterStaff = selectedInterStaff.filter(name => name !== staffName);
+                        renderSelectedStaff();
+                    }
+                });
             }
 
-            interStaffSearchInput.addEventListener('input', () => {
-                const query = interStaffSearchInput.value.trim().toUpperCase();
-                interStaffSearchResults.innerHTML = '';
-
-                if (query.length < 2) {
-                    interStaffSearchResults.classList.add('hidden');
-                    return;
-                }
-
-                const filteredStaff = staffList.filter(staff => 
-                    staff.name.includes(query) && !selectedInterStaff.includes(staff.name)
-                ).slice(0, 10);
-
-                if (filteredStaff.length > 0) {
-                    filteredStaff.forEach(staff => {
-                        const li = document.createElement('li');
-                        li.className = 'p-2 hover:bg-inter-accent-light hover:text-white cursor-pointer transition duration-150 text-sm md:text-base';
-                        li.textContent = staff.name;
-                        li.setAttribute('data-name', staff.name);
-                        li.addEventListener('click', (e) => {
-                            selectedInterStaff.push(e.target.getAttribute('data-name'));
-                            interStaffSearchInput.value = '';
-                            interStaffSearchResults.classList.add('hidden');
-                            renderSelectedStaff();
-                        });
-                        interStaffSearchResults.appendChild(li);
-                    });
-                    interStaffSearchResults.classList.remove('hidden');
-                } else {
-                    interStaffSearchResults.classList.add('hidden');
-                }
-            });
-
-            document.addEventListener('click', (e) => {
-                if (!interStaffSearchInput.contains(e.target) && !interStaffSearchResults.contains(e.target)) {
-                    interStaffSearchResults.classList.add('hidden');
-                }
-            });
-
-            interStaffSelectedList.addEventListener('click', (e) => {
-                if (e.target.classList.contains('remove-staff-btn')) {
-                    const staffName = e.target.getAttribute('data-name');
-                    selectedInterStaff = selectedInterStaff.filter(name => name !== staffName);
-                    renderSelectedStaff();
-                }
-            });
+            // Evento para el campo totalQuantity (para presidencia)
+            totalQuantityInput.addEventListener('input', calculateTotalCost);
 
             document.querySelectorAll('input[name="deliveryOption"]').forEach(radio => {
                 radio.addEventListener('change', () => {
@@ -1612,30 +1933,36 @@
                     msoObservationsSelect.value = '';
                 }
 
-                document.querySelectorAll('input[name="externalStaff"]').forEach(checkbox => {
-                    checkbox.checked = false;
-                    const quantityInput = document.getElementById(`quantity${checkbox.value}`);
-                    quantityInput.value = '0';
-                    quantityInput.classList.add('hidden-quantity');
-                });
-
-                if (requestToEdit.externalStaff) {
-                    Object.keys(requestToEdit.externalStaff).forEach(key => {
-                        const quantity = requestToEdit.externalStaff[key];
-                        if (quantity > 0) {
-                            const checkbox = document.getElementById(`check${key}`);
-                            const quantityInput = document.getElementById(`quantity${key}`);
-                            if (checkbox && quantityInput) {
-                                checkbox.checked = true;
-                                quantityInput.value = quantity;
-                                quantityInput.classList.remove('hidden-quantity');
-                            }
+                if (currentProfile === 'admin') {
+                    document.querySelectorAll('input[name="externalStaff"]').forEach(checkbox => {
+                        checkbox.checked = false;
+                        const quantityInput = document.getElementById(`quantity${checkbox.value}`);
+                        if (quantityInput) {
+                            quantityInput.value = '0';
+                            quantityInput.classList.add('hidden-quantity');
                         }
                     });
-                }
 
-                selectedInterStaff = requestToEdit.interStaff.slice();
-                renderSelectedStaff();
+                    if (requestToEdit.externalStaff) {
+                        Object.keys(requestToEdit.externalStaff).forEach(key => {
+                            const quantity = requestToEdit.externalStaff[key];
+                            if (quantity > 0) {
+                                const checkbox = document.getElementById(`check${key}`);
+                                const quantityInput = document.getElementById(`quantity${key}`);
+                                if (checkbox && quantityInput) {
+                                    checkbox.checked = true;
+                                    quantityInput.value = quantity;
+                                    quantityInput.classList.remove('hidden-quantity');
+                                }
+                            }
+                        });
+                    }
+
+                    selectedInterStaff = requestToEdit.interStaff ? requestToEdit.interStaff.slice() : [];
+                    renderSelectedStaff();
+                } else {
+                    totalQuantityInput.value = requestToEdit.totalQuantity;
+                }
 
                 const deliveryCostValue = parseFloat(requestToEdit.deliveryCost);
                 if (deliveryCostValue > 0) {
@@ -1663,16 +1990,18 @@
             form.addEventListener('submit', async (e) => {
                 e.preventDefault();
 
-                const externalStaffData = {};
-                document.querySelectorAll('input[name="externalStaff"]:checked').forEach(checkbox => {
-                    const quantityInput = document.getElementById(`quantity${checkbox.value}`);
-                    const quantity = parseInt(quantityInput.value) || 0;
-                    if (quantity > 0) {
-                        externalStaffData[checkbox.value] = quantity;
-                    }
-                });
+                let externalStaffData = {};
+                if (currentProfile === 'admin') {
+                    document.querySelectorAll('input[name="externalStaff"]:checked').forEach(checkbox => {
+                        const quantityInput = document.getElementById(`quantity${checkbox.value}`);
+                        const quantity = parseInt(quantityInput ? quantityInput.value : 0) || 0;
+                        if (quantity > 0) {
+                            externalStaffData[checkbox.value] = quantity;
+                        }
+                    });
+                }
 
-                const totalQuantity = calculateTotalQuantity();
+                const totalQuantity = calculateTotalQuantity(); // Usamos la función corregida
                 const totalCost = parseFloat(costInput.value);
                 const deliveryCostValue = deliveryFree.checked ? 0 : (parseFloat(deliveryCostInput.value) || 0);
 
@@ -1691,13 +2020,28 @@
                     return;
                 }
 
+                // Validar que el evento esté seleccionado
+                if (!eventSelect.value) {
+                    displayMessage('Debe seleccionar un Evento.', 'error');
+                    return;
+                }
+
+                // Validar que el motivo esté lleno
+                if (!reasonTextarea.value.trim()) {
+                    displayMessage('Debe completar el Motivo de la Solicitud.', 'error');
+                    return;
+                }
+
+                // Determinar quién aprueba la solicitud
+                const approver = getApprover(departmentSelect.value, msoObservationsSelect.value);
+
                 const newRequest = {
                     id: editingRequestId || Date.now(),
                     department: departmentSelect.value,
                     mealType: mealTypeSelect.value,
                     event: eventSelect.value,
                     externalStaff: externalStaffData,
-                    interStaff: selectedInterStaff.slice(),
+                    interStaff: currentProfile === 'admin' ? selectedInterStaff.slice() : [],
                     totalQuantity: totalQuantity,
                     deliveryPlace: deliveryPlaceInput.value,
                     deliveryDate: deliveryDateTimeInput.value,
@@ -1706,7 +2050,8 @@
                     totalCost: totalCost,
                     providerName: providerNameSelect.value,
                     reason: reasonTextarea.value,
-                    registrationDate: new Date().toISOString()
+                    registrationDate: new Date().toISOString(),
+                    approvedBy: approver
                 };
 
                 if (departmentSelect.value === 'MSO' && msoObservationsSelect.value) {
@@ -1732,12 +2077,24 @@
                         initializeForm();
                     }
                     
-                    renderTable();
-                    updateSummaryTotals();
-                    updateCharts();
+                    // Filtrar para Presidencia si es necesario
+                    let displayRequests = foodRequests.slice();
+                    if (currentProfile === 'presidencia') {
+                        // CORRECCIÓN: Mostrar todas las solicitudes de MSO que sean de Presidencia O Personal Visitante
+                        displayRequests = foodRequests.filter(req => 
+                            req.department === 'MSO' && 
+                            (req.msoDepartment === 'Presidencia' || req.msoDepartment === 'Personal Visitante')
+                        );
+                    }
                     
-                    if (reportMonthInput.value) {
-                        generateReport();
+                    renderTable(displayRequests);
+                    updateSummaryTotals(displayRequests);
+                    
+                    if (currentProfile === 'admin') {
+                        updateCharts();
+                        if (reportMonthInput && reportMonthInput.value) {
+                            generateReport();
+                        }
                     }
                     
                 } catch (error) {
@@ -1749,8 +2106,8 @@
                 return `$${parseFloat(cost || 0).toFixed(2)}`;
             }
             
-            function renderTable() {
-                let filteredRequests = foodRequests.slice();
+            function renderTable(requests = foodRequests) {
+                let filteredRequests = requests.slice();
                 
                 if (activeFilters.length > 0) {
                     filteredRequests = filteredRequests.filter(request => {
@@ -1764,7 +2121,7 @@
                                     request.deliveryPlace.toLowerCase().includes(searchTerm) ||
                                     request.providerName.toLowerCase().includes(searchTerm) ||
                                     request.reason.toLowerCase().includes(searchTerm) ||
-                                    request.interStaff.some(staff => staff.toLowerCase().includes(searchTerm)) ||
+                                    (request.interStaff && request.interStaff.some(staff => staff.toLowerCase().includes(searchTerm))) ||
                                     (request.msoDepartment && request.msoDepartment.toLowerCase().includes(searchTerm))
                                 );
                             } else if (filter.field === 'department') {
@@ -1774,7 +2131,7 @@
                             } else if (filter.field === 'provider') {
                                 return request.providerName.toLowerCase().includes(searchTerm);
                             } else if (filter.field === 'staff') {
-                                return request.interStaff.some(staff => staff.toLowerCase().includes(searchTerm));
+                                return request.interStaff && request.interStaff.some(staff => staff.toLowerCase().includes(searchTerm));
                             }
                             return true;
                         });
@@ -1799,11 +2156,11 @@
                 tableView.classList.remove('hidden');
 
                 filteredRequests.forEach(request => {
-                    const externalStaffText = Object.keys(request.externalStaff)
+                    const externalStaffText = request.externalStaff ? Object.keys(request.externalStaff)
                         .map(key => `${key} (${request.externalStaff[key]})`)
-                        .join(', ');
+                        .join(', ') : 'N/A';
 
-                    const interStaffText = request.interStaff.join(', ');
+                    const interStaffText = request.interStaff ? request.interStaff.join(', ') : 'N/A';
                     
                     const displayDate = new Date(request.deliveryDate + 'T12:00:00').toLocaleDateString('es-ES', {
                         year: 'numeric',
@@ -1815,44 +2172,140 @@
                         ? `${request.department} (${request.msoDepartment})`
                         : request.department;
 
+                    const approver = request.approvedBy || getApprover(request.department, request.msoDepartment);
+
                     const row = tableBody.insertRow();
                     row.className = 'hover:bg-gray-50 transition duration-150';
                     
-                    row.innerHTML = `
-                        <td class="px-4 py-3 whitespace-nowrap">
-                            <input type="checkbox" data-id="${request.id}" class="row-checkbox form-checkbox h-4 w-4 text-inter-primary rounded">
-                        </td>
-                        <td class="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900" title="${displayDate}">
-                            ${displayDate}
-                        </td>
-                        <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500 truncate-cell" title="${displayDepartment}">
-                            ${displayDepartment}
-                        </td>
-                        <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500" title="${request.mealType}">
-                            ${request.mealType}
-                        </td>
-                        <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500 truncate-cell" title="${externalStaffText}">
-                            ${externalStaffText || 'N/A'}
-                        </td>
-                        <td class="px-4 py-3 max-w-xs overflow-hidden truncate-cell text-sm text-gray-500" title="${interStaffText}">
-                            ${interStaffText || 'N/A'}
-                        </td>
-                        <td class="px-4 py-3 whitespace-nowrap text-sm text-right font-medium text-inter-primary">
-                            ${request.totalQuantity}
-                        </td>
-                        <td class="px-4 py-3 whitespace-nowrap text-sm text-right font-bold text-inter-primary">
-                            ${formatCost(request.totalCost)}
-                        </td>
-                        <td class="px-4 py-3 whitespace-nowrap text-right text-sm font-medium">
-                            <button onclick="editRequest(${request.id})" class="bg-blue-500 hover:bg-blue-600 text-white py-1 px-3 rounded-md text-xs transition duration-150 transform hover:scale-105">
-                                Editar
-                            </button>
-                        </td>
-                    `;
+                    // Construir HTML de la fila según el perfil
+                    let rowHTML = '';
+                    
+                    if (currentProfile === 'admin') {
+                        rowHTML = `
+                            <td class="px-4 py-3 whitespace-nowrap">
+                                <input type="checkbox" data-id="${request.id}" class="row-checkbox form-checkbox h-4 w-4 text-inter-primary rounded">
+                            </td>
+                            <td class="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900" title="${displayDate}">
+                                ${displayDate}
+                            </td>
+                            <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500 truncate-cell" title="${displayDepartment}">
+                                ${displayDepartment}
+                            </td>
+                            <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500" title="${request.mealType}">
+                                ${request.mealType}
+                            </td>
+                            <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500 truncate-cell" title="${externalStaffText}">
+                                ${externalStaffText || 'N/A'}
+                            </td>
+                            <td class="px-4 py-3 max-w-xs overflow-hidden truncate-cell text-sm text-gray-500" title="${interStaffText}">
+                                ${interStaffText || 'N/A'}
+                            </td>
+                            <td class="px-4 py-3 whitespace-nowrap text-sm text-right font-medium text-inter-primary">
+                                ${request.totalQuantity}
+                            </td>
+                            <td class="px-4 py-3 whitespace-nowrap text-sm text-right font-bold text-inter-primary">
+                                ${formatCost(request.totalCost)}
+                            </td>
+                            <td class="px-4 py-3 whitespace-nowrap text-right text-sm font-medium">
+                                <div class="action-cell">
+                                    <button onclick="editRequest(${request.id})" class="bg-blue-500 hover:bg-blue-600 text-white py-1 px-2 rounded-md text-xs transition duration-150 transform hover:scale-105">
+                                        Editar
+                                    </button>
+                                    <button onclick="deleteSingleRequest(${request.id})" class="bg-red-500 hover:bg-red-600 text-white py-1 px-2 rounded-md text-xs transition duration-150 transform hover:scale-105">
+                                        Eliminar
+                                    </button>
+                                </div>
+                            </td>
+                            <td class="px-4 py-3 whitespace-nowrap text-sm text-center text-gray-600">
+                                ${approver}
+                            </td>
+                        `;
+                    } else {
+                        // Para Presidencia - con botones de editar y eliminar
+                        rowHTML = `
+                            <td class="px-4 py-3 whitespace-nowrap">
+                                <input type="checkbox" data-id="${request.id}" class="row-checkbox form-checkbox h-4 w-4 text-inter-primary rounded">
+                            </td>
+                            <td class="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900" title="${displayDate}">
+                                ${displayDate}
+                            </td>
+                            <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500 truncate-cell" title="${displayDepartment}">
+                                ${displayDepartment}
+                            </td>
+                            <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500" title="${request.mealType}">
+                                ${request.mealType}
+                            </td>
+                            <td class="px-4 py-3 whitespace-nowrap text-sm text-right font-medium text-inter-primary">
+                                ${request.totalQuantity}
+                            </td>
+                            <td class="px-4 py-3 whitespace-nowrap text-sm text-right font-bold text-inter-primary">
+                                ${formatCost(request.totalCost)}
+                            </td>
+                            <td class="px-4 py-3 whitespace-nowrap text-right text-sm font-medium">
+                                <div class="action-cell">
+                                    <button onclick="editRequest(${request.id})" class="bg-blue-500 hover:bg-blue-600 text-white py-1 px-2 rounded-md text-xs transition duration-150 transform hover:scale-105">
+                                        Editar
+                                    </button>
+                                    <button onclick="deleteSingleRequest(${request.id})" class="bg-red-500 hover:bg-red-600 text-white py-1 px-2 rounded-md text-xs transition duration-150 transform hover:scale-105">
+                                        Eliminar
+                                    </button>
+                                </div>
+                            </td>
+                            <td class="px-4 py-3 whitespace-nowrap text-sm text-center text-gray-600">
+                                ${approver}
+                            </td>
+                        `;
+                    }
+                    
+                    row.innerHTML = rowHTML;
                 });
 
-                selectAllCheckboxes.checked = false;
+                if (selectAllCheckboxes) selectAllCheckboxes.checked = false;
             }
+
+            // Función para eliminar una sola solicitud
+            window.deleteSingleRequest = (id) => {
+                const selectedIds = [id];
+                modalText.textContent = `¿Estás seguro de que quieres eliminar esta solicitud? Esta acción no se puede deshacer.`;
+                deleteModal.classList.remove('hidden');
+
+                confirmDeleteBtn.onclick = async () => {
+                    try {
+                        await deleteRequestsFromFirestore(selectedIds);
+                        
+                        foodRequests = foodRequests.filter(req => !selectedIds.includes(req.id));
+                        
+                        let displayRequests = foodRequests.slice();
+                        if (currentProfile === 'presidencia') {
+                            // CORRECCIÓN: Mostrar todas las solicitudes de MSO que sean de Presidencia O Personal Visitante
+                            displayRequests = foodRequests.filter(req => 
+                                req.department === 'MSO' && 
+                                (req.msoDepartment === 'Presidencia' || req.msoDepartment === 'Personal Visitante')
+                            );
+                        }
+                        
+                        renderTable(displayRequests);
+                        updateSummaryTotals(displayRequests);
+                        
+                        if (currentProfile === 'admin') {
+                            updateCharts();
+                            if (reportMonthInput && reportMonthInput.value) {
+                                generateReport();
+                            }
+                        }
+                        
+                        deleteModal.classList.add('hidden');
+                        displayMessage('Solicitud eliminada con éxito.', 'success');
+                    } catch (error) {
+                        displayMessage('Error al eliminar la solicitud: ' + error.message, 'error');
+                        deleteModal.classList.add('hidden');
+                    }
+                };
+
+                cancelDeleteBtn.onclick = () => {
+                    deleteModal.classList.add('hidden');
+                };
+            };
 
             function renderActiveFilters() {
                 activeFiltersContainer.innerHTML = '';
@@ -1938,53 +2391,74 @@
             
             clearAllFiltersBtn.addEventListener('click', clearAllFilters);
             
-            selectAllCheckboxes.addEventListener('change', (e) => {
-                document.querySelectorAll('.row-checkbox').forEach(checkbox => {
-                    checkbox.checked = e.target.checked;
-                });
-            });
-
-            deleteSelectedBtn.addEventListener('click', async () => {
-                const selectedIds = Array.from(document.querySelectorAll('.row-checkbox:checked'))
-                    .map(cb => parseInt(cb.getAttribute('data-id')));
-
-                if (selectedIds.length === 0) {
-                    displayMessage('Debe seleccionar al menos una solicitud para eliminar.', 'error');
-                    return;
-                }
-
-                modalText.textContent = `¿Estás seguro de que quieres eliminar ${selectedIds.length} solicitud(es)? Esta acción no se puede deshacer.`;
-                deleteModal.classList.remove('hidden');
-
-                confirmDeleteBtn.onclick = async () => {
-                    try {
-                        await deleteRequestsFromFirestore(selectedIds);
-                        
-                        foodRequests = foodRequests.filter(req => !selectedIds.includes(req.id));
-                        
-                        renderTable();
-                        updateSummaryTotals();
-                        updateCharts();
-                        
-                        if (reportMonthInput.value) {
-                            generateReport();
+            if (selectAllCheckboxes) {
+                selectAllCheckboxes.addEventListener('change', (e) => {
+                    document.querySelectorAll('.row-checkbox').forEach(checkbox => {
+                        if (checkbox) {
+                            checkbox.checked = e.target.checked;
                         }
-                        
-                        deleteModal.classList.add('hidden');
-                        displayMessage('Solicitud(es) eliminada(s) con éxito.', 'success');
-                    } catch (error) {
-                        displayMessage('Error al eliminar las solicitudes: ' + error.message, 'error');
-                        deleteModal.classList.add('hidden');
-                    }
-                };
+                    });
+                });
+            }
 
-                cancelDeleteBtn.onclick = () => {
-                    deleteModal.classList.add('hidden');
-                };
-            });
+            if (deleteSelectedBtn) {
+                deleteSelectedBtn.addEventListener('click', async () => {
+                    const selectedIds = Array.from(document.querySelectorAll('.row-checkbox:checked'))
+                        .map(cb => parseInt(cb.getAttribute('data-id')));
+
+                    if (selectedIds.length === 0) {
+                        displayMessage('Debe seleccionar al menos una solicitud para eliminar.', 'error');
+                        return;
+                    }
+
+                    modalText.textContent = `¿Estás seguro de que quieres eliminar ${selectedIds.length} solicitud(es)? Esta acción no se puede deshacer.`;
+                    deleteModal.classList.remove('hidden');
+
+                    confirmDeleteBtn.onclick = async () => {
+                        try {
+                            await deleteRequestsFromFirestore(selectedIds);
+                            
+                            foodRequests = foodRequests.filter(req => !selectedIds.includes(req.id));
+                            
+                            let displayRequests = foodRequests.slice();
+                            if (currentProfile === 'presidencia') {
+                                // CORRECCIÓN: Mostrar todas las solicitudes de MSO que sean de Presidencia O Personal Visitante
+                                displayRequests = foodRequests.filter(req => 
+                                    req.department === 'MSO' && 
+                                    (req.msoDepartment === 'Presidencia' || req.msoDepartment === 'Personal Visitante')
+                                );
+                            }
+                            
+                            renderTable(displayRequests);
+                            updateSummaryTotals(displayRequests);
+                            
+                            if (currentProfile === 'admin') {
+                                updateCharts();
+                                if (reportMonthInput && reportMonthInput.value) {
+                                    generateReport();
+                                }
+                            }
+                            
+                            deleteModal.classList.add('hidden');
+                            displayMessage('Solicitud(es) eliminada(s) con éxito.', 'success');
+                        } catch (error) {
+                            displayMessage('Error al eliminar las solicitudes: ' + error.message, 'error');
+                            deleteModal.classList.add('hidden');
+                        }
+                    };
+
+                    cancelDeleteBtn.onclick = () => {
+                        deleteModal.classList.add('hidden');
+                    };
+                });
+            }
 
             exportCsvBtn.addEventListener('click', () => {
-                if (foodRequests.length === 0) {
+                const requestsToExport = currentProfile === 'presidencia' 
+                    ? foodRequests.filter(req => req.department === 'MSO' && (req.msoDepartment === 'Presidencia' || req.msoDepartment === 'Personal Visitante'))
+                    : foodRequests;
+                    
+                if (requestsToExport.length === 0) {
                     displayMessage('No hay datos para exportar.', 'error');
                     return;
                 }
@@ -2008,17 +2482,18 @@
                     "Costo Comida Unitario ($)", 
                     "Costo Total Comida ($)", 
                     "Costo Delivery ($)", 
-                    "Costo Total Final ($)"
+                    "Costo Total Final ($)",
+                    "Aprobado por"
                 ];
             
                 let csv = headers.join(";") + "\n";
 
-                foodRequests.forEach(req => {
-                    const externalStaffText = Object.keys(req.externalStaff)
+                requestsToExport.forEach(req => {
+                    const externalStaffText = req.externalStaff ? Object.keys(req.externalStaff)
                         .map(key => `${key} (${req.externalStaff[key]})`)
-                        .join(' | ');
+                        .join(' | ') : '';
 
-                    const interStaffText = req.interStaff.join(' | ');
+                    const interStaffText = req.interStaff ? req.interStaff.join(' | ') : '';
                     const totalCostComida = req.totalQuantity * req.unitCost;
                     
                     const row = [
@@ -2036,7 +2511,8 @@
                         parseFloat(req.unitCost).toFixed(2).replace('.', ','),
                         totalCostComida.toFixed(2).replace('.', ','),
                         parseFloat(req.deliveryCost).toFixed(2).replace('.', ','),
-                        parseFloat(req.totalCost).toFixed(2).replace('.', ',')
+                        parseFloat(req.totalCost).toFixed(2).replace('.', ','),
+                        csvQuote(req.approvedBy || '')
                     ];
                     csv += row.join(";") + "\n";
                 });
@@ -2053,7 +2529,7 @@
                 displayMessage('Datos exportados a CSV con éxito.', 'success');
             });
 
-            function updateSummaryTotals() {
+            function updateSummaryTotals(requests = foodRequests) {
                 const now = new Date();
                 const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
                 const weekStart = new Date(today);
@@ -2064,7 +2540,7 @@
                 let weeklyTotal = 0;
                 let monthlyTotal = 0;
 
-                foodRequests.forEach(req => {
+                requests.forEach(req => {
                     const reqDateForComparison = new Date(req.deliveryDate + 'T12:00:00');
                     const cost = parseFloat(req.totalCost) || 0;
 
@@ -2093,6 +2569,9 @@
             }
 
             function updateCharts() {
+                // Solo actualizar gráficos si es admin
+                if (currentProfile !== 'admin') return;
+                
                 const now = new Date();
                 const currentMonth = now.getMonth();
                 const currentYear = now.getFullYear();
@@ -2276,9 +2755,11 @@
                 });
 
                 const staffRequests = currentYearRequests.reduce((acc, req) => {
-                    req.interStaff.forEach(staff => {
-                        acc[staff] = (acc[staff] || 0) + 1;
-                    });
+                    if (req.interStaff) {
+                        req.interStaff.forEach(staff => {
+                            acc[staff] = (acc[staff] || 0) + 1;
+                        });
+                    }
                     return acc;
                 }, {});
 
@@ -2395,29 +2876,142 @@
                 });
             }
 
+            function updateUIForProfile() {
+                const departmentField = document.getElementById('departmentField');
+                const msoObservationsContainer = document.getElementById('msoObservationsContainer');
+                const departmentSelect = document.getElementById('department');
+                const msoObservations = document.getElementById('msoObservations');
+                const eventSelect = document.getElementById('event');
+                
+                if (currentProfile === 'presidencia') {
+                    // Configurar para Presidencia
+                    departmentSelect.innerHTML = `
+                        <option value="" disabled selected>Selecciona un Departamento</option>
+                        <option value="MSO">MSO</option>
+                    `;
+                    
+                    // Configurar MSO específico - INCLUYE PERSONAL VISITANTE
+                    msoObservations.innerHTML = `
+                        <option value="" selected>Selecciona departamento MSO</option>
+                        <option value="Presidencia">Presidencia</option>
+                        <option value="Personal Visitante">Personal Visitante</option>
+                    `;
+                    
+                    // Configurar eventos solo para Presidencia
+                    eventSelect.innerHTML = `
+                        <option value="" disabled selected>Selecciona un Evento</option>
+                        <option value="Evento extraordinario">Evento extraordinario</option>
+                        <option value="Otros">Otros</option>
+                    `;
+                    
+                    // Forzar selección de MSO
+                    departmentSelect.value = 'MSO';
+                    msoObservationsContainer.classList.remove('hidden');
+                    msoObservations.value = 'Presidencia';
+                } else {
+                    // Restaurar configuración normal para admin - INCLUYE PERSONAL VISITANTE
+                    departmentSelect.innerHTML = `
+                        <option value="" disabled selected>Selecciona un Departamento</option>
+                        <option value="Administracion">Administración</option>
+                        <option value="Area Comercial">Área Comercial</option>
+                        <option value="C.O El Rosal">C.O El Rosal</option>
+                        <option value="C.O La Naya">C.O La Naya</option>
+                        <option value="C.O Los Ruices">C.O Los Ruices</option>
+                        <option value="C.O Paraiso-Catia">C.O Paraiso-Catia</option>
+                        <option value="Gerencia Senior">Gerencia Senior</option>
+                        <option value="Head End">Head End</option>
+                        <option value="MSO">MSO</option>
+                        <option value="Ocad">Ocad</option>
+                        <option value="Obras">Obras</option>
+                    `;
+                    
+                    msoObservations.innerHTML = `
+                        <option value="" selected>Selecciona departamento MSO</option>
+                        <option value="Marketing">Marketing</option>
+                        <option value="Presidencia">Presidencia</option>
+                        <option value="Interconexiones">Interconexiones</option>
+                        <option value="Importaciones">Importaciones</option>
+                        <option value="RRHH MSO">RRHH MSO</option>
+                        <option value="Documentacion de obras">Documentación de obras</option>
+                        <option value="Logistica">Logística</option>
+                        <option value="Personal Visitante">Personal Visitante</option>
+                    `;
+                    
+                    eventSelect.innerHTML = `
+                        <option value="" disabled selected>Selecciona un Evento</option>
+                        <option value="Evento extraordinario">Evento extraordinario</option>
+                        <option value="Corte de fibra">Corte de fibra</option>
+                        <option value="Mantenimiento de red">Mantenimiento de red</option>
+                        <option value="Feeder y obras">Feeder y obras</option>
+                        <option value="Ventas en calle">Ventas en calle</option>
+                        <option value="Ventana de mantenimiento">Ventana de mantenimiento</option>
+                        <option value="Transporte y flota">Transporte y flota</option>
+                        <option value="Otros">Otros</option>
+                    `;
+                }
+            }
+
+            async function reloadData() {
+                try {
+                    foodRequests = await loadRequests();
+                    
+                    // Filtrar solicitudes para Presidencia
+                    let displayRequests = foodRequests.slice();
+                    if (currentProfile === 'presidencia') {
+                        // CORRECCIÓN: Mostrar todas las solicitudes de MSO que sean de Presidencia O Personal Visitante
+                        displayRequests = foodRequests.filter(req => 
+                            req.department === 'MSO' && 
+                            (req.msoDepartment === 'Presidencia' || req.msoDepartment === 'Personal Visitante')
+                        );
+                    }
+                    
+                    renderTable(displayRequests);
+                    updateSummaryTotals(displayRequests);
+                    
+                    if (currentProfile === 'admin') {
+                        updateCharts();
+                        if (reportMonthInput && reportMonthInput.value) {
+                            generateReport();
+                        }
+                    }
+                    
+                    console.log("Datos recargados para perfil:", currentProfile);
+                } catch (error) {
+                    console.error("Error al recargar datos:", error);
+                }
+            }
+
             const now = new Date();
             const year = now.getFullYear();
             const month = String(now.getMonth() + 1).padStart(2, '0');
-            reportMonthInput.value = `${year}-${month}`;
+            if (reportMonthInput) {
+                reportMonthInput.value = `${year}-${month}`;
+            }
             
             const startDate = `${year}-${month}-01`;
             const endDate = new Date(year, parseInt(month), 15).toISOString().split('T')[0];
-            biweekStartDate.value = startDate;
-            biweekEndDate.value = endDate;
+            if (biweekStartDate && biweekEndDate) {
+                biweekStartDate.value = startDate;
+                biweekEndDate.value = endDate;
+            }
 
-            periodMonthly.addEventListener('change', function() {
-                if (this.checked) {
-                    monthlyFilter.classList.remove('hidden');
-                    biweeklyFilter.classList.add('hidden');
-                }
-            });
+            if (periodMonthly) {
+                periodMonthly.addEventListener('change', function() {
+                    if (this.checked) {
+                        monthlyFilter.classList.remove('hidden');
+                        biweeklyFilter.classList.add('hidden');
+                    }
+                });
+            }
             
-            periodBiweekly.addEventListener('change', function() {
-                if (this.checked) {
-                    monthlyFilter.classList.add('hidden');
-                    biweeklyFilter.classList.remove('hidden');
-                }
-            });
+            if (periodBiweekly) {
+                periodBiweekly.addEventListener('change', function() {
+                    if (this.checked) {
+                        monthlyFilter.classList.add('hidden');
+                        biweeklyFilter.classList.remove('hidden');
+                    }
+                });
+            }
 
             function mapDepartment(department, msoDepartment) {
                 if (!department) return 'NO ESPECIFICADO';
@@ -2449,7 +3043,8 @@
                     dept.includes('IMPORTACIONES') ||
                     dept.includes('RRHH MSO') ||
                     dept.includes('DOCUMENTACION DE OBRAS') ||
-                    dept.includes('LOGISTICA')) {
+                    dept.includes('LOGISTICA') ||
+                    dept.includes('PERSONAL VISITANTE')) {
                     return 'MSO';
                 }
                 
@@ -2465,6 +3060,8 @@
             }
 
             function generateReport() {
+                if (currentProfile !== 'admin') return;
+                
                 const isMonthly = periodMonthly.checked;
                 let filteredRequests = [];
                 let reportTitle = '';
@@ -2543,7 +3140,6 @@
                 
                 console.log(`Solicitudes filtradas: ${filteredRequests.length} de ${foodRequests.length} totales`);
                 
-                // Inicializar todas las estructuras de datos con todos los departamentos en 0
                 const departmentData = {};
                 ALL_DEPARTMENTS.forEach(dept => {
                     departmentData[dept] = { meals: 0, amount: 0 };
@@ -2555,10 +3151,8 @@
                     MSO: {} 
                 };
                 
-                // Estructura para MSO por departamento específico
                 const msoDepartmentData = {};
                 
-                // Procesar solicitudes existentes
                 filteredRequests.forEach(request => {
                     const departmentKey = formatDepartmentName(mapDepartment(request.department, request.msoDepartment));
                     const providerKey = request.providerName || 'No especificado';
@@ -2566,7 +3160,6 @@
                     const meals = parseInt(request.totalQuantity) || 0;
                     const amount = parseFloat(request.totalCost) || 0;
                     
-                    // Solo sumar si el departamento está en nuestra lista
                     if (departmentData[departmentKey]) {
                         departmentData[departmentKey].meals += meals;
                         departmentData[departmentKey].amount += amount;
@@ -2578,7 +3171,6 @@
                     providerData[providerKey].meals += meals;
                     providerData[providerKey].amount += amount;
                     
-                    // Para MSO, guardar también por departamento específico
                     if (unit === 'MSO') {
                         let msoSpecificKey = 'MSO';
                         if (request.msoDepartment) {
@@ -2599,7 +3191,6 @@
                     }
                 });
                 
-                // Calcular totales generales
                 let totalMealsAll = 0;
                 let totalAmountAll = 0;
                 
@@ -2622,12 +3213,12 @@
             }
 
             function renderDepartmentReport(departmentData) {
+                if (!departmentReportBody) return;
                 departmentReportBody.innerHTML = '';
                 
                 let totalMeals = 0;
                 let totalAmount = 0;
                 
-                // Ordenar departamentos alfabéticamente
                 Object.keys(departmentData)
                     .sort((a, b) => a.localeCompare(b, 'es'))
                     .forEach(deptKey => {
@@ -2651,11 +3242,12 @@
                         departmentReportBody.appendChild(row);
                     });
                 
-                totalDepartmentMeals.textContent = totalMeals;
-                totalDepartmentAmount.textContent = `$${totalAmount.toFixed(2)}`;
+                if (totalDepartmentMeals) totalDepartmentMeals.textContent = totalMeals;
+                if (totalDepartmentAmount) totalDepartmentAmount.textContent = `$${totalAmount.toFixed(2)}`;
             }
 
             function renderProviderReport(providerData) {
+                if (!providerReportBody) return;
                 providerReportBody.innerHTML = '';
                 
                 let totalMeals = 0;
@@ -2684,8 +3276,8 @@
                         providerReportBody.appendChild(row);
                     });
                 
-                totalProviderMeals.textContent = totalMeals;
-                totalProviderAmount.textContent = `$${totalAmount.toFixed(2)}`;
+                if (totalProviderMeals) totalProviderMeals.textContent = totalMeals;
+                if (totalProviderAmount) totalProviderAmount.textContent = `$${totalAmount.toFixed(2)}`;
             }
 
             function calculateTotals(departmentData) {
@@ -2706,16 +3298,17 @@
                     }
                 });
                 
-                ccsTotalMeals.textContent = ccsMeals;
-                ccsTotalAmount.textContent = `$${ccsAmount.toFixed(2)}`;
-                msoTotalMeals.textContent = msoMeals;
-                msoTotalAmount.textContent = `$${msoAmount.toFixed(2)}`;
+                if (ccsTotalMeals) ccsTotalMeals.textContent = ccsMeals;
+                if (ccsTotalAmount) ccsTotalAmount.textContent = `$${ccsAmount.toFixed(2)}`;
+                if (msoTotalMeals) msoTotalMeals.textContent = msoMeals;
+                if (msoTotalAmount) msoTotalAmount.textContent = `$${msoAmount.toFixed(2)}`;
                 
                 const grandTotalAmountValue = ccsAmount + msoAmount;
-                grandTotalAmount.textContent = `$${grandTotalAmountValue.toFixed(2)}`;
+                if (grandTotalAmount) grandTotalAmount.textContent = `$${grandTotalAmountValue.toFixed(2)}`;
             }
 
             function renderUnitProviderReport(unitProviderData) {
+                if (!unitProviderReportBody) return;
                 unitProviderReportBody.innerHTML = '';
                 
                 let totalMeals = 0;
@@ -2735,7 +3328,6 @@
                         `;
                         unitProviderReportBody.appendChild(headerRow);
                         
-                        // Ordenar proveedores por cantidad de comidas
                         Object.keys(unitData)
                             .filter(provider => unitData[provider].meals > 0)
                             .sort((a, b) => unitData[b].meals - unitData[a].meals)
@@ -2787,17 +3379,17 @@
                     }
                 });
                 
-                totalUnitProviderMeals.textContent = totalMeals;
-                totalUnitProviderAmount.textContent = `$${totalAmount.toFixed(2)}`;
+                if (totalUnitProviderMeals) totalUnitProviderMeals.textContent = totalMeals;
+                if (totalUnitProviderAmount) totalUnitProviderAmount.textContent = `$${totalAmount.toFixed(2)}`;
             }
 
             function verifyConsistency(expectedMeals, expectedAmount) {
-                const deptMeals = parseInt(totalDepartmentMeals.textContent) || 0;
-                const deptAmount = parseFloat(totalDepartmentAmount.textContent.replace('$', '')) || 0;
-                const provMeals = parseInt(totalProviderMeals.textContent) || 0;
-                const provAmount = parseFloat(totalProviderAmount.textContent.replace('$', '')) || 0;
-                const unitProvMeals = parseInt(totalUnitProviderMeals.textContent) || 0;
-                const unitProvAmount = parseFloat(totalUnitProviderAmount.textContent.replace('$', '')) || 0;
+                const deptMeals = parseInt(totalDepartmentMeals ? totalDepartmentMeals.textContent : '0') || 0;
+                const deptAmount = parseFloat(totalDepartmentAmount ? totalDepartmentAmount.textContent.replace('$', '') : '0') || 0;
+                const provMeals = parseInt(totalProviderMeals ? totalProviderMeals.textContent : '0') || 0;
+                const provAmount = parseFloat(totalProviderAmount ? totalProviderAmount.textContent.replace('$', '') : '0') || 0;
+                const unitProvMeals = parseInt(totalUnitProviderMeals ? totalUnitProviderMeals.textContent : '0') || 0;
+                const unitProvAmount = parseFloat(totalUnitProviderAmount ? totalUnitProviderAmount.textContent.replace('$', '') : '0') || 0;
                 
                 console.log('=== VERIFICACIÓN DE CONSISTENCIA ===');
                 console.log(`Departamento: ${deptMeals} comidas, $${deptAmount.toFixed(2)}`);
@@ -2807,6 +3399,8 @@
             }
 
             function exportReportToExcel() {
+                if (currentProfile !== 'admin') return;
+                
                 const isMonthly = periodMonthly.checked;
                 let fileName = '';
                 
@@ -2906,6 +3500,8 @@
             }
 
             async function exportReportToPDF() {
+                if (currentProfile !== 'admin') return;
+                
                 const isMonthly = periodMonthly.checked;
                 let periodText = '';
                 
@@ -3131,8 +3727,8 @@
                                         ${providerRows}
                                         <tr class="total-row" style="font-weight: bold; background-color: #f9f9f9;">
                                             <td style="padding: 4px; border: 1px solid #ddd; font-size: 7px;">TOTAL</td>
-                                            <td style="padding: 4px; border: 1px solid #ddd; text-align: center; font-size: 7px;">${totalProviderMeals.textContent}</td>
-                                            <td style="padding: 4px; border: 1px solid #ddd; text-align: right; font-size: 7px;">${totalProviderAmount.textContent}</td>
+                                            <td style="padding: 4px; border: 1px solid #ddd; text-align: center; font-size: 7px;">${totalProviderMeals ? totalProviderMeals.textContent : '0'}</td>
+                                            <td style="padding: 4px; border: 1px solid #ddd; text-align: right; font-size: 7px;">${totalProviderAmount ? totalProviderAmount.textContent : '$0.00'}</td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -3148,22 +3744,22 @@
                                         <h3 style="color: #005BAA; font-size: 10px; margin-bottom: 5px; text-align: center;">UNIDAD CCS</h3>
                                         <div style="margin-bottom: 3px; display: flex; justify-content: space-between;">
                                             <span style="color: #666; font-size: 8px;">Total Comidas:</span>
-                                            <span style="font-weight: bold; color: #005BAA; font-size: 8px;">${ccsTotalMeals.textContent}</span>
+                                            <span style="font-weight: bold; color: #005BAA; font-size: 8px;">${ccsTotalMeals ? ccsTotalMeals.textContent : '0'}</span>
                                         </div>
                                         <div style="display: flex; justify-content: space-between;">
                                             <span style="color: #666; font-size: 8px;">Importe Total:</span>
-                                            <span style="font-weight: bold; color: #005BAA; font-size: 8px;">${ccsTotalAmount.textContent}</span>
+                                            <span style="font-weight: bold; color: #005BAA; font-size: 8px;">${ccsTotalAmount ? ccsTotalAmount.textContent : '$0.00'}</span>
                                         </div>
                                     </div>
                                     <div class="pdf-summary-box" style="flex: 1; border: 1px solid #ddd; padding: 6px; border-radius: 3px; background-color: #f9f9f9;">
                                         <h3 style="color: #005BAA; font-size: 10px; margin-bottom: 5px; text-align: center;">UNIDAD MSO</h3>
                                         <div style="margin-bottom: 3px; display: flex; justify-content: space-between;">
                                             <span style="color: #666; font-size: 8px;">Total Comidas:</span>
-                                            <span style="font-weight: bold; color: #005BAA; font-size: 8px;">${msoTotalMeals.textContent}</span>
+                                            <span style="font-weight: bold; color: #005BAA; font-size: 8px;">${msoTotalMeals ? msoTotalMeals.textContent : '0'}</span>
                                         </div>
                                         <div style="display: flex; justify-content: space-between;">
                                             <span style="color: #666; font-size: 8px;">Importe Total:</span>
-                                            <span style="font-weight: bold; color: #005BAA; font-size: 8px;">${msoTotalAmount.textContent}</span>
+                                            <span style="font-weight: bold; color: #005BAA; font-size: 8px;">${msoTotalAmount ? msoTotalAmount.textContent : '$0.00'}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -3173,7 +3769,7 @@
                                         Total
                                     </div>
                                     <div style="font-size: 16px; font-weight: bold; color: #005BAA;">
-                                        ${grandTotalAmount.textContent}
+                                        ${grandTotalAmount ? grandTotalAmount.textContent : '$0.00'}
                                     </div>
                                 </div>
                             </div>
@@ -3204,8 +3800,8 @@
                                         ${unitProviderRows}
                                         <tr class="total-row" style="font-weight: bold; background-color: #f9f9f9;">
                                             <td colspan="2" style="padding: 4px; border: 1px solid #ddd; font-size: 7px;">TOTAL GENERAL</td>
-                                            <td style="padding: 4px; border: 1px solid #ddd; text-align: center; color: #005BAA; font-size: 7px;">${totalUnitProviderMeals.textContent}</td>
-                                            <td style="padding: 4px; border: 1px solid #ddd; text-align: right; color: #005BAA; font-size: 7px;">${totalUnitProviderAmount.textContent}</td>
+                                            <td style="padding: 4px; border: 1px solid #ddd; text-align: center; color: #005BAA; font-size: 7px;">${totalUnitProviderMeals ? totalUnitProviderMeals.textContent : '0'}</td>
+                                            <td style="padding: 4px; border: 1px solid #ddd; text-align: right; color: #005BAA; font-size: 7px;">${totalUnitProviderAmount ? totalUnitProviderAmount.textContent : '$0.00'}</td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -3284,20 +3880,36 @@
                 }
             }
 
-            generateReportBtn.addEventListener('click', generateReport);
-            exportReportBtn.addEventListener('click', exportReportToExcel);
-            exportPdfBtn.addEventListener('click', exportReportToPDF);
+            if (generateReportBtn) generateReportBtn.addEventListener('click', generateReport);
+            if (exportReportBtn) exportReportBtn.addEventListener('click', exportReportToExcel);
+            if (exportPdfBtn) exportPdfBtn.addEventListener('click', exportReportToPDF);
+
+            // Actualizar UI según perfil
+            updateUIForProfile();
 
             initializeForm();
 
             try {
                 foodRequests = await loadRequests();
-                renderTable();
-                updateSummaryTotals();
-                updateCharts();
                 
-                if (reportMonthInput.value) {
-                    generateReport();
+                // Aplicar filtro inicial según perfil
+                let displayRequests = foodRequests.slice();
+                if (currentProfile === 'presidencia') {
+                    // CORRECCIÓN: Mostrar todas las solicitudes de MSO que sean de Presidencia O Personal Visitante
+                    displayRequests = foodRequests.filter(req => 
+                        req.department === 'MSO' && 
+                        (req.msoDepartment === 'Presidencia' || req.msoDepartment === 'Personal Visitante')
+                    );
+                }
+                
+                renderTable(displayRequests);
+                updateSummaryTotals(displayRequests);
+                
+                if (currentProfile === 'admin') {
+                    updateCharts();
+                    if (reportMonthInput && reportMonthInput.value) {
+                        generateReport();
+                    }
                 }
                 
                 console.log("Página cargada y datos iniciales renderizados.");
