@@ -1689,19 +1689,21 @@
                 removeCancelEditButton();
 
                 // Solo limpiar campos de personal externo si existen (para admin)
-                document.querySelectorAll('input[name="externalStaff"]').forEach(checkbox => {
-                    if (checkbox) {
-                        checkbox.checked = false;
-                        const quantityInput = document.getElementById(`quantity${checkbox.value}`);
-                        if (quantityInput) {
-                            quantityInput.value = '0';
-                            quantityInput.classList.add('hidden-quantity');
+                if (currentProfile === 'admin') {
+                    document.querySelectorAll('input[name="externalStaff"]').forEach(checkbox => {
+                        if (checkbox) {
+                            checkbox.checked = false;
+                            const quantityInput = document.getElementById(`quantity${checkbox.value}`);
+                            if (quantityInput) {
+                                quantityInput.value = '0';
+                                quantityInput.classList.add('hidden-quantity');
+                            }
                         }
-                    }
-                });
-                
-                selectedInterStaff = [];
-                renderSelectedStaff();
+                    });
+                    
+                    selectedInterStaff = [];
+                    renderSelectedStaff();
+                }
                 
                 if (departmentSelect.value !== 'MSO') {
                     msoObservationsContainer.classList.add('hidden');
@@ -1709,7 +1711,6 @@
                 }
             }
 
-            // Mover renderSelectedStaff FUERA del bloque condicional para que esté disponible para todos los perfiles
             function renderSelectedStaff() {
                 if (!interStaffSelectedList) return;
                 
@@ -1726,6 +1727,7 @@
                     `;
                     interStaffSelectedList.appendChild(li);
                 });
+                calculateTotalQuantity();
                 calculateTotalCost();
             }
 
@@ -1747,14 +1749,15 @@
                 }, 5000);
             }
 
-            // --- FUNCIÓN CORREGIDA ---
+            // --- FUNCIÓN PARA CALCULAR TOTAL DE COMIDAS SEGÚN PERFIL ---
             function calculateTotalQuantity() {
-                // Si el perfil es 'presidencia', simplemente devolvemos el valor del campo totalQuantity
+                // Para presidencia, usar el valor manual del campo totalQuantity
                 if (currentProfile === 'presidencia') {
-                    return parseInt(totalQuantityInput.value) || 0;
+                    const total = parseInt(totalQuantityInput.value) || 0;
+                    return total;
                 }
 
-                // Si es admin, hacemos el cálculo normal
+                // Para admin, calcular automáticamente
                 let externalQuantity = 0;
                 document.querySelectorAll('input[type="number"][id^="quantity"]').forEach(input => {
                     if (input) {
@@ -1769,7 +1772,7 @@
             }
 
             function calculateTotalCost() {
-                const totalQuantity = parseFloat(totalQuantityInput.value) || 0;
+                const totalQuantity = calculateTotalQuantity(); // Usamos la función para obtener el total actualizado
                 const unitCost = parseFloat(unitCostInput.value) || 0;
                 const deliveryCost = deliveryFree.checked ? 0 : (parseFloat(deliveryCostInput.value) || 0);
 
@@ -1777,8 +1780,9 @@
                 costInput.value = totalCost.toFixed(2);
             }
 
-            // Solo configurar eventos de personal externo si es admin
+            // Configurar eventos según el perfil
             if (currentProfile === 'admin') {
+                // Eventos para personal externo
                 document.querySelectorAll('input[name="externalStaff"]').forEach(checkbox => {
                     checkbox.addEventListener('change', (e) => {
                         const quantityInput = document.getElementById(`quantity${e.target.value}`);
@@ -1791,6 +1795,7 @@
                                 quantityInput.value = 0;
                             }
                         }
+                        calculateTotalQuantity();
                         calculateTotalCost();
                     });
                 });
@@ -1810,10 +1815,12 @@
                                 input.classList.remove('hidden-quantity');
                             }
                         }
+                        calculateTotalQuantity();
                         calculateTotalCost();
                     });
                 });
 
+                // Eventos para personal Inter
                 interStaffSearchInput.addEventListener('input', () => {
                     const query = interStaffSearchInput.value.trim().toUpperCase();
                     interStaffSearchResults.innerHTML = '';
@@ -1838,6 +1845,7 @@
                                 interStaffSearchInput.value = '';
                                 interStaffSearchResults.classList.add('hidden');
                                 renderSelectedStaff();
+                                calculateTotalCost();
                             });
                             interStaffSearchResults.appendChild(li);
                         });
@@ -1858,13 +1866,15 @@
                         const staffName = e.target.getAttribute('data-name');
                         selectedInterStaff = selectedInterStaff.filter(name => name !== staffName);
                         renderSelectedStaff();
+                        calculateTotalCost();
                     }
                 });
+            } else {
+                // Para presidencia: el campo totalQuantity es editable y actualiza el costo
+                totalQuantityInput.addEventListener('input', calculateTotalCost);
             }
 
-            // Evento para el campo totalQuantity (para presidencia)
-            totalQuantityInput.addEventListener('input', calculateTotalCost);
-
+            // Eventos comunes para ambos perfiles
             document.querySelectorAll('input[name="deliveryOption"]').forEach(radio => {
                 radio.addEventListener('change', () => {
                     if (deliveryCostOption.checked) {
