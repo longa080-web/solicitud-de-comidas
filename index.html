@@ -419,6 +419,7 @@
                             <option value="Documentacion de obras">Documentación de obras</option>
                             <option value="Logistica">Logística</option>
                             <option value="Personal Visitante">Personal Visitante</option>
+                            <option value="Backbone">Backbone</option>
                         </select>
                     </div>
                     
@@ -2919,7 +2920,7 @@
                     msoObservationsContainer.classList.remove('hidden');
                     msoObservations.value = 'Presidencia';
                 } else {
-                    // Restaurar configuración normal para admin - INCLUYE PERSONAL VISITANTE
+                    // Restaurar configuración normal para admin - INCLUYE PERSONAL VISITANTE Y BACKBONE
                     departmentSelect.innerHTML = `
                         <option value="" disabled selected>Selecciona un Departamento</option>
                         <option value="Administracion">Administración</option>
@@ -2945,6 +2946,7 @@
                         <option value="Documentacion de obras">Documentación de obras</option>
                         <option value="Logistica">Logística</option>
                         <option value="Personal Visitante">Personal Visitante</option>
+                        <option value="Backbone">Backbone</option>
                     `;
                     
                     eventSelect.innerHTML = `
@@ -3054,7 +3056,8 @@
                     dept.includes('RRHH MSO') ||
                     dept.includes('DOCUMENTACION DE OBRAS') ||
                     dept.includes('LOGISTICA') ||
-                    dept.includes('PERSONAL VISITANTE')) {
+                    dept.includes('PERSONAL VISITANTE') ||
+                    dept.includes('BACKBONE')) {
                     return 'MSO';
                 }
                 
