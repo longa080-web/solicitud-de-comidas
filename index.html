@@ -22,16 +22,16 @@
         .filter-tag { background-color: #E3F2FD; color: #005BAA; padding: 4px 10px; border-radius: 16px; font-size: 12px; margin-right: 5px; margin-bottom: 5px; display: inline-flex; align-items: center; }
         .filter-tag-remove { margin-left: 5px; cursor: pointer; font-weight: bold; }
         .filter-tag-remove:hover { color: #FF5252; }
-        .report-pdf { background-color: white; padding: 10px; font-family: 'Inter', sans-serif; }
-        .pdf-header { text-align: center; margin-bottom: 10px; border-bottom: 2px solid #005BAA; padding-bottom: 8px; }
-        .pdf-title { color: #005BAA; font-size: 16px; font-weight: bold; margin-bottom: 3px; }
-        .pdf-subtitle { color: #666; font-size: 12px; margin-bottom: 5px; }
-        .pdf-section { margin-bottom: 12px; page-break-inside: avoid; }
-        .pdf-table { width: 100%; border-collapse: collapse; margin-bottom: 6px; font-size: 7px; }
-        .pdf-table th { background-color: #f0f7ff; color: #005BAA; font-weight: bold; padding: 4px; border: 1px solid #ddd; text-align: left; }
-        .pdf-table td { padding: 4px; border: 1px solid #ddd; font-size: 7px; }
-        .pdf-table .total-row { font-weight: bold; background-color: #f9f9f9; }
-        .pdf-summary-box { border: 1px solid #ddd; padding: 8px; margin-bottom: 8px; border-radius: 4px; background-color: #f9f9f9; }
+        .report-pdf { background-color: white; padding: 15px; font-family: 'Inter', sans-serif; font-size: 8px; }
+        .report-pdf table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+        .report-pdf th, .report-pdf td { border: 1px solid #999; padding: 5px; vertical-align: top; }
+        .report-pdf th { background-color: #f0f7ff; color: #005BAA; font-weight: bold; text-align: left; font-size: 9px; }
+        .report-pdf td { font-size: 8px; }
+        .report-pdf .text-right { text-align: right; }
+        .report-pdf .text-center { text-align: center; }
+        .report-pdf .font-bold { font-weight: bold; }
+        .report-pdf .section-title { font-size: 12px; font-weight: bold; color: #005BAA; margin: 12px 0 6px 0; border-bottom: 1px solid #005BAA; padding-bottom: 3px; }
+        .report-pdf .sub-section-title { font-size: 10px; font-weight: bold; margin: 8px 0 4px 0; }
         .pdf-footer { text-align: center; margin-top: 15px; padding-top: 8px; border-top: 1px solid #ddd; color: #666; font-size: 7px; }
         .tab-navigation { display: flex; background-color: #f8fafc; border-radius: 8px; padding: 4px; margin-bottom: 20px; overflow-x: auto; white-space: nowrap; }
         .tab-button { flex: 1; padding: 12px 16px; text-align: center; background: transparent; border: none; font-weight: 600; color: #64748b; cursor: pointer; border-radius: 6px; transition: all 0.3s ease; min-width: 120px; }
@@ -69,7 +69,7 @@
     <div id="loginModal" class="login-container">
         <div class="login-box">
             <div class="login-title">Control de Solicitud de Comidas</div>
-            <div class="mb-4 text-center text-gray-600">Seleccione su perfil y ingrese su contraseña</div>
+            <div class="mb-4 text-center text-gray-600">Seleccione su perfil e ingrese su contraseña</div>
             <select id="loginProfile" class="login-input">
                 <option value="admin">Administrador</option>
                 <option value="presidencia">Presidencia</option>
@@ -1185,35 +1185,262 @@
                 const blob=new Blob(["\uFEFF",csv],{type:'text/csv;charset=utf-8;'}), a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=fn; document.body.appendChild(a); a.click(); document.body.removeChild(a); displayMessage('Reporte exportado','success');
             }
 
+            // NUEVA FUNCIÓN PDF CON EL MISMO ESTILO QUE EL REPORTE DE TRASLADOS
             async function exportReportToPDF(){
-                if(currentProfile!=='admin') return;
-                const isMonthly=periodMonthly.checked;
-                let period='';
-                if(isMonthly){ const sm=reportMonthInput.value; if(!sm){ displayMessage('Genere reporte primero','error'); return; } const [y,m]=sm.split('-'); period=`${getMonthName(m)} ${y}`; }
-                else{ if(!biweekStartDate.value||!biweekEndDate.value){ displayMessage('Genere reporte primero','error'); return; } period=`${formatDateForDisplay(biweekStartDate.value)} a ${formatDateForDisplay(biweekEndDate.value)}`; }
-                const todayStr=new Date().toLocaleDateString('es-ES');
-                displayMessage('Generando PDF...','success');
-                try{
-                    const deptData={}; ALL_DEPARTMENTS.forEach(d=>deptData[d]={meals:0,amount:0});
-                    let filtered=[];
-                    if(isMonthly){ const [y,m]=reportMonthInput.value.split('-'); filtered=foodRequests.filter(r=>r.status==='aprobado' && r.deliveryDate && (()=>{ const d=new Date(r.deliveryDate+'T12:00:00'); return d.getFullYear()===parseInt(y) && d.getMonth()+1===parseInt(m); })()); }
-                    else{ filtered=foodRequests.filter(r=>r.status==='aprobado' && r.deliveryDate && (()=>{ const d=new Date(r.deliveryDate+'T00:00:00'); return d>=new Date(biweekStartDate.value+'T00:00:00') && d<=new Date(biweekEndDate.value+'T23:59:59.999'); })()); }
-                    filtered.forEach(r=>{ const dk=formatDepartmentName(mapDepartment(r.department,r.msoDepartment)); const meals=parseInt(r.totalQuantity)||0, amt=parseFloat(r.totalCost)||0; if(deptData[dk]){ deptData[dk].meals+=meals; deptData[dk].amount+=amt; } });
-                    let tM=0,tA=0, deptRows=''; Object.keys(deptData).sort((a,b)=>a.localeCompare(b,'es')).forEach(d=>{ const r=deptData[d]; tM+=r.meals; tA+=r.amount; deptRows+=`<tr><td style="padding:3px;border:1px solid #ddd;font-size:6px;">${escapeHtml(d)}</td><td style="padding:3px;border:1px solid #ddd;text-align:center;font-size:6px;">${r.meals}</td><td style="padding:3px;border:1px solid #ddd;text-align:right;font-size:6px;">$${r.amount.toFixed(2)}</td></tr>`; });
-                    let provRows=''; Array.from(providerReportBody.querySelectorAll('tr')).forEach(r=>{ const c=r.querySelectorAll('td'); if(c.length>=3) provRows+=`<tr><td style="padding:3px;border:1px solid #ddd;font-size:6px;">${escapeHtml(c[0].textContent)}</td><td style="padding:3px;border:1px solid #ddd;text-align:center;font-size:6px;">${c[1].textContent}</td><td style="padding:3px;border:1px solid #ddd;text-align:right;font-size:6px;">${c[2].textContent}</td></tr>`; });
-                    let unitRows=''; Array.from(unitProviderReportBody.querySelectorAll('tr')).forEach(r=>{ const c=r.querySelectorAll('td'); if(c.length===1 && c[0].colSpan===4) unitRows+=`<tr style="background:#f0f7ff"><td colspan="4" style="color:#005BAA;font-size:8px;padding:4px;border:1px solid #ddd;">${escapeHtml(c[0].textContent)}</td></tr>`; else if(c.length===4 && c[0].textContent!==''){ const u=c[0].textContent||'', p=c[1].textContent, m=c[2].textContent, a=c[3].textContent; if(p.trim()) unitRows+=`<tr><td style="padding:3px;border:1px solid #ddd;font-size:6px;">${escapeHtml(u)}</td><td style="padding:3px;border:1px solid #ddd;font-size:6px;">${escapeHtml(p)}</td><td style="padding:3px;border:1px solid #ddd;text-align:center;font-size:6px;">${m}</td><td style="padding:3px;border:1px solid #ddd;text-align:right;font-size:6px;">${a}</td></tr>`; } else if(c.length===4 && c[0].colSpan===2) unitRows+=`<tr style="background:#f9f9f9"><td colspan="2" style="padding:3px;border:1px solid #ddd;text-align:right;">${c[0].textContent}</td><td style="padding:3px;border:1px solid #ddd;text-align:center;color:#005BAA;">${c[1].textContent}</td><td style="padding:3px;border:1px solid #ddd;text-align:right;color:#005BAA;">${c[2].textContent}</td></tr>`; });
-                    const html=`<div class="report-pdf"><div class="pdf-header"><h1 class="pdf-title">Gastos de comida</h1><div class="pdf-subtitle">${period}</div><div class="pdf-subtitle">Fecha: ${todayStr}</div></div><div class="pdf-section"><h2>SOLICITUD DE COMIDAS POR UNIDAD DE OPERACIONES</h2><table class="pdf-table"><thead><tr><th>UNIDAD</th><th>CANTIDAD</th><th>IMPORTE</th></tr></thead><tbody>${deptRows}<tr class="total-row"><td>TOTAL</td><td style="text-align:center">${tM}</td><td style="text-align:right">$${tA.toFixed(2)}</td></tr></tbody></table></div><div class="pdf-section"><h2>SOLICITUD DE COMIDAS POR PROVEEDOR</h2><table class="pdf-table"><thead><tr><th>PROVEEDOR</th><th>CANTIDAD</th><th>IMPORTE</th></tr></thead><tbody>${provRows}<tr class="total-row"><td>TOTAL</td><td style="text-align:center">${totalProviderMeals?.textContent||'0'}</td><td style="text-align:right">${totalProviderAmount?.textContent||'$0.00'}</td></tr></tbody></table></div><div class="pdf-section"><h2>RESUMEN POR TIPO DE UNIDAD</h2><div style="display:flex;gap:10px;"><div class="pdf-summary-box"><h3>UNIDAD CCS</h3><div>Total Comidas: ${ccsTotalMeals?.textContent||'0'}</div><div>Importe Total: ${ccsTotalAmount?.textContent||'$0.00'}</div></div><div class="pdf-summary-box"><h3>UNIDAD MSO</h3><div>Total Comidas: ${msoTotalMeals?.textContent||'0'}</div><div>Importe Total: ${msoTotalAmount?.textContent||'$0.00'}</div></div></div><div style="text-align:center;padding:8px;background:#f0f7ff;margin-top:8px;"><div>Total</div><div style="font-size:16px;font-weight:bold;">${grandTotalAmount?.textContent||'$0.00'}</div></div></div><div class="pdf-section"><h2>SERVICIOS POR UNIDAD Y PROVEEDOR</h2><table class="pdf-table"><thead><tr><th>UNIDAD</th><th>PROVEEDOR</th><th>CANTIDAD</th><th>IMPORTE</th></tr></thead><tbody>${unitRows}<tr class="total-row"><td colspan="2">TOTAL GENERAL</td><td style="text-align:center">${totalUnitProviderMeals?.textContent||'0'}</td><td style="text-align:right">${totalUnitProviderAmount?.textContent||'$0.00'}</td></tr></tbody></table></div><div class="pdf-footer"><div>Reporte generado el ${todayStr}</div><div>Control de Solicitud de Comidas - Inter</div></div></div>`;
-                    const div=document.createElement('div'); div.innerHTML=html; div.style.position='absolute'; div.style.left='-9999px'; div.style.width='600px'; div.style.background='white'; div.style.padding='15px'; document.body.appendChild(div);
-                    await new Promise(r=>setTimeout(r,500));
-                    const canvas=await html2canvas(div,{scale:2,backgroundColor:'#ffffff',width:600,height:div.scrollHeight});
-                    document.body.removeChild(div);
-                    const pdf=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
-                    const imgData=canvas.toDataURL('image/png'), imgWidth=190, imgHeight=(canvas.height*imgWidth)/canvas.width, ph=pdf.internal.pageSize.getHeight();
-                    if(imgHeight<ph-20) pdf.addImage(imgData,'PNG',10,10,imgWidth,imgHeight);
-                    else{ const sf=(ph-20)/imgHeight; pdf.addImage(imgData,'PNG',10,10,imgWidth*sf,imgHeight*sf); }
-                    let fn=''; if(isMonthly){ const [y,m]=reportMonthInput.value.split('-'); fn=`Gastos_Comida_${getMonthName(m)}_${y}.pdf`; } else fn=`Gastos_Comida_${formatDateForFilename(biweekStartDate.value)}_${formatDateForFilename(biweekEndDate.value)}.pdf`;
-                    pdf.save(fn); displayMessage('PDF generado','success');
-                }catch(e){ console.error(e); displayMessage('Error PDF: '+e.message,'error'); }
+                if(currentProfile !== 'admin') return;
+                const isMonthly = periodMonthly.checked;
+                let period = '';
+                let periodRaw = '';
+                if(isMonthly){
+                    const sm = reportMonthInput.value;
+                    if(!sm){ displayMessage('Genere reporte primero','error'); return; }
+                    const [y,m] = sm.split('-');
+                    period = `${getMonthName(m)} ${y}`;
+                    periodRaw = sm;
+                } else {
+                    if(!biweekStartDate.value || !biweekEndDate.value){ displayMessage('Genere reporte primero','error'); return; }
+                    period = `${formatDateForDisplay(biweekStartDate.value)} al ${formatDateForDisplay(biweekEndDate.value)}`;
+                    periodRaw = `${biweekStartDate.value}_${biweekEndDate.value}`;
+                }
+                const todayStr = new Date().toLocaleDateString('es-ES');
+                displayMessage('Generando PDF con nuevo formato...','success');
+                
+                try {
+                    // Obtener datos filtrados igual que en generarReporte
+                    let filtered = [];
+                    if(isMonthly){
+                        const [y,m] = reportMonthInput.value.split('-');
+                        filtered = foodRequests.filter(r => r.status === 'aprobado' && r.deliveryDate && (() => { const d = new Date(r.deliveryDate+'T12:00:00'); return d.getFullYear() === parseInt(y) && d.getMonth()+1 === parseInt(m); })());
+                    } else {
+                        const sd = biweekStartDate.value, ed = biweekEndDate.value;
+                        filtered = foodRequests.filter(r => r.status === 'aprobado' && r.deliveryDate && (() => { const d = new Date(r.deliveryDate+'T00:00:00'); return d >= new Date(sd+'T00:00:00') && d <= new Date(ed+'T23:59:59.999'); })());
+                    }
+                    
+                    // 1. TABLA DEPARTAMENTO - CENTRO DE OPERACIONES
+                    const deptMap = new Map(); // key: "DEPARTAMENTO|CENTRO"
+                    filtered.forEach(r => {
+                        const deptName = mapDepartment(r.department, r.msoDepartment);
+                        const unit = classifyUnit(r.department, r.msoDepartment);
+                        const meals = parseInt(r.totalQuantity) || 0;
+                        const amount = parseFloat(r.totalCost) || 0;
+                        const key = `${deptName}|${unit}`;
+                        if(!deptMap.has(key)){
+                            deptMap.set(key, { departamento: deptName, centro: unit, meals: 0, amount: 0 });
+                        }
+                        const entry = deptMap.get(key);
+                        entry.meals += meals;
+                        entry.amount += amount;
+                    });
+                    
+                    let ccsSubtotal = 0, msoSubtotal = 0;
+                    const deptRows = [];
+                    for(const [_, item] of deptMap.entries()){
+                        const row = `<tr>
+                            <td style="border:1px solid #999; padding:5px;">${escapeHtml(item.departamento)}</td>
+                            <td style="border:1px solid #999; padding:5px;">${item.centro}</td>
+                            <td style="border:1px solid #999; padding:5px; text-align:right;">$${item.amount.toFixed(2)}</td>
+                        </tr>`;
+                        deptRows.push(row);
+                        if(item.centro === 'CCS') ccsSubtotal += item.amount;
+                        else if(item.centro === 'MSO') msoSubtotal += item.amount;
+                    }
+                    
+                    // 2. TABLA EMPRESAS PROVEEDORAS
+                    const ccsProviders = new Map(); // proveedor -> { meals, amount }
+                    const msoProviders = new Map();
+                    
+                    filtered.forEach(r => {
+                        const provider = r.providerName || 'No especificado';
+                        const unit = classifyUnit(r.department, r.msoDepartment);
+                        const meals = parseInt(r.totalQuantity) || 0;
+                        const amount = parseFloat(r.totalCost) || 0;
+                        const targetMap = unit === 'CCS' ? ccsProviders : msoProviders;
+                        if(!targetMap.has(provider)){
+                            targetMap.set(provider, { meals: 0, amount: 0 });
+                        }
+                        const provData = targetMap.get(provider);
+                        provData.meals += meals;
+                        provData.amount += amount;
+                    });
+                    
+                    let totalCcsMeals = 0, totalCcsAmount = 0, totalMsoMeals = 0, totalMsoAmount = 0;
+                    const providerRows = [];
+                    const allProviderNames = new Set([...ccsProviders.keys(), ...msoProviders.keys()]);
+                    const sortedProviders = Array.from(allProviderNames).sort();
+                    
+                    for(const prov of sortedProviders){
+                        const ccs = ccsProviders.get(prov) || { meals: 0, amount: 0 };
+                        const mso = msoProviders.get(prov) || { meals: 0, amount: 0 };
+                        const mealsCcs = ccs.meals, amountCcs = ccs.amount;
+                        const mealsMso = mso.meals, amountMso = mso.amount;
+                        totalCcsMeals += mealsCcs; totalCcsAmount += amountCcs;
+                        totalMsoMeals += mealsMso; totalMsoAmount += amountMso;
+                        
+                        const ccsCell = mealsCcs > 0 ? `${mealsCcs} serv<br/>$${amountCcs.toFixed(2)}` : '0 serv<br/>$0.00';
+                        const msoCell = mealsMso > 0 ? `${mealsMso} serv<br/>$${amountMso.toFixed(2)}` : '0 serv<br/>$0.00';
+                        const totalAmount = amountCcs + amountMso;
+                        const totalMeals = mealsCcs + mealsMso;
+                        const totalCell = totalMeals > 0 ? `${totalMeals} serv<br/>$${totalAmount.toFixed(2)}` : '0 serv<br/>$0.00';
+                        
+                        const row = `<tr>
+                            <td style="border:1px solid #999; padding:5px;">${escapeHtml(prov)}</td>
+                            <td style="border:1px solid #999; padding:5px;">${ccsCell}</td>
+                            <td style="border:1px solid #999; padding:5px;">${msoCell}</td>
+                            <td style="border:1px solid #999; padding:5px;">${totalCell}</td>
+                        </tr>`;
+                        providerRows.push(row);
+                    }
+                    
+                    // 3. TABLA RESUMEN POR UNIDAD
+                    const totalGeneralAmount = totalCcsAmount + totalMsoAmount;
+                    const totalGeneralMeals = totalCcsMeals + totalMsoMeals;
+                    
+                    const htmlContent = `
+                        <div style="font-family: 'Inter', sans-serif; background: white; padding: 15px; font-size: 8px;">
+                            <div style="text-align: center; margin-bottom: 15px;">
+                                <h2 style="color: #005BAA; font-size: 16px; margin: 0;">Gastos de comida</h2>
+                                <p style="margin: 2px 0; font-size: 10px;">${period}</p>
+                                <p style="margin: 2px 0; font-size: 9px;">Fecha: ${todayStr}</p>
+                            </div>
+                            
+                            <table style="width:100%; border-collapse: collapse; margin-bottom: 15px;">
+                                <thead>
+                                    <tr style="background-color: #f0f7ff;">
+                                        <th style="border:1px solid #999; padding:5px; text-align:left;">DEPARTAMENTO</th>
+                                        <th style="border:1px solid #999; padding:5px; text-align:left;">CENTRO DE OPERACIONES</th>
+                                        <th style="border:1px solid #999; padding:5px; text-align:left;">IMPORTE (USD)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${deptRows.join('')}
+                                    <tr style="background-color: #f9f9f9; font-weight:bold;">
+                                        <td colspan="2" style="border:1px solid #999; padding:5px; text-align:right;">TOTAL CCS</td>
+                                        <td style="border:1px solid #999; padding:5px; text-align:right;">$${ccsSubtotal.toFixed(2)}</td>
+                                    </tr>
+                                    <tr style="background-color: #f9f9f9; font-weight:bold;">
+                                        <td colspan="2" style="border:1px solid #999; padding:5px; text-align:right;">TOTAL MSO</td>
+                                        <td style="border:1px solid #999; padding:5px; text-align:right;">$${msoSubtotal.toFixed(2)}</td>
+                                    </tr>
+                                    <tr style="background-color: #e6f3ff; font-weight:bold;">
+                                        <td colspan="2" style="border:1px solid #999; padding:5px; text-align:right;">TOTAL GENERAL</td>
+                                        <td style="border:1px solid #999; padding:5px; text-align:right;">$${(ccsSubtotal + msoSubtotal).toFixed(2)}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            
+                            <div style="margin-top: 15px;">
+                                <h3 style="color: #005BAA; font-size: 11px; margin: 5px 0;">EMPRESAS PROVEEDORAS DE SERVICIO</h3>
+                                <table style="width:100%; border-collapse: collapse; margin-bottom: 15px;">
+                                    <thead>
+                                        <tr style="background-color: #f0f7ff;">
+                                            <th style="border:1px solid #999; padding:5px; text-align:left;">EMPRESA</th>
+                                            <th style="border:1px solid #999; padding:5px; text-align:center;">SERVICIOS A CCS</th>
+                                            <th style="border:1px solid #999; padding:5px; text-align:center;">SERVICIOS A MSO</th>
+                                            <th style="border:1px solid #999; padding:5px; text-align:center;">TOTAL</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        ${providerRows.join('')}
+                                        <tr style="background-color: #f9f9f9; font-weight:bold;">
+                                            <td style="border:1px solid #999; padding:5px; text-align:right;">TOTALES</td>
+                                            <td style="border:1px solid #999; padding:5px; text-align:center;">${totalCcsMeals} serv<br/>$${totalCcsAmount.toFixed(2)}</td>
+                                            <td style="border:1px solid #999; padding:5px; text-align:center;">${totalMsoMeals} serv<br/>$${totalMsoAmount.toFixed(2)}</td>
+                                            <td style="border:1px solid #999; padding:5px; text-align:center;">${totalGeneralMeals} serv<br/>$${totalGeneralAmount.toFixed(2)}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            
+                            <div style="margin-top: 15px;">
+                                <h3 style="color: #005BAA; font-size: 11px; margin: 5px 0;">RESUMEN POR UNIDAD</h3>
+                                <table style="width:100%; border-collapse: collapse;">
+                                    <thead>
+                                        <tr style="background-color: #f0f7ff;">
+                                            <th style="border:1px solid #999; padding:5px; text-align:left;">UNIDAD</th>
+                                            <th style="border:1px solid #999; padding:5px; text-align:center;">CANTIDAD</th>
+                                            <th style="border:1px solid #999; padding:5px; text-align:right;">IMPORTE TOTAL</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td style="border:1px solid #999; padding:5px;">UNIDAD CCS</td>
+                                            <td style="border:1px solid #999; padding:5px; text-align:center;">${totalCcsMeals} servicios</td>
+                                            <td style="border:1px solid #999; padding:5px; text-align:right;">$${totalCcsAmount.toFixed(2)}</td>
+                                        </tr>
+                                        <tr>
+                                            <td style="border:1px solid #999; padding:5px;">UNIDAD MSO</td>
+                                            <td style="border:1px solid #999; padding:5px; text-align:center;">${totalMsoMeals} servicios</td>
+                                            <td style="border:1px solid #999; padding:5px; text-align:right;">$${totalMsoAmount.toFixed(2)}</td>
+                                        </tr>
+                                        <tr style="background-color: #e6f3ff; font-weight:bold;">
+                                            <td style="border:1px solid #999; padding:5px;">TOTAL GENERAL</td>
+                                            <td style="border:1px solid #999; padding:5px; text-align:center;">${totalGeneralMeals} servicios</td>
+                                            <td style="border:1px solid #999; padding:5px; text-align:right;">$${totalGeneralAmount.toFixed(2)}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div style="text-align: center; margin-top: 20px; padding-top: 8px; border-top: 1px solid #ddd; color: #666; font-size: 7px;">
+                                Reporte generado el ${todayStr}<br/>Control de Solicitud de Comidas - Inter
+                            </div>
+                        </div>
+                    `;
+                    
+                    // Renderizar a canvas y generar PDF
+                    const container = document.createElement('div');
+                    container.innerHTML = htmlContent;
+                    container.style.position = 'absolute';
+                    container.style.left = '-9999px';
+                    container.style.width = '700px';
+                    container.style.background = 'white';
+                    container.style.padding = '15px';
+                    document.body.appendChild(container);
+                    
+                    await new Promise(r => setTimeout(r, 300));
+                    const canvas = await html2canvas(container, { scale: 2, backgroundColor: '#ffffff', width: 700, height: container.scrollHeight });
+                    document.body.removeChild(container);
+                    
+                    const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+                    const imgData = canvas.toDataURL('image/png');
+                    const imgWidth = 190; // mm
+                    const imgHeight = (canvas.height * imgWidth) / canvas.width;
+                    const pageHeight = pdf.internal.pageSize.getHeight();
+                    
+                    if(imgHeight < pageHeight - 20){
+                        pdf.addImage(imgData, 'PNG', 10, 10, imgWidth, imgHeight);
+                    } else {
+                        let yOffset = 10;
+                        let remainingHeight = imgHeight;
+                        let imgY = 0;
+                        while(remainingHeight > 0){
+                            if(yOffset > 10) pdf.addPage();
+                            const sliceHeight = Math.min(pageHeight - 20, remainingHeight);
+                            const canvasSlice = document.createElement('canvas');
+                            canvasSlice.width = canvas.width;
+                            canvasSlice.height = canvas.height * (sliceHeight / imgHeight);
+                            const ctx = canvasSlice.getContext('2d');
+                            ctx.drawImage(canvas, 0, imgY, canvas.width, canvas.height * (sliceHeight / imgHeight), 0, 0, canvasSlice.width, canvasSlice.height);
+                            const sliceData = canvasSlice.toDataURL('image/png');
+                            pdf.addImage(sliceData, 'PNG', 10, yOffset, imgWidth, sliceHeight);
+                            yOffset = 10;
+                            imgY += canvas.height * (sliceHeight / imgHeight);
+                            remainingHeight -= sliceHeight;
+                        }
+                    }
+                    
+                    let filename = '';
+                    if(isMonthly){
+                        const [y,m] = reportMonthInput.value.split('-');
+                        filename = `Gastos_Comida_${getMonthName(m)}_${y}.pdf`;
+                    } else {
+                        filename = `Gastos_Comida_${formatDateForFilename(biweekStartDate.value)}_${formatDateForFilename(biweekEndDate.value)}.pdf`;
+                    }
+                    pdf.save(filename);
+                    displayMessage('PDF generado con éxito', 'success');
+                } catch(e){
+                    console.error(e);
+                    displayMessage('Error al generar PDF: ' + e.message, 'error');
+                }
             }
 
             generateReportBtn?.addEventListener('click',generateReport);
