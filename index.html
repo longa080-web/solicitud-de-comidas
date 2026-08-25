@@ -1041,6 +1041,7 @@
                 removeCancelEditButton();
                 if (deliveryCostInput) deliveryCostInput.classList.add('hidden');
                 loadCityData();
+                // No recargar la página ni reiniciar la sesión
             }
 
             function initializeForm() {
@@ -1244,6 +1245,7 @@
                 return nd ? nd.replace(/-/g,'') : '';
             }
 
+            // Función mejorada para editar solicitudes
             window.editRequest = (id) => {
                 const req = foodRequests.find(r => r.id === id);
                 if (!req) return;
@@ -1253,16 +1255,16 @@
                 eventSelect.value = req.event || '';
                 deliveryPlaceInput.value = req.deliveryPlace;
                 deliveryDateTimeInput.value = normalizeDate(req.deliveryDate) || '';
-                unitCostInput.value = parseFloat(req.unitCost).toFixed(2);
-                providerNameSelect.value = req.providerName;
-                reasonTextarea.value = req.reason;
-                totalQuantityInput.value = req.totalQuantity;
+                unitCostInput.value = parseFloat(req.unitCost || 0).toFixed(2);
+                providerNameSelect.value = req.providerName || '';
+                reasonTextarea.value = req.reason || '';
+                totalQuantityInput.value = req.totalQuantity || 0;
                 const config = getConfig();
                 const isPresidenciaProfile = currentProfile === 'presidencia';
                 if (req.department === 'MSO' && (config.hasMSO || isPresidenciaProfile)) {
                     msoObservationsContainer.classList.remove('hidden');
                     msoObservationsContainer.classList.remove('mso-hidden');
-                    msoObservationsSelect.value = req.msoDepartment;
+                    msoObservationsSelect.value = req.msoDepartment || '';
                 } else {
                     msoObservationsContainer.classList.add('hidden');
                     if (!config.hasMSO && !isPresidenciaProfile) msoObservationsContainer.classList.add('mso-hidden');
@@ -1288,7 +1290,7 @@
                     selectedInterStaff = req.interStaff ? [...req.interStaff] : [];
                     renderSelectedStaff();
                 }
-                const delCost = parseFloat(req.deliveryCost);
+                const delCost = parseFloat(req.deliveryCost || 0);
                 if (delCost > 0 && !isUser) {
                     deliveryCostOption.checked = true;
                     deliveryFree.checked = false;
@@ -1308,6 +1310,7 @@
                 window.scrollTo({ top: 0, behavior: 'smooth' });
             };
 
+            // Función mejorada para aprobar solicitudes
             window.approveRequest = (id) => {
                 const req = foodRequests.find(r => r.id === id);
                 if (!req) return;
@@ -1317,9 +1320,9 @@
                 eventSelect.value = req.event || '';
                 deliveryPlaceInput.value = req.deliveryPlace;
                 deliveryDateTimeInput.value = normalizeDate(req.deliveryDate) || '';
-                providerNameSelect.value = req.providerName;
-                reasonTextarea.value = req.reason;
-                totalQuantityInput.value = req.totalQuantity;
+                providerNameSelect.value = req.providerName || '';
+                reasonTextarea.value = req.reason || '';
+                totalQuantityInput.value = req.totalQuantity || 0;
                 if (req.externalStaff) {
                     Object.keys(req.externalStaff).forEach(k => {
                         const qty = req.externalStaff[k];
@@ -1334,14 +1337,15 @@
                     selectedInterStaff = [...req.interStaff];
                     renderSelectedStaff();
                 }
+                // Habilitar campos de costo para el admin
                 unitCostInput.disabled = false;
                 unitCostInput.classList.remove('disabled-field');
-                unitCostInput.value = req.unitCost || '0.00';
-                if (req.deliveryCost > 0) {
+                unitCostInput.value = parseFloat(req.unitCost || 0).toFixed(2);
+                if (parseFloat(req.deliveryCost || 0) > 0) {
                     deliveryCostOption.checked = true;
                     deliveryFree.checked = false;
                     deliveryCostInput.disabled = false;
-                    deliveryCostInput.value = req.deliveryCost.toFixed(2);
+                    deliveryCostInput.value = parseFloat(req.deliveryCost || 0).toFixed(2);
                     deliveryCostInput.classList.remove('disabled-field');
                     deliveryCostInput.classList.remove('hidden');
                 } else {
@@ -1355,46 +1359,18 @@
                 if (req.department === 'MSO' && (config.hasMSO || isPresidenciaProfile)) {
                     msoObservationsContainer.classList.remove('hidden');
                     msoObservationsContainer.classList.remove('mso-hidden');
-                    msoObservationsSelect.value = req.msoDepartment;
+                    msoObservationsSelect.value = req.msoDepartment || '';
                 }
                 calculateTotalCost();
                 submitButton.textContent = 'Aprobar y Guardar';
                 submitButton.classList.remove('bg-inter-primary', 'hover:bg-blue-700');
                 submitButton.classList.add('bg-green-600', 'hover:bg-green-700');
                 addCancelEditButton();
-                const originalHandler = form.submit;
-                const approveHandler = async (e) => {
-                    e.preventDefault();
-                    const updated = { 
-                        ...req, 
-                        unitCost: parseFloat(unitCostInput.value) || 0, 
-                        deliveryCost: deliveryFree.checked ? 0 : (parseFloat(deliveryCostInput.value) || 0), 
-                        totalCost: parseFloat(costInput.value) || 0, 
-                        status: 'aprobado' 
-                    };
-                    try {
-                        await updateRequestInFirestore(id, updated);
-                        const idx = foodRequests.findIndex(r => r.id === id);
-                        if (idx !== -1) foodRequests[idx] = updated;
-                        displayMessage('Solicitud aprobada con éxito.', 'success');
-                        resetFormAndEditing();
-                        renderTable(getFilteredRequestsForDisplay());
-                        updateSummaryTotals(getFilteredRequestsForDisplay());
-                        if (isAdmin) {
-                            updateCharts();
-                            if (reportMonthInput && reportMonthInput.value) generateReport();
-                        }
-                        form.removeEventListener('submit', approveHandler);
-                        form.addEventListener('submit', originalHandler);
-                    } catch(e) {
-                        displayMessage('Error al aprobar: '+e.message, 'error');
-                    }
-                };
-                form.removeEventListener('submit', originalHandler);
-                form.addEventListener('submit', approveHandler);
+                // Usamos el manejador normal del formulario, no sobrescribimos
                 window.scrollTo({ top: 0, behavior: 'smooth' });
             };
 
+            // Manejar el envío del formulario
             form.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 let externalStaffData = {};
@@ -1407,7 +1383,7 @@
                     });
                 }
                 const totalQty = calculateTotalQuantity();
-                let totalCost = parseFloat(costInput.value);
+                let totalCost = parseFloat(costInput.value) || 0;
                 const delCost = deliveryFree.checked ? 0 : (parseFloat(deliveryCostInput.value) || 0);
                 if (isUser) totalCost = 0;
                 if (totalQty === 0) { displayMessage('El total de comidas debe ser mayor a 0.', 'error'); return; }
