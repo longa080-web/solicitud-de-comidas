@@ -726,11 +726,20 @@
                 return getCityConfig(currentCity);
             }
 
+            // ============================================================
+            // CORRECCIÓN APLICADA: El admin CCS ahora también ve los
+            // registros con city === 'mso' (Presidencia / MSO).
+            // ============================================================
             function getFilteredRequestsForDisplay() {
                 let requests = foodRequests.slice();
 
                 if (isAdminCcs) {
-                    requests = requests.filter(req => req.city === 'ccs' || !req.city || req.city === '');
+                    requests = requests.filter(req => 
+                        req.city === 'ccs' || 
+                        req.city === 'mso' || 
+                        !req.city || 
+                        req.city === ''
+                    );
                 }
                 else if (isAdminGuar) {
                     requests = requests.filter(req => req.city === 'guar');
@@ -1475,7 +1484,10 @@
                     const dispDept = r.department === 'MSO' && r.msoDepartment ? `${r.department} (${r.msoDepartment})` : r.department;
                     const approver = r.approvedBy || getApprover(r.department, r.msoDepartment);
                     const badge = r.status === 'pendiente' ? '<span class="bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded-full">Pendiente</span>' : '<span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">Aprobado</span>';
-                    const cityBadge = r.city === 'guar' ? '<span class="city-badge city-badge-guar text-xs">Guarenas</span>' : '<span class="city-badge city-badge-ccs text-xs">CCS</span>';
+                    let cityBadge = '';
+                    if (r.city === 'guar') cityBadge = '<span class="city-badge city-badge-guar text-xs">Guarenas</span>';
+                    else if (r.city === 'mso') cityBadge = '<span class="city-badge city-badge-mso text-xs">MSO</span>';
+                    else cityBadge = '<span class="city-badge city-badge-ccs text-xs">CCS</span>';
                     const row = tableBody.insertRow();
                     if (isAdmin) {
                         const actions = r.status === 'pendiente' ? 
