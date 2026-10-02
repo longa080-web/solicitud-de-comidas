@@ -423,7 +423,7 @@
                     { id: 67, name: "REVERON ROGELIO" }, { id: 68, name: "HERNANDEZ SERGIO" }, { id: 69, name: "CEDEÑO LEONEL" },
                     { id: 70, name: "UZCATEGUI BREINER" }, { id: 71, name: "MALDONADO DYLAN" }, { id: 72, name: "HERNANDEZ LUIS" },
                     { id: 73, name: "MENESES KELVIS" }, { id: 74, name: "HERNANDEZ RAFAEL" }, { id: 75, name: "VILLAMIZAR YOHAN" },
-                    { id: 76, name: "CASTRO MANUEL" }, { id: 77, name: "BRICEÑO ALEXY" }, { id: 78, name: "ROCA YUNIOR" },
+                    { id: 76, name: "CASTRO MANUEL" }, { id: 77, name: "BRICEÑO ALEX" }, { id: 78, name: "ROCA YUNIOR" },
                     { id: 79, name: "DIAZ MANUEL" }, { id: 80, name: "ZERPA ODREIMY" }, { id: 81, name: "RODRIGUEZ FELIX" },
                     { id: 82, name: "GARCIA ANGEL" }, { id: 83, name: "TONITO JULIO" }, { id: 84, name: "GARCIA EDNEY" },
                     { id: 85, name: "CASTRILLO MANUEL" }, { id: 86, name: "GUERRERO GABRIEL" }, { id: 87, name: "MATHEUS FERNANDO" },
@@ -726,27 +726,23 @@
                 return getCityConfig(currentCity);
             }
 
-            // ============================================================
-            // CORRECCIÓN APLICADA: El admin CCS ahora también ve los
-            // registros con city === 'mso' (Presidencia / MSO).
-            // ============================================================
+            // ============================================================================
+            // CORRECCIÓN: Presidencia ya NO mezcla "Personal Visitante" con "Presidencia"
+            // ============================================================================
             function getFilteredRequestsForDisplay() {
                 let requests = foodRequests.slice();
 
                 if (isAdminCcs) {
-                    requests = requests.filter(req => 
-                        req.city === 'ccs' || 
-                        req.city === 'mso' || 
-                        !req.city || 
-                        req.city === ''
-                    );
+                    requests = requests.filter(req => req.city === 'ccs' || !req.city || req.city === '');
                 }
                 else if (isAdminGuar) {
                     requests = requests.filter(req => req.city === 'guar');
                 }
                 else if (isPresidencia) {
-                    requests = requests.filter(req => req.department === 'MSO' && 
-                        (req.msoDepartment === 'Presidencia' || req.msoDepartment === 'Personal Visitante'));
+                    // Presidencia ve TODOS los MSO aquí. El filtro por defecto de "solo Presidencia"
+                    // se aplica en renderTable() cuando no hay filtros activos. Así, si el usuario
+                    // filtra explícitamente por "Personal Visitante", podrá verlos.
+                    requests = requests.filter(req => req.department === 'MSO');
                 }
                 else if (isUserCcs) {
                     requests = requests.filter(req => req.city === 'ccs' || !req.city || req.city === '');
@@ -760,6 +756,10 @@
 
             function getFilteredApprovedRequests() {
                 const filtered = getFilteredRequestsForDisplay();
+                // Si es Presidencia y no hay filtros activos, aplicar filtro por defecto
+                if (isPresidencia && activeFilters.length === 0) {
+                    return filtered.filter(r => r.status === 'aprobado' && r.msoDepartment === 'Presidencia');
+                }
                 return filtered.filter(r => r.status === 'aprobado');
             }
 
@@ -1050,7 +1050,6 @@
                 removeCancelEditButton();
                 if (deliveryCostInput) deliveryCostInput.classList.add('hidden');
                 loadCityData();
-                // No recargar la página ni reiniciar la sesión
             }
 
             function initializeForm() {
@@ -1254,7 +1253,6 @@
                 return nd ? nd.replace(/-/g,'') : '';
             }
 
-            // Función mejorada para editar solicitudes
             window.editRequest = (id) => {
                 const req = foodRequests.find(r => r.id === id);
                 if (!req) return;
@@ -1319,7 +1317,6 @@
                 window.scrollTo({ top: 0, behavior: 'smooth' });
             };
 
-            // Función mejorada para aprobar solicitudes
             window.approveRequest = (id) => {
                 const req = foodRequests.find(r => r.id === id);
                 if (!req) return;
@@ -1346,7 +1343,6 @@
                     selectedInterStaff = [...req.interStaff];
                     renderSelectedStaff();
                 }
-                // Habilitar campos de costo para el admin
                 unitCostInput.disabled = false;
                 unitCostInput.classList.remove('disabled-field');
                 unitCostInput.value = parseFloat(req.unitCost || 0).toFixed(2);
@@ -1375,11 +1371,9 @@
                 submitButton.classList.remove('bg-inter-primary', 'hover:bg-blue-700');
                 submitButton.classList.add('bg-green-600', 'hover:bg-green-700');
                 addCancelEditButton();
-                // Usamos el manejador normal del formulario, no sobrescribimos
                 window.scrollTo({ top: 0, behavior: 'smooth' });
             };
 
-            // Manejar el envío del formulario
             form.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 let externalStaffData = {};
@@ -1454,13 +1448,28 @@
 
             function formatCost(c) { return `$${parseFloat(c || 0).toFixed(2)}`; }
 
+            // ============================================================================
+            // CORRECCIÓN: renderTable aplica filtro por defecto a Presidencia
+            // cuando no hay filtros activos, y el filtro de 'department' busca
+            // también en msoDepartment.
+            // ============================================================================
             function renderTable(requests = foodRequests) {
                 let filtered = getFilteredRequestsForDisplay();
+                
+                // Si es Presidencia y NO hay filtros activos, mostrar solo Presidencia por defecto
+                if (isPresidencia && activeFilters.length === 0) {
+                    filtered = filtered.filter(r => r.msoDepartment === 'Presidencia');
+                }
+                
                 if (activeFilters.length) {
                     filtered = filtered.filter(r => activeFilters.every(f => {
                         const t = f.term.toLowerCase();
                         if (f.field === 'all') return r.department.toLowerCase().includes(t) || r.mealType.toLowerCase().includes(t) || r.deliveryPlace.toLowerCase().includes(t) || r.providerName.toLowerCase().includes(t) || r.reason.toLowerCase().includes(t) || (r.interStaff && r.interStaff.some(s => s.toLowerCase().includes(t))) || (r.msoDepartment && r.msoDepartment.toLowerCase().includes(t));
-                        if (f.field === 'department') return r.department.toLowerCase().includes(t);
+                        if (f.field === 'department') {
+                            // Buscar tanto en department como en msoDepartment
+                            return r.department.toLowerCase().includes(t) || 
+                                   (r.msoDepartment && r.msoDepartment.toLowerCase().includes(t));
+                        }
                         if (f.field === 'mealType') return r.mealType.toLowerCase().includes(t);
                         if (f.field === 'provider') return r.providerName.toLowerCase().includes(t);
                         if (f.field === 'staff') return r.interStaff && r.interStaff.some(s => s.toLowerCase().includes(t));
@@ -1484,10 +1493,7 @@
                     const dispDept = r.department === 'MSO' && r.msoDepartment ? `${r.department} (${r.msoDepartment})` : r.department;
                     const approver = r.approvedBy || getApprover(r.department, r.msoDepartment);
                     const badge = r.status === 'pendiente' ? '<span class="bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded-full">Pendiente</span>' : '<span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">Aprobado</span>';
-                    let cityBadge = '';
-                    if (r.city === 'guar') cityBadge = '<span class="city-badge city-badge-guar text-xs">Guarenas</span>';
-                    else if (r.city === 'mso') cityBadge = '<span class="city-badge city-badge-mso text-xs">MSO</span>';
-                    else cityBadge = '<span class="city-badge city-badge-ccs text-xs">CCS</span>';
+                    const cityBadge = r.city === 'guar' ? '<span class="city-badge city-badge-guar text-xs">Guarenas</span>' : '<span class="city-badge city-badge-ccs text-xs">CCS</span>';
                     const row = tableBody.insertRow();
                     if (isAdmin) {
                         const actions = r.status === 'pendiente' ? 
@@ -1541,6 +1547,10 @@
                 }));
                 renderTable();
             }
+
+            // ============================================================================
+            // CORRECCIÓN: addFilter detecta términos de MSO como filtro de departamento
+            // ============================================================================
             function addFilter() {
                 const term = filterInput.value.trim();
                 if (!term) { displayMessage('Ingrese un término', 'error'); return; }
@@ -1549,7 +1559,7 @@
                 if (['desayuno', 'almuerzo', 'cena', 'refrigerios'].some(t => tl.includes(t))) field = 'mealType';
                 else if (tl.includes('monteluso') || tl.includes('susi') || tl.includes('cumbes') || tl.includes('sub_brayan') || tl.includes('corporación')) field = 'provider';
                 else if (tl.split(' ').length >= 2) field = 'staff';
-                else if (tl.includes('admin') || tl.includes('comercial') || tl.includes('gerencia') || tl.includes('head') || tl.includes('mso') || tl.includes('ocad') || tl.includes('obras') || tl.includes('guarenas') || tl.includes('guatire')) field = 'department';
+                else if (tl.includes('admin') || tl.includes('comercial') || tl.includes('gerencia') || tl.includes('head') || tl.includes('mso') || tl.includes('ocad') || tl.includes('obras') || tl.includes('guarenas') || tl.includes('guatire') || tl.includes('presidencia') || tl.includes('visitante') || tl.includes('marketing') || tl.includes('interconexiones') || tl.includes('importaciones') || tl.includes('rrhh') || tl.includes('logistica') || tl.includes('backbone')) field = 'department';
                 activeFilters.push({ field, term });
                 filterInput.value = '';
                 renderActiveFilters();
@@ -1593,6 +1603,9 @@
 
             exportCsvBtn.addEventListener('click', () => {
                 let toExp = getFilteredRequestsForDisplay();
+                if (isPresidencia && activeFilters.length === 0) {
+                    toExp = toExp.filter(r => r.msoDepartment === 'Presidencia');
+                }
                 if (!toExp.length) { displayMessage('No hay datos para exportar', 'error'); return; }
                 const quote = s => `"${String(s || '').replace(/"/g, '""')}"`;
                 let csv = ["Fecha de Entrega;Departamento;Departamento MSO;Tipo de Comida;Evento;Personal Externo;Personal Inter;Total Comidas;Lugar de Entrega;Motivo;Proveedor;Costo Unitario;Costo Total Comida;Costo Delivery;Costo Total Final;Aprobado por;Estado;Ciudad"].join("\n") + "\n";
@@ -1621,7 +1634,10 @@
             });
 
             function updateSummaryTotals(requests = foodRequests) {
-                const filtered = getFilteredRequestsForDisplay();
+                let filtered = getFilteredRequestsForDisplay();
+                if (isPresidencia && activeFilters.length === 0) {
+                    filtered = filtered.filter(r => r.msoDepartment === 'Presidencia');
+                }
                 const now = new Date();
                 const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
                 const weekStart = new Date(today);
