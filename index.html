@@ -727,28 +727,30 @@
             }
 
             // ============================================================================
-            // CORRECCIÓN: Presidencia ya NO mezcla "Personal Visitante" con "Presidencia"
+            // CORRECCIÓN PRINCIPAL
+            // Admin CCS y Usuario CCS: ven CCS + MSO (Presidencia, Personal Visitante, etc.)
+            // Admin Guarenas y Usuario Guarenas: ven solo Guar
+            // Presidencia: ve solo MSO (lo suyo)
             // ============================================================================
             function getFilteredRequestsForDisplay() {
                 let requests = foodRequests.slice();
 
-                if (isAdminCcs) {
-                    requests = requests.filter(req => req.city === 'ccs' || !req.city || req.city === '');
+                if (isAdminCcs || isUserCcs) {
+                    // CCS + MSO: porque Presidencia y Personal Visitante pertenecen a MSO
+                    requests = requests.filter(req => 
+                        req.city === 'ccs' || 
+                        !req.city || 
+                        req.city === '' || 
+                        req.city === 'mso'
+                    );
                 }
-                else if (isAdminGuar) {
+                else if (isAdminGuar || isUserGuar) {
+                    // Solo Guarenas
                     requests = requests.filter(req => req.city === 'guar');
                 }
                 else if (isPresidencia) {
-                    // Presidencia ve TODOS los MSO aquí. El filtro por defecto de "solo Presidencia"
-                    // se aplica en renderTable() cuando no hay filtros activos. Así, si el usuario
-                    // filtra explícitamente por "Personal Visitante", podrá verlos.
+                    // Presidencia ve solo lo de MSO (department === 'MSO')
                     requests = requests.filter(req => req.department === 'MSO');
-                }
-                else if (isUserCcs) {
-                    requests = requests.filter(req => req.city === 'ccs' || !req.city || req.city === '');
-                }
-                else if (isUserGuar) {
-                    requests = requests.filter(req => req.city === 'guar');
                 }
                 
                 return requests;
@@ -757,6 +759,7 @@
             function getFilteredApprovedRequests() {
                 const filtered = getFilteredRequestsForDisplay();
                 // Si es Presidencia y no hay filtros activos, aplicar filtro por defecto
+                // para que vea solo Presidencia (no Personal Visitante) en su historial
                 if (isPresidencia && activeFilters.length === 0) {
                     return filtered.filter(r => r.status === 'aprobado' && r.msoDepartment === 'Presidencia');
                 }
@@ -1448,11 +1451,6 @@
 
             function formatCost(c) { return `$${parseFloat(c || 0).toFixed(2)}`; }
 
-            // ============================================================================
-            // CORRECCIÓN: renderTable aplica filtro por defecto a Presidencia
-            // cuando no hay filtros activos, y el filtro de 'department' busca
-            // también en msoDepartment.
-            // ============================================================================
             function renderTable(requests = foodRequests) {
                 let filtered = getFilteredRequestsForDisplay();
                 
@@ -1466,7 +1464,6 @@
                         const t = f.term.toLowerCase();
                         if (f.field === 'all') return r.department.toLowerCase().includes(t) || r.mealType.toLowerCase().includes(t) || r.deliveryPlace.toLowerCase().includes(t) || r.providerName.toLowerCase().includes(t) || r.reason.toLowerCase().includes(t) || (r.interStaff && r.interStaff.some(s => s.toLowerCase().includes(t))) || (r.msoDepartment && r.msoDepartment.toLowerCase().includes(t));
                         if (f.field === 'department') {
-                            // Buscar tanto en department como en msoDepartment
                             return r.department.toLowerCase().includes(t) || 
                                    (r.msoDepartment && r.msoDepartment.toLowerCase().includes(t));
                         }
@@ -1548,9 +1545,6 @@
                 renderTable();
             }
 
-            // ============================================================================
-            // CORRECCIÓN: addFilter detecta términos de MSO como filtro de departamento
-            // ============================================================================
             function addFilter() {
                 const term = filterInput.value.trim();
                 if (!term) { displayMessage('Ingrese un término', 'error'); return; }
