@@ -86,6 +86,8 @@
         .btn-fix-data:hover { background: #c77000; }
         .btn-fix-city { background: #E85D04; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 600; margin-left: 10px; }
         .btn-fix-city:hover { background: #c77000; }
+        .btn-fix-totals { background: #E85D04; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 600; margin-left: 10px; }
+        .btn-fix-totals:hover { background: #c77000; }
     </style>
 </head>
 <body class="bg-gray-100 p-4 min-h-screen flex flex-col items-center" data-profile="admin_ccs" data-city="ccs">
@@ -118,7 +120,9 @@
                 <option value="user_guar">Usuario Guarenas</option>
             </select>
             <button id="logoutBtn" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg transition duration-300">Cerrar Sesión</button>
-            <button id="fixCityBtn" class="btn-fix-city admin-only" style="display:none;">Reparar ciudad de registros</button>
+            <button id="fixCityBtn" class="btn-fix-city admin-only" style="display:none;">Reparar ciudad</button>
+            <button id="fixTotalsBtn" class="btn-fix-totals admin-only" style="display:none;">Reparar totales</button>
+            <button id="auditBtn" class="btn-fix-totals admin-only" style="display:none;">Auditar totales</button>
         </div>
 
         <header class="text-center mb-4 md:mb-6 bg-inter-primary rounded-t-xl py-4 md:py-6 relative overflow-hidden">
@@ -188,9 +192,7 @@
 
                     <div class="col-span-1 admin-and-user">
                         <label class="block text-sm font-medium text-gray-700 mb-1">Personal Externo</label>
-                        <div class="space-y-1 md:space-y-2" id="externalStaffContainer">
-                            <!-- Se llena dinámicamente según la ciudad -->
-                        </div>
+                        <div class="space-y-1 md:space-y-2" id="externalStaffContainer"></div>
                     </div>
 
                     <div class="col-span-1 admin-and-user">
@@ -204,7 +206,7 @@
 
                     <div class="col-span-1">
                         <label for="totalQuantity" class="block text-sm font-medium text-gray-700 mb-1">Total de Comidas</label>
-                        <input type="number" id="totalQuantity" min="0" value="0" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-inter-primary focus:border-inter-primary text-sm md:text-base">
+                        <input type="number" id="totalQuantity" min="0" value="0" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-inter-primary focus:border-inter-primary text-sm md:text-base bg-gray-100 cursor-not-allowed" readonly>
                     </div>
                     
                     <div class="col-span-1 md:col-span-2">
@@ -239,7 +241,7 @@
                     </div>
                     <div class="col-span-1 md:col-span-3">
                         <label for="reason" class="block text-sm font-medium text-gray-700 mb-1">Motivo de la Solicitud (Obligatorio para justificar)</label>
-                        <textarea id="reason" rows="3" required class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-inter-primary focus:border-inter-primary text-sm md:text-base" placeholder="Ej. Personal de Área Técnica trabajando en proyecto X fuera de horario, Área Comercial en visita a cliente en Y."></textarea>
+                        <textarea id="reason" rows="3" required class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-inter-primary focus:border-inter-primary text-sm md:text-base" placeholder="Ej. Personal de Área Técnica trabajando en proyecto X fuera de horario..."></textarea>
                     </div>
                     <div class="col-span-1 md:col-span-3 flex flex-col sm:flex-row justify-end items-center gap-3 md:gap-4" id="formActions">
                         <button type="submit" class="bg-inter-primary hover:bg-blue-700 text-white font-bold py-2 px-4 md:py-2 md:px-6 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105 w-full sm:w-auto">Registrar Solicitud</button>
@@ -374,7 +376,7 @@
         const { jsPDF } = window.jspdf;
         let currentProfile = 'admin_ccs', isLoggedIn = false;
         let currentCity = 'ccs';
-        
+
         const PASSWORDS = {
             'admin_ccs': 'Admin1234',
             'admin_guar': 'Admingua1234',
@@ -385,17 +387,9 @@
 
         const CITY_CONFIG = {
             ccs: {
-                name: 'CCS',
-                label: 'CCS',
-                cityBadgeClass: 'city-badge-ccs',
-                cityBtnClass: '',
-                hasMSO: true,
-                departments: [
-                    'Administración', 'Área Comercial', 'C.O El Rosal', 'C.O La Naya', 
-                    'C.O Los Ruices', 'C.O Paraiso-Catia', 'Gerencia Senior', 'Head End', 
-                    'MSO', 'Ocad', 'Obras'
-                ],
-                providers: ['Monteluso', 'Susi fresh', 'Cumbes Barlovento'],
+                name: 'CCS', label: 'CCS', cityBadgeClass: 'city-badge-ccs', cityBtnClass: '', hasMSO: true,
+                departments: ['Administración','Área Comercial','C.O El Rosal','C.O La Naya','C.O Los Ruices','C.O Paraiso-Catia','Gerencia Senior','Head End','MSO','Ocad','Obras'],
+                providers: ['Monteluso','Susi fresh','Cumbes Barlovento'],
                 unitName: 'CCS',
                 staffList: [
                     { id: 1, name: "GALEA CESAR" }, { id: 2, name: "CASTILLO TIBET" }, { id: 3, name: "QUINTERO ROSANA" },
@@ -451,29 +445,22 @@
                     { id: 151, name: "VAMONDE JOSE" }, { id: 152, name: "MARTINEZ MARINA" }, { id: 153, name: "MARQUEZ ACXEL" },
                     { id: 154, name: "BARON YOSMAR" }, { id: 155, name: "CALDERON LUISANA" }, { id: 156, name: "BASUALDO JORGE" },
                     { id: 157, name: "PEREZ JENNYFER" }, { id: 158, name: "URBINA GENESIS" }, { id: 159, name: "MAGALLANES LUIS" },
-                    { id: 160, name: "ESCALONA KARLA" }, { id: 161, name: "BRICEÑO ALEXA" }, { id: 162, name: "RUIZ EDGAR" }, 
+                    { id: 160, name: "ESCALONA KARLA" }, { id: 161, name: "BRICEÑO ALEXA" }, { id: 162, name: "RUIZ EDGAR" },
                     { id: 163, name: "CEBALLOS LEONID" }
                 ],
                 externalStaff: [
                     { id: 'CANTV', label: 'CANTV' },
                     { id: 'EDC', label: 'EDC' },
-                    { id: 'ExternalOthers', label: 'Otros' }
+                    { id: 'Otros', label: 'Otros' }
                 ],
                 getApprover: function(department, msoDepartment) {
                     return (department === 'MSO' || msoDepartment) ? 'Mario Fernández' : 'Jorge Basualdo';
                 }
             },
             guar: {
-                name: 'Guarenas',
-                label: 'Guarenas',
-                cityBadgeClass: 'city-badge-guar',
-                cityBtnClass: 'guar',
-                hasMSO: false,
-                departments: [
-                    'Administración', 'Área Comercial', 'C.O Guarenas', 'C.O Guatire',
-                    'Gerencia Senior', 'Head End', 'Ocad', 'Obras'
-                ],
-                providers: ['Sub_Brayan', 'Corporación Stark (Bunker)'],
+                name: 'Guarenas', label: 'Guarenas', cityBadgeClass: 'city-badge-guar', cityBtnClass: 'guar', hasMSO: false,
+                departments: ['Administración','Área Comercial','C.O Guarenas','C.O Guatire','Gerencia Senior','Head End','Ocad','Obras'],
+                providers: ['Sub_Brayan','Corporación Stark (Bunker)'],
                 unitName: 'Guarenas',
                 staffList: [
                     { id: 1, name: "PEREIRA JOSE" }, { id: 2, name: "AZUAJE YENNY" }, { id: 3, name: "ROMERO ORLANDO" },
@@ -506,16 +493,123 @@
                 externalStaff: [
                     { id: 'CANTV', label: 'CANTV' },
                     { id: 'EDC', label: 'EDC' },
-                    { id: 'OtrosGuar', label: 'Otros' }
+                    { id: 'Otros', label: 'Otros' }
                 ],
-                getApprover: function(department, msoDepartment) {
-                    return 'Jorge Basualdo';
-                }
+                getApprover: function() { return 'Jorge Basualdo'; }
             }
         };
 
-        function getCityConfig(city) {
-            return CITY_CONFIG[city] || CITY_CONFIG.ccs;
+        function getCityConfig(city) { return CITY_CONFIG[city] || CITY_CONFIG.ccs; }
+
+        // ============================================================================
+        // FUNCIÓN CENTRAL DE CÁLCULO
+        // ============================================================================
+        function calcularTotalesRegistro(registro) {
+            const externalStaff = registro.externalStaff || {};
+            let extTotal = 0;
+            const extNormalizado = {};
+            Object.keys(externalStaff).forEach(key => {
+                const qty = parseInt(externalStaff[key]) || 0;
+                if (qty > 0) {
+                    let keyNorm = key;
+                    if (key === 'ExternalOthers') keyNorm = 'Otros';
+                    if (key === 'OtrosGuar') keyNorm = 'Otros';
+                    extNormalizado[keyNorm] = (extNormalizado[keyNorm] || 0) + qty;
+                    extTotal += qty;
+                }
+            });
+            const interTotal = (registro.interStaff || []).length;
+            const totalQuantity = extTotal + interTotal;
+            const unitCost = parseFloat(registro.unitCost) || 0;
+            const deliveryCost = parseFloat(registro.deliveryCost) || 0;
+            const totalCost = (totalQuantity * unitCost) + deliveryCost;
+            return {
+                externalStaffNormalizado: extNormalizado,
+                externalStaffTotal: extTotal,
+                interStaffTotal: interTotal,
+                totalQuantity, unitCost, deliveryCost, totalCost
+            };
+        }
+
+        async function fixCityRecords() {
+            if (!confirm('Esta acción reparará los registros que no tengan ciudad asignada, asignándoles "ccs" por defecto. ¿Estás seguro?')) return;
+            try {
+                const { collection, getDocs, updateDoc, doc } = window.firebaseFunctions;
+                if (!window.firebaseDb) { alert('Firebase no inicializado'); return; }
+                const snapshot = await getDocs(collection(window.firebaseDb, 'foodRequests'));
+                let count = 0;
+                for (const document of snapshot.docs) {
+                    const data = document.data();
+                    if (!data.city || data.city === '') {
+                        await updateDoc(doc(window.firebaseDb, 'foodRequests', document.id), { city: 'ccs' });
+                        count++;
+                    }
+                }
+                alert(`Se repararon ${count} registros. La página se recargará.`);
+                location.reload();
+            } catch(e) { console.error(e); alert("Error al reparar: " + e.message); }
+        }
+
+        async function fixTotalsRecords() {
+            if (!confirm('Esto recalculará totalQuantity y totalCost de TODOS los registros según sus componentes. ¿Continuar?')) return;
+            try {
+                const { collection, getDocs, updateDoc, doc } = window.firebaseFunctions;
+                const snapshot = await getDocs(collection(window.firebaseDb, 'foodRequests'));
+                let corregidos = 0;
+                const detalles = [];
+                for (const document of snapshot.docs) {
+                    const r = document.data();
+                    const calc = calcularTotalesRegistro(r);
+                    const qtyGuardada = r.totalQuantity || 0;
+                    const costGuardado = parseFloat(r.totalCost) || 0;
+                    if (qtyGuardada !== calc.totalQuantity || Math.abs(costGuardado - calc.totalCost) > 0.01) {
+                        await updateDoc(doc(window.firebaseDb, 'foodRequests', document.id), {
+                            totalQuantity: calc.totalQuantity,
+                            totalCost: calc.totalCost,
+                            externalStaff: calc.externalStaffNormalizado,
+                            externalStaffTotal: calc.externalStaffTotal,
+                            interStaffTotal: calc.interStaffTotal
+                        });
+                        corregidos++;
+                        detalles.push({ id: r.id, dept: r.department, qtyAntes: qtyGuardada, qtyDespues: calc.totalQuantity, costAntes: costGuardado, costDespues: calc.totalCost });
+                    }
+                }
+                console.table(detalles);
+                alert(`Se corrigieron ${corregidos} registros. La página se recargará.`);
+                if (corregidos > 0) location.reload();
+            } catch(e) { console.error(e); alert('Error: ' + e.message); }
+        }
+
+        async function auditTotals() {
+            try {
+                const { collection, getDocs } = window.firebaseFunctions;
+                const snapshot = await getDocs(collection(window.firebaseDb, 'foodRequests'));
+                const problemas = [];
+                let sumaQtyG = 0, sumaQtyC = 0, sumaCostG = 0, sumaCostC = 0;
+                snapshot.forEach(document => {
+                    const r = document.data();
+                    const calc = calcularTotalesRegistro(r);
+                    const qtyG = r.totalQuantity || 0;
+                    const costG = parseFloat(r.totalCost) || 0;
+                    sumaQtyG += qtyG; sumaQtyC += calc.totalQuantity;
+                    sumaCostG += costG; sumaCostC += calc.totalCost;
+                    if (qtyG !== calc.totalQuantity || Math.abs(costG - calc.totalCost) > 0.01) {
+                        problemas.push({
+                            id: r.id, dept: r.department, msoDept: r.msoDepartment || '',
+                            qtyGuardada: qtyG, qtyCalculada: calc.totalQuantity,
+                            costGuardado: costG.toFixed(2), costCalculado: calc.totalCost.toFixed(2),
+                            externos: JSON.stringify(r.externalStaff || {}), internos: (r.interStaff || []).join(', ')
+                        });
+                    }
+                });
+                console.log('=== AUDITORÍA ===');
+                console.log('Registros totales:', snapshot.size, '| Con problemas:', problemas.length);
+                console.log('Diferencia Qty:', sumaQtyG - sumaQtyC);
+                console.log('Diferencia Cost:', (sumaCostG - sumaCostC).toFixed(2));
+                console.table(problemas);
+                if (problemas.length === 0) alert(`✅ Todos los registros cuadran (${snapshot.size} revisados).`);
+                else alert(`⚠️ ${problemas.length} registros con problemas. Revisa la consola (F12).`);
+            } catch(e) { console.error(e); alert('Error: ' + e.message); }
         }
 
         document.addEventListener('DOMContentLoaded', () => {
@@ -543,32 +637,11 @@
                 else if (this.value !== currentProfile) this.value = currentProfile;
             });
             document.getElementById('fixCityBtn').addEventListener('click', fixCityRecords);
+            const fixT = document.getElementById('fixTotalsBtn');
+            const aud = document.getElementById('auditBtn');
+            if (fixT) fixT.addEventListener('click', fixTotalsRecords);
+            if (aud) aud.addEventListener('click', auditTotals);
         });
-
-        async function fixCityRecords() {
-            if (!confirm('Esta acción reparará los registros que no tengan ciudad asignada, asignándoles "ccs" por defecto. ¿Estás seguro?')) return;
-            try {
-                const db = window.firebaseDb;
-                const { collection, getDocs, updateDoc, doc } = window.firebaseFunctions;
-                if (!db) { alert('Firebase no está inicializado'); return; }
-                const colRef = collection(db, 'foodRequests');
-                const snapshot = await getDocs(colRef);
-                let count = 0;
-                for (const document of snapshot.docs) {
-                    const data = document.data();
-                    if (!data.city || data.city === '') {
-                        await updateDoc(doc(db, 'foodRequests', document.id), { city: 'ccs' });
-                        count++;
-                        console.log(`Actualizado documento ${document.id} a city: 'ccs'`);
-                    }
-                }
-                alert(`Se repararon ${count} registros. La página se recargará.`);
-                location.reload();
-            } catch(e) {
-                console.error("Error:", e);
-                alert("Error al reparar: " + e.message);
-            }
-        }
 
         function handleLogin() {
             const profile = document.getElementById('loginProfile').value;
@@ -577,15 +650,10 @@
             const errorElement = document.getElementById('loginError');
             if (password === PASSWORDS[profile]) {
                 isLoggedIn = true; currentProfile = profile;
-                if (profile === 'admin_ccs' || profile === 'user_ccs') {
-                    currentCity = 'ccs';
-                } else if (profile === 'admin_guar' || profile === 'user_guar') {
-                    currentCity = 'guar';
-                } else if (profile === 'presidencia') {
-                    currentCity = 'mso';
-                } else {
-                    currentCity = 'ccs';
-                }
+                if (profile === 'admin_ccs' || profile === 'user_ccs') currentCity = 'ccs';
+                else if (profile === 'admin_guar' || profile === 'user_guar') currentCity = 'guar';
+                else if (profile === 'presidencia') currentCity = 'mso';
+                else currentCity = 'ccs';
                 document.body.setAttribute('data-profile', profile);
                 document.body.setAttribute('data-city', currentCity);
                 if (rememberMe) localStorage.setItem('savedProfile', profile);
@@ -618,16 +686,13 @@
             const historyBadge = document.getElementById('historyCityBadge');
             if (!badge) return;
             if (currentCity === 'ccs') {
-                badge.textContent = 'CCS';
-                badge.className = 'city-badge city-badge-ccs';
+                badge.textContent = 'CCS'; badge.className = 'city-badge city-badge-ccs';
                 if (historyBadge) { historyBadge.textContent = 'CCS'; historyBadge.className = 'city-badge city-badge-ccs text-sm'; }
             } else if (currentCity === 'guar') {
-                badge.textContent = 'Guarenas';
-                badge.className = 'city-badge city-badge-guar';
+                badge.textContent = 'Guarenas'; badge.className = 'city-badge city-badge-guar';
                 if (historyBadge) { historyBadge.textContent = 'Guarenas'; historyBadge.className = 'city-badge city-badge-guar text-sm'; }
             } else if (currentCity === 'mso') {
-                badge.textContent = 'MSO';
-                badge.className = 'city-badge city-badge-mso';
+                badge.textContent = 'MSO'; badge.className = 'city-badge city-badge-mso';
                 if (historyBadge) { historyBadge.textContent = 'MSO'; historyBadge.className = 'city-badge city-badge-mso text-sm'; }
             }
         }
@@ -635,21 +700,18 @@
         async function initializeApplication() {
             if (!window.firebaseDb || !window.firebaseFunctions) {
                 console.error("Firebase no inicializado");
-                displayMessage('Error: Firebase no se pudo inicializar', 'error');
+                alert('Error: Firebase no se pudo inicializar');
                 return;
             }
             db = window.firebaseDb;
             firebaseFunctions = window.firebaseFunctions;
-            console.log("Firebase configurado correctamente");
-            console.log("Perfil actual:", currentProfile, "Ciudad:", currentCity);
             setupTabNavigation();
             await initializeAppContent();
-            
-            const fixBtn = document.getElementById('fixCityBtn');
-            if (fixBtn) {
-                const isAdmin = currentProfile === 'admin_ccs' || currentProfile === 'admin_guar';
-                fixBtn.style.display = isAdmin ? 'inline-block' : 'none';
-            }
+            const isAdmin = currentProfile === 'admin_ccs' || currentProfile === 'admin_guar';
+            ['fixCityBtn', 'fixTotalsBtn', 'auditBtn'].forEach(id => {
+                const btn = document.getElementById(id);
+                if (btn) btn.style.display = isAdmin ? 'inline-block' : 'none';
+            });
         }
 
         function setupTabNavigation() {
@@ -720,87 +782,54 @@
             const isUserCcs = currentProfile === 'user_ccs';
             const isUserGuar = currentProfile === 'user_guar';
 
-            console.log("Estado de perfiles:", { isAdminCcs, isAdminGuar, isUserCcs, isUserGuar, isPresidencia });
+            function getConfig() { return getCityConfig(currentCity); }
 
-            function getConfig() {
-                return getCityConfig(currentCity);
-            }
-
-            // ============================================================================
-            // CORRECCIÓN PRINCIPAL
-            // Admin CCS y Usuario CCS: ven CCS + MSO (Presidencia, Personal Visitante, etc.)
-            // Admin Guarenas y Usuario Guarenas: ven solo Guar
-            // Presidencia: ve solo MSO (lo suyo)
-            // ============================================================================
             function getFilteredRequestsForDisplay() {
                 let requests = foodRequests.slice();
-
                 if (isAdminCcs || isUserCcs) {
-                    // CCS + MSO: porque Presidencia y Personal Visitante pertenecen a MSO
-                    requests = requests.filter(req => 
-                        req.city === 'ccs' || 
-                        !req.city || 
-                        req.city === '' || 
-                        req.city === 'mso'
-                    );
-                }
-                else if (isAdminGuar || isUserGuar) {
-                    // Solo Guarenas
+                    requests = requests.filter(req => req.city === 'ccs' || !req.city || req.city === '' || req.city === 'mso');
+                } else if (isAdminGuar || isUserGuar) {
                     requests = requests.filter(req => req.city === 'guar');
-                }
-                else if (isPresidencia) {
-                    // Presidencia ve solo lo de MSO (department === 'MSO')
+                } else if (isPresidencia) {
                     requests = requests.filter(req => req.department === 'MSO');
                 }
-                
                 return requests;
             }
 
-            function getFilteredApprovedRequests() {
-                const filtered = getFilteredRequestsForDisplay();
-                // Si es Presidencia y no hay filtros activos, aplicar filtro por defecto
-                // para que vea solo Presidencia (no Personal Visitante) en su historial
-                if (isPresidencia && activeFilters.length === 0) {
-                    return filtered.filter(r => r.status === 'aprobado' && r.msoDepartment === 'Presidencia');
-                }
-                return filtered.filter(r => r.status === 'aprobado');
-            }
+            function getApprover(department, msoDepartment) { return getConfig().getApprover(department, msoDepartment); }
 
-            function getUnitDisplayName() {
-                if (isAdminGuar || isUserGuar) {
-                    return 'Guarenas';
-                }
-                return 'CCS';
+            function escapeHtml(str) {
+                if (!str) return '';
+                return str.replace(/[&<>]/g, function(m) {
+                    if (m === '&') return '&amp;';
+                    if (m === '<') return '&lt;';
+                    if (m === '>') return '&gt;';
+                    return m;
+                });
             }
 
             function loadCityData() {
                 const config = getConfig();
                 const isPresidenciaProfile = currentProfile === 'presidencia';
-                
                 departmentSelect.innerHTML = `<option value="" disabled selected>Selecciona un Departamento</option>`;
                 if (isPresidenciaProfile) {
                     const opt = document.createElement('option');
-                    opt.value = 'MSO';
-                    opt.textContent = 'MSO';
+                    opt.value = 'MSO'; opt.textContent = 'MSO';
                     departmentSelect.appendChild(opt);
                     departmentSelect.value = 'MSO';
                 } else {
                     config.departments.forEach(d => {
                         const opt = document.createElement('option');
-                        opt.value = d;
-                        opt.textContent = d;
+                        opt.value = d; opt.textContent = d;
                         departmentSelect.appendChild(opt);
                     });
                 }
-                
                 providerNameSelect.innerHTML = `<option value="" disabled selected>Selecciona un Proveedor</option>`;
                 config.providers.forEach(p => {
                     const opt = document.createElement('option');
-                    opt.value = p;
-                    opt.textContent = p;
+                    opt.value = p; opt.textContent = p;
                     providerNameSelect.appendChild(opt);
                 });
-                
                 const externalContainer = document.getElementById('externalStaffContainer');
                 if (externalContainer) {
                     externalContainer.innerHTML = '';
@@ -848,7 +877,6 @@
                         });
                     });
                 }
-                
                 if (isPresidenciaProfile) {
                     msoObservationsContainer.classList.remove('hidden');
                     msoObservationsContainer.classList.remove('mso-hidden');
@@ -858,7 +886,6 @@
                 } else {
                     msoObservationsContainer.classList.remove('mso-hidden');
                 }
-                
                 updateCityBadge();
                 selectedInterStaff = [];
                 renderSelectedStaff();
@@ -866,46 +893,20 @@
                 calculateTotalCost();
             }
 
-            function getStaffList() {
-                return getConfig().staffList || [];
-            }
-
-            function getApprover(department, msoDepartment) {
-                return getConfig().getApprover(department, msoDepartment);
-            }
-
-            function formatDepartmentName(deptKey) {
-                if (!deptKey) return '';
-                if (deptKey.includes('C.O')) {
-                    const parts = deptKey.split(' ');
-                    if (parts.length >= 3) {
-                        const rest = parts.slice(2).join(' ').toLowerCase();
-                        const formatted = rest.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
-                        return `C.O ${formatted}`;
-                    }
-                    return deptKey;
-                }
-                const special = ['MSO', 'CCS', 'DPTO', 'G', 'RRHH'];
-                return deptKey.split(' ').map(w => special.includes(w.toUpperCase()) ? w.toUpperCase() : w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
-            }
+            function getStaffList() { return getConfig().staffList || []; }
 
             function calculateTotalQuantity() {
-                let externalTotal = 0;
-                let internalTotal = 0;
+                let externalTotal = 0, internalTotal = 0;
                 const isAdminOrUser = isAdmin || isUser;
                 if (isAdminOrUser) {
-                    const externalInputs = document.querySelectorAll('input[type="number"][id^="quantity"]');
-                    externalInputs.forEach(input => {
+                    document.querySelectorAll('input[type="number"][id^="quantity"]').forEach(input => {
                         externalTotal += parseInt(input.value) || 0;
                     });
                     internalTotal = selectedInterStaff.length;
-                    const total = externalTotal + internalTotal;
-                    if (totalQuantityInput) totalQuantityInput.value = total;
-                    return total;
-                } else if (isPresidencia) {
-                    return parseInt(totalQuantityInput.value) || 0;
                 }
-                return 0;
+                const total = externalTotal + internalTotal;
+                if (totalQuantityInput) totalQuantityInput.value = total;
+                return total;
             }
 
             function calculateTotalCost() {
@@ -926,10 +927,7 @@
                 selectedInterStaff.forEach(name => {
                     const li = document.createElement('li');
                     li.className = 'flex items-center justify-between text-sm bg-blue-50 p-2 rounded';
-                    li.innerHTML = `
-                        <span class="text-gray-700 truncate">${escapeHtml(name)}</span>
-                        <button type="button" data-name="${escapeHtml(name)}" class="remove-staff-btn text-red-500 hover:text-red-700 ml-2 font-bold px-2">&times;</button>
-                    `;
+                    li.innerHTML = `<span class="text-gray-700 truncate">${escapeHtml(name)}</span><button type="button" data-name="${escapeHtml(name)}" class="remove-staff-btn text-red-500 hover:text-red-700 ml-2 font-bold px-2">&times;</button>`;
                     interStaffSelectedList.appendChild(li);
                 });
                 interStaffSelectedList.querySelectorAll('.remove-staff-btn').forEach(btn => {
@@ -945,28 +943,12 @@
                 calculateTotalCost();
             }
 
-            function escapeHtml(str) {
-                if (!str) return '';
-                return str.replace(/[&<>]/g, function(m) {
-                    if (m === '&') return '&amp;';
-                    if (m === '<') return '&lt;';
-                    if (m === '>') return '&gt;';
-                    return m;
-                });
-            }
-
             if (interStaffSearchInput) {
                 interStaffSearchInput.addEventListener('input', () => {
                     const query = interStaffSearchInput.value.trim().toUpperCase();
                     interStaffSearchResults.innerHTML = '';
-                    if (query.length < 2) {
-                        interStaffSearchResults.classList.add('hidden');
-                        return;
-                    }
-                    const staff = getStaffList();
-                    const filtered = staff.filter(s => 
-                        s.name.includes(query) && !selectedInterStaff.includes(s.name)
-                    ).slice(0, 10);
+                    if (query.length < 2) { interStaffSearchResults.classList.add('hidden'); return; }
+                    const filtered = getStaffList().filter(s => s.name.includes(query) && !selectedInterStaff.includes(s.name)).slice(0, 10);
                     if (filtered.length > 0) {
                         filtered.forEach(s => {
                             const li = document.createElement('li');
@@ -993,12 +975,8 @@
 
             if (deliveryFree && deliveryCostOption && deliveryCostInput) {
                 document.querySelectorAll('input[name="deliveryOption"]').forEach(radio => radio.addEventListener('change', () => {
-                    if (deliveryCostOption.checked && !isUser) {
-                        deliveryCostInput.classList.remove('hidden');
-                    } else {
-                        deliveryCostInput.classList.add('hidden');
-                        deliveryCostInput.value = '0.00';
-                    }
+                    if (deliveryCostOption.checked && !isUser) deliveryCostInput.classList.remove('hidden');
+                    else { deliveryCostInput.classList.add('hidden'); deliveryCostInput.value = '0.00'; }
                     calculateTotalCost();
                 }));
             }
@@ -1030,20 +1008,16 @@
             function addCancelEditButton() {
                 if (!document.getElementById('cancelEditBtn')) {
                     const btn = document.createElement('button');
-                    btn.id = 'cancelEditBtn';
-                    btn.type = 'button';
-                    btn.textContent = 'Cancelar Edición';
+                    btn.id = 'cancelEditBtn'; btn.type = 'button'; btn.textContent = 'Cancelar Edición';
                     btn.className = 'bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-lg shadow-md w-full sm:w-auto mt-2 sm:mt-0';
                     btn.addEventListener('click', resetFormAndEditing);
                     formActionsContainer.insertBefore(btn, submitButton);
                 }
             }
-            
             function removeCancelEditButton() {
                 const btn = document.getElementById('cancelEditBtn');
                 if (btn) btn.remove();
             }
-            
             function resetFormAndEditing() {
                 form.reset();
                 initializeForm();
@@ -1072,10 +1046,7 @@
                     if (cb) {
                         cb.checked = false;
                         const qi = document.getElementById(`quantity${cb.value}`);
-                        if (qi) {
-                            qi.value = '0';
-                            qi.classList.add('hidden-quantity');
-                        }
+                        if (qi) { qi.value = '0'; qi.classList.add('hidden-quantity'); }
                     }
                 });
                 selectedInterStaff = [];
@@ -1095,7 +1066,6 @@
             function updateUIForProfile() {
                 const config = getConfig();
                 const isPresidenciaProfile = currentProfile === 'presidencia';
-
                 if (isPresidenciaProfile) {
                     departmentSelect.innerHTML = `<option value="" disabled selected>Selecciona un Departamento</option><option value="MSO">MSO</option>`;
                     departmentSelect.value = 'MSO';
@@ -1104,28 +1074,22 @@
                     eventSelect.innerHTML = `<option value="" disabled selected>Selecciona un Evento</option><option value="Evento extraordinario">Evento extraordinario</option><option value="Otros">Otros</option>`;
                     msoObservationsContainer.classList.remove('hidden');
                     msoObservationsContainer.classList.remove('mso-hidden');
-                    unitCostInput.disabled = false;
-                    unitCostInput.classList.remove('disabled-field');
-                    deliveryFree.disabled = false;
-                    deliveryCostOption.disabled = false;
-                    deliveryCostInput.disabled = false;
-                    deliveryCostInput.classList.remove('disabled-field');
-                    providerNameSelect.disabled = false;
-                    providerNameSelect.classList.remove('readonly-field');
+                    unitCostInput.disabled = false; unitCostInput.classList.remove('disabled-field');
+                    deliveryFree.disabled = false; deliveryCostOption.disabled = false;
+                    deliveryCostInput.disabled = false; deliveryCostInput.classList.remove('disabled-field');
+                    providerNameSelect.disabled = false; providerNameSelect.classList.remove('readonly-field');
                     providerNameSelect.required = true;
                     providerNameSelect.innerHTML = `<option value="" disabled selected>Selecciona un Proveedor</option>`;
                     config.providers.forEach(p => {
                         const opt = document.createElement('option');
-                        opt.value = p;
-                        opt.textContent = p;
+                        opt.value = p; opt.textContent = p;
                         providerNameSelect.appendChild(opt);
                     });
                 } else if (isUser) {
                     departmentSelect.innerHTML = `<option value="" disabled selected>Selecciona un Departamento</option>`;
                     config.departments.forEach(d => {
                         const opt = document.createElement('option');
-                        opt.value = d;
-                        opt.textContent = d;
+                        opt.value = d; opt.textContent = d;
                         departmentSelect.appendChild(opt);
                     });
                     if (!config.hasMSO) {
@@ -1134,32 +1098,23 @@
                     }
                     msoObservationsSelect.innerHTML = `<option value="" selected>Selecciona departamento MSO</option><option value="Marketing">Marketing</option><option value="Presidencia">Presidencia</option><option value="Interconexiones">Interconexiones</option><option value="Importaciones">Importaciones</option><option value="RRHH MSO">RRHH MSO</option><option value="Documentacion de obras">Documentación de obras</option><option value="Logistica">Logística</option><option value="Personal Visitante">Personal Visitante</option><option value="Backbone">Backbone</option>`;
                     eventSelect.innerHTML = `<option value="" disabled selected>Selecciona un Evento</option><option value="Evento extraordinario">Evento extraordinario</option><option value="Corte de fibra">Corte de fibra</option><option value="Mantenimiento de red">Mantenimiento de red</option><option value="Feeder y obras">Feeder y obras</option><option value="Ventas en calle">Ventas en calle</option><option value="Ventana de mantenimiento">Ventana de mantenimiento</option><option value="Transporte y flota">Transporte y flota</option><option value="Otros">Otros</option>`;
-                    unitCostInput.disabled = true;
-                    unitCostInput.value = '0.00';
-                    unitCostInput.classList.add('disabled-field');
-                    deliveryFree.disabled = true;
-                    deliveryCostOption.disabled = true;
-                    deliveryCostInput.disabled = true;
-                    deliveryCostInput.classList.add('disabled-field');
-                    costInput.disabled = true;
-                    costInput.classList.add('disabled-field');
-                    providerNameSelect.disabled = true;
-                    providerNameSelect.classList.add('readonly-field');
+                    unitCostInput.disabled = true; unitCostInput.value = '0.00'; unitCostInput.classList.add('disabled-field');
+                    deliveryFree.disabled = true; deliveryCostOption.disabled = true;
+                    deliveryCostInput.disabled = true; deliveryCostInput.classList.add('disabled-field');
+                    costInput.disabled = true; costInput.classList.add('disabled-field');
+                    providerNameSelect.disabled = true; providerNameSelect.classList.add('readonly-field');
                     providerNameSelect.removeAttribute('required');
                     providerNameSelect.innerHTML = `<option value="" disabled selected>Selecciona un Proveedor</option>`;
                     config.providers.forEach(p => {
                         const opt = document.createElement('option');
-                        opt.value = p;
-                        opt.textContent = p;
+                        opt.value = p; opt.textContent = p;
                         providerNameSelect.appendChild(opt);
                     });
                 } else {
-                    // ADMIN
                     departmentSelect.innerHTML = `<option value="" disabled selected>Selecciona un Departamento</option>`;
                     config.departments.forEach(d => {
                         const opt = document.createElement('option');
-                        opt.value = d;
-                        opt.textContent = d;
+                        opt.value = d; opt.textContent = d;
                         departmentSelect.appendChild(opt);
                     });
                     if (!config.hasMSO) {
@@ -1168,22 +1123,16 @@
                     }
                     msoObservationsSelect.innerHTML = `<option value="" selected>Selecciona departamento MSO</option><option value="Marketing">Marketing</option><option value="Presidencia">Presidencia</option><option value="Interconexiones">Interconexiones</option><option value="Importaciones">Importaciones</option><option value="RRHH MSO">RRHH MSO</option><option value="Documentacion de obras">Documentación de obras</option><option value="Logistica">Logística</option><option value="Personal Visitante">Personal Visitante</option><option value="Backbone">Backbone</option>`;
                     eventSelect.innerHTML = `<option value="" disabled selected>Selecciona un Evento</option><option value="Evento extraordinario">Evento extraordinario</option><option value="Corte de fibra">Corte de fibra</option><option value="Mantenimiento de red">Mantenimiento de red</option><option value="Feeder y obras">Feeder y obras</option><option value="Ventas en calle">Ventas en calle</option><option value="Ventana de mantenimiento">Ventana de mantenimiento</option><option value="Transporte y flota">Transporte y flota</option><option value="Otros">Otros</option>`;
-                    unitCostInput.disabled = false;
-                    unitCostInput.classList.remove('disabled-field');
-                    deliveryFree.disabled = false;
-                    deliveryCostOption.disabled = false;
-                    deliveryCostInput.disabled = false;
-                    deliveryCostInput.classList.remove('disabled-field');
-                    costInput.disabled = false;
-                    costInput.classList.remove('disabled-field');
-                    providerNameSelect.disabled = false;
-                    providerNameSelect.classList.remove('readonly-field');
+                    unitCostInput.disabled = false; unitCostInput.classList.remove('disabled-field');
+                    deliveryFree.disabled = false; deliveryCostOption.disabled = false;
+                    deliveryCostInput.disabled = false; deliveryCostInput.classList.remove('disabled-field');
+                    costInput.disabled = false; costInput.classList.remove('disabled-field');
+                    providerNameSelect.disabled = false; providerNameSelect.classList.remove('readonly-field');
                     providerNameSelect.required = true;
                     providerNameSelect.innerHTML = `<option value="" disabled selected>Selecciona un Proveedor</option>`;
                     config.providers.forEach(p => {
                         const opt = document.createElement('option');
-                        opt.value = p;
-                        opt.textContent = p;
+                        opt.value = p; opt.textContent = p;
                         providerNameSelect.appendChild(opt);
                     });
                 }
@@ -1198,27 +1147,21 @@
             }
 
             async function addRequestToFirestore(request) {
-                try {
-                    const docRef = await firebaseFunctions.addDoc(firebaseFunctions.collection(db, 'foodRequests'), request);
-                    return { ...request, firestoreId: docRef.id };
-                } catch(e) { throw e; }
+                const docRef = await firebaseFunctions.addDoc(firebaseFunctions.collection(db, 'foodRequests'), request);
+                return { ...request, firestoreId: docRef.id };
             }
             async function updateRequestInFirestore(requestId, updatedData) {
-                try {
-                    const q = firebaseFunctions.query(firebaseFunctions.collection(db, 'foodRequests'), firebaseFunctions.where('id', '==', requestId));
-                    const snap = await firebaseFunctions.getDocs(q);
-                    if (!snap.empty) await firebaseFunctions.updateDoc(firebaseFunctions.doc(db, 'foodRequests', snap.docs[0].id), updatedData);
-                } catch(e) { throw e; }
+                const q = firebaseFunctions.query(firebaseFunctions.collection(db, 'foodRequests'), firebaseFunctions.where('id', '==', requestId));
+                const snap = await firebaseFunctions.getDocs(q);
+                if (!snap.empty) await firebaseFunctions.updateDoc(firebaseFunctions.doc(db, 'foodRequests', snap.docs[0].id), updatedData);
             }
             async function deleteRequestsFromFirestore(requestIds) {
-                try {
-                    const ref = firebaseFunctions.collection(db, 'foodRequests');
-                    await Promise.all(requestIds.map(async id => {
-                        const q = firebaseFunctions.query(ref, firebaseFunctions.where('id', '==', id));
-                        const snap = await firebaseFunctions.getDocs(q);
-                        if (!snap.empty) await firebaseFunctions.deleteDoc(firebaseFunctions.doc(db, 'foodRequests', snap.docs[0].id));
-                    }));
-                } catch(e) { throw e; }
+                const ref = firebaseFunctions.collection(db, 'foodRequests');
+                await Promise.all(requestIds.map(async id => {
+                    const q = firebaseFunctions.query(ref, firebaseFunctions.where('id', '==', id));
+                    const snap = await firebaseFunctions.getDocs(q);
+                    if (!snap.empty) await firebaseFunctions.deleteDoc(firebaseFunctions.doc(db, 'foodRequests', snap.docs[0].id));
+                }));
             }
             async function loadRequests() {
                 try {
@@ -1246,15 +1189,6 @@
                     return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
                 } catch(e) { return null; }
             }
-            function formatDateForDisplay(ds) {
-                const nd = normalizeDate(ds);
-                if (!nd) return '';
-                return new Date(nd+'T12:00:00').toLocaleDateString('es-ES', { day:'2-digit', month:'2-digit', year:'numeric' });
-            }
-            function formatDateForFilename(ds) {
-                const nd = normalizeDate(ds);
-                return nd ? nd.replace(/-/g,'') : '';
-            }
 
             window.editRequest = (id) => {
                 const req = foodRequests.find(r => r.id === id);
@@ -1268,7 +1202,6 @@
                 unitCostInput.value = parseFloat(req.unitCost || 0).toFixed(2);
                 providerNameSelect.value = req.providerName || '';
                 reasonTextarea.value = req.reason || '';
-                totalQuantityInput.value = req.totalQuantity || 0;
                 const config = getConfig();
                 const isPresidenciaProfile = currentProfile === 'presidencia';
                 if (req.department === 'MSO' && (config.hasMSO || isPresidenciaProfile)) {
@@ -1289,10 +1222,13 @@
                     });
                     if (req.externalStaff) {
                         Object.keys(req.externalStaff).forEach(k => {
-                            const qty = req.externalStaff[k];
+                            let kNorm = k;
+                            if (k === 'ExternalOthers') kNorm = 'Otros';
+                            if (k === 'OtrosGuar') kNorm = 'Otros';
+                            const qty = parseInt(req.externalStaff[k]) || 0;
                             if (qty > 0) {
-                                const cb = document.getElementById(`check${k}`);
-                                const qi = document.getElementById(`quantity${k}`);
+                                const cb = document.getElementById(`check${kNorm}`);
+                                const qi = document.getElementById(`quantity${kNorm}`);
                                 if (cb && qi) { cb.checked = true; qi.value = qty; qi.classList.remove('hidden-quantity'); }
                             }
                         });
@@ -1302,17 +1238,20 @@
                 }
                 const delCost = parseFloat(req.deliveryCost || 0);
                 if (delCost > 0 && !isUser) {
-                    deliveryCostOption.checked = true;
-                    deliveryFree.checked = false;
+                    deliveryCostOption.checked = true; deliveryFree.checked = false;
                     deliveryCostInput.value = delCost.toFixed(2);
                     deliveryCostInput.classList.remove('hidden');
                 } else {
-                    deliveryFree.checked = true;
-                    deliveryCostOption.checked = false;
+                    deliveryFree.checked = true; deliveryCostOption.checked = false;
                     deliveryCostInput.value = '0.00';
                     deliveryCostInput.classList.add('hidden');
                 }
                 calculateTotalCost();
+                const totalRecalc = calculateTotalQuantity();
+                if (totalRecalc !== (req.totalQuantity || 0)) {
+                    console.warn(`⚠️ Discrepancia en solicitud ${id}: guardado=${req.totalQuantity}, recalculado=${totalRecalc}`);
+                    totalQuantityInput.value = req.totalQuantity || 0;
+                }
                 submitButton.textContent = 'Guardar Cambios';
                 submitButton.classList.remove('bg-inter-primary', 'hover:bg-blue-700');
                 submitButton.classList.add('bg-green-600', 'hover:bg-green-700');
@@ -1321,60 +1260,8 @@
             };
 
             window.approveRequest = (id) => {
-                const req = foodRequests.find(r => r.id === id);
-                if (!req) return;
-                editingRequestId = id;
-                departmentSelect.value = req.department;
-                mealTypeSelect.value = req.mealType;
-                eventSelect.value = req.event || '';
-                deliveryPlaceInput.value = req.deliveryPlace;
-                deliveryDateTimeInput.value = normalizeDate(req.deliveryDate) || '';
-                providerNameSelect.value = req.providerName || '';
-                reasonTextarea.value = req.reason || '';
-                totalQuantityInput.value = req.totalQuantity || 0;
-                if (req.externalStaff) {
-                    Object.keys(req.externalStaff).forEach(k => {
-                        const qty = req.externalStaff[k];
-                        if (qty > 0) {
-                            const cb = document.getElementById(`check${k}`);
-                            const qi = document.getElementById(`quantity${k}`);
-                            if (cb && qi) { cb.checked = true; qi.value = qty; qi.classList.remove('hidden-quantity'); }
-                        }
-                    });
-                }
-                if (req.interStaff && req.interStaff.length > 0) {
-                    selectedInterStaff = [...req.interStaff];
-                    renderSelectedStaff();
-                }
-                unitCostInput.disabled = false;
-                unitCostInput.classList.remove('disabled-field');
-                unitCostInput.value = parseFloat(req.unitCost || 0).toFixed(2);
-                if (parseFloat(req.deliveryCost || 0) > 0) {
-                    deliveryCostOption.checked = true;
-                    deliveryFree.checked = false;
-                    deliveryCostInput.disabled = false;
-                    deliveryCostInput.value = parseFloat(req.deliveryCost || 0).toFixed(2);
-                    deliveryCostInput.classList.remove('disabled-field');
-                    deliveryCostInput.classList.remove('hidden');
-                } else {
-                    deliveryFree.checked = true;
-                    deliveryCostOption.checked = false;
-                    deliveryCostInput.value = '0.00';
-                    deliveryCostInput.classList.add('hidden');
-                }
-                const config = getConfig();
-                const isPresidenciaProfile = currentProfile === 'presidencia';
-                if (req.department === 'MSO' && (config.hasMSO || isPresidenciaProfile)) {
-                    msoObservationsContainer.classList.remove('hidden');
-                    msoObservationsContainer.classList.remove('mso-hidden');
-                    msoObservationsSelect.value = req.msoDepartment || '';
-                }
-                calculateTotalCost();
+                window.editRequest(id);
                 submitButton.textContent = 'Aprobar y Guardar';
-                submitButton.classList.remove('bg-inter-primary', 'hover:bg-blue-700');
-                submitButton.classList.add('bg-green-600', 'hover:bg-green-700');
-                addCancelEditButton();
-                window.scrollTo({ top: 0, behavior: 'smooth' });
             };
 
             form.addEventListener('submit', async (e) => {
@@ -1389,9 +1276,9 @@
                     });
                 }
                 const totalQty = calculateTotalQuantity();
-                let totalCost = parseFloat(costInput.value) || 0;
                 const delCost = deliveryFree.checked ? 0 : (parseFloat(deliveryCostInput.value) || 0);
-                if (isUser) totalCost = 0;
+                const unitCostVal = isUser ? 0 : (parseFloat(unitCostInput.value) || 0);
+                const totalCost = isUser ? 0 : ((totalQty * unitCostVal) + delCost);
                 if (totalQty === 0) { displayMessage('El total de comidas debe ser mayor a 0.', 'error'); return; }
                 if (!departmentSelect.value) { displayMessage('Debe seleccionar un Departamento/Área.', 'error'); return; }
                 if (!isUser && !providerNameSelect.value) { displayMessage('Debe seleccionar un Proveedor.', 'error'); return; }
@@ -1401,23 +1288,17 @@
                 const approver = getApprover(departmentSelect.value, msoObservationsSelect.value);
                 const newReq = {
                     id: editingRequestId || Date.now(),
-                    department: departmentSelect.value,
-                    mealType: mealTypeSelect.value,
-                    event: eventSelect.value,
-                    externalStaff: externalStaffData,
+                    department: departmentSelect.value, mealType: mealTypeSelect.value,
+                    event: eventSelect.value, externalStaff: externalStaffData,
                     interStaff: isAdminOrUser ? [...selectedInterStaff] : [],
-                    totalQuantity: totalQty,
-                    deliveryPlace: deliveryPlaceInput.value,
+                    totalQuantity: totalQty, deliveryPlace: deliveryPlaceInput.value,
                     deliveryDate: deliveryDateTimeInput.value,
-                    unitCost: isUser ? 0 : (parseFloat(unitCostInput.value) || 0),
-                    deliveryCost: isUser ? 0 : delCost,
-                    totalCost: totalCost,
+                    unitCost: unitCostVal, deliveryCost: delCost, totalCost: totalCost,
                     providerName: providerNameSelect.value || (isUser ? 'Por definir' : ''),
-                    reason: reasonTextarea.value,
-                    registrationDate: new Date().toISOString(),
-                    approvedBy: approver,
-                    status: status,
-                    city: currentCity
+                    reason: reasonTextarea.value, registrationDate: new Date().toISOString(),
+                    approvedBy: approver, status: status, city: currentCity,
+                    externalStaffTotal: Object.values(externalStaffData).reduce((a,b) => a+b, 0),
+                    interStaffTotal: isAdminOrUser ? selectedInterStaff.length : 0
                 };
                 const config = getConfig();
                 const isPresidenciaProfile = currentProfile === 'presidencia';
@@ -1440,35 +1321,23 @@
                     }
                     renderTable(getFilteredRequestsForDisplay());
                     updateSummaryTotals(getFilteredRequestsForDisplay());
-                    if (isAdmin) {
-                        updateCharts();
-                        if (reportMonthInput && reportMonthInput.value) generateReport();
-                    }
-                } catch(e) {
-                    displayMessage('Error al guardar: '+e.message, 'error');
-                }
+                } catch(e) { displayMessage('Error al guardar: '+e.message, 'error'); }
             });
 
             function formatCost(c) { return `$${parseFloat(c || 0).toFixed(2)}`; }
 
             function renderTable(requests = foodRequests) {
                 let filtered = getFilteredRequestsForDisplay();
-                
-                // Si es Presidencia y NO hay filtros activos, mostrar solo Presidencia por defecto
                 if (isPresidencia && activeFilters.length === 0) {
                     filtered = filtered.filter(r => r.msoDepartment === 'Presidencia');
                 }
-                
                 if (activeFilters.length) {
                     filtered = filtered.filter(r => activeFilters.every(f => {
                         const t = f.term.toLowerCase();
-                        if (f.field === 'all') return r.department.toLowerCase().includes(t) || r.mealType.toLowerCase().includes(t) || r.deliveryPlace.toLowerCase().includes(t) || r.providerName.toLowerCase().includes(t) || r.reason.toLowerCase().includes(t) || (r.interStaff && r.interStaff.some(s => s.toLowerCase().includes(t))) || (r.msoDepartment && r.msoDepartment.toLowerCase().includes(t));
-                        if (f.field === 'department') {
-                            return r.department.toLowerCase().includes(t) || 
-                                   (r.msoDepartment && r.msoDepartment.toLowerCase().includes(t));
-                        }
-                        if (f.field === 'mealType') return r.mealType.toLowerCase().includes(t);
-                        if (f.field === 'provider') return r.providerName.toLowerCase().includes(t);
+                        if (f.field === 'all') return (r.department||'').toLowerCase().includes(t) || (r.mealType||'').toLowerCase().includes(t) || (r.deliveryPlace||'').toLowerCase().includes(t) || (r.providerName||'').toLowerCase().includes(t) || (r.reason||'').toLowerCase().includes(t) || (r.interStaff && r.interStaff.some(s => s.toLowerCase().includes(t))) || (r.msoDepartment && r.msoDepartment.toLowerCase().includes(t));
+                        if (f.field === 'department') return (r.department||'').toLowerCase().includes(t) || (r.msoDepartment && r.msoDepartment.toLowerCase().includes(t));
+                        if (f.field === 'mealType') return (r.mealType||'').toLowerCase().includes(t);
+                        if (f.field === 'provider') return (r.providerName||'').toLowerCase().includes(t);
                         if (f.field === 'staff') return r.interStaff && r.interStaff.some(s => s.toLowerCase().includes(t));
                         return true;
                     }));
@@ -1482,9 +1351,13 @@
                 }
                 noRequestsMessage.classList.add('hidden');
                 tableView.classList.remove('hidden');
-
                 filtered.forEach(r => {
-                    const extText = r.externalStaff ? Object.keys(r.externalStaff).map(k => `${k} (${r.externalStaff[k]})`).join(', ') : 'N/A';
+                    const extText = r.externalStaff ? Object.keys(r.externalStaff).map(k => {
+                        let kNorm = k;
+                        if (k === 'ExternalOthers') kNorm = 'Otros';
+                        if (k === 'OtrosGuar') kNorm = 'Otros';
+                        return `${kNorm} (${r.externalStaff[k]})`;
+                    }).join(', ') : 'N/A';
                     const interText = r.interStaff ? r.interStaff.join(', ') : 'N/A';
                     const dispDate = new Date(r.deliveryDate+'T12:00:00').toLocaleDateString('es-ES', { year: 'numeric', month: '2-digit', day: '2-digit' });
                     const dispDept = r.department === 'MSO' && r.msoDepartment ? `${r.department} (${r.msoDepartment})` : r.department;
@@ -1493,9 +1366,9 @@
                     const cityBadge = r.city === 'guar' ? '<span class="city-badge city-badge-guar text-xs">Guarenas</span>' : '<span class="city-badge city-badge-ccs text-xs">CCS</span>';
                     const row = tableBody.insertRow();
                     if (isAdmin) {
-                        const actions = r.status === 'pendiente' ? 
-                            `<button onclick="approveRequest(${r.id})" class="bg-green-500 hover:bg-green-600 text-white py-1 px-2 rounded-md text-xs">Aprobar</button><button onclick="editRequest(${r.id})" class="bg-blue-500 hover:bg-blue-600 text-white py-1 px-2 rounded-md text-xs">Editar</button><button onclick="deleteSingleRequest(${r.id})" class="bg-red-500 hover:bg-red-600 text-white py-1 px-2 rounded-md text-xs">Eliminar</button>` :
-                            `<button onclick="editRequest(${r.id})" class="bg-blue-500 hover:bg-blue-600 text-white py-1 px-2 rounded-md text-xs">Editar</button><button onclick="deleteSingleRequest(${r.id})" class="bg-red-500 hover:bg-red-600 text-white py-1 px-2 rounded-md text-xs">Eliminar</button>`;
+                        const actions = r.status === 'pendiente'
+                            ? `<button onclick="approveRequest(${r.id})" class="bg-green-500 hover:bg-green-600 text-white py-1 px-2 rounded-md text-xs">Aprobar</button><button onclick="editRequest(${r.id})" class="bg-blue-500 hover:bg-blue-600 text-white py-1 px-2 rounded-md text-xs">Editar</button><button onclick="deleteSingleRequest(${r.id})" class="bg-red-500 hover:bg-red-600 text-white py-1 px-2 rounded-md text-xs">Eliminar</button>`
+                            : `<button onclick="editRequest(${r.id})" class="bg-blue-500 hover:bg-blue-600 text-white py-1 px-2 rounded-md text-xs">Editar</button><button onclick="deleteSingleRequest(${r.id})" class="bg-red-500 hover:bg-red-600 text-white py-1 px-2 rounded-md text-xs">Eliminar</button>`;
                         row.innerHTML = `<td class="px-4 py-3"><input type="checkbox" data-id="${r.id}" class="row-checkbox"></td><td class="px-4 py-3 text-sm">${dispDate}</td><td class="px-4 py-3 text-sm">${escapeHtml(dispDept)}</td><td class="px-4 py-3 text-sm">${r.mealType}</td><td class="px-4 py-3 text-sm">${escapeHtml(extText)}</td><td class="px-4 py-3 text-sm">${escapeHtml(interText)}</td><td class="px-4 py-3 text-right">${r.totalQuantity}</td><td class="px-4 py-3 text-right font-bold">${formatCost(r.totalCost)}</td><td class="px-4 py-3 text-center">${badge}</td><td class="px-4 py-3 text-right"><div class="action-cell">${actions}</div></td><td class="px-4 py-3 text-center text-sm">${escapeHtml(approver)}</td><td class="px-4 py-3 text-center text-sm">${cityBadge}</td>`;
                     } else if (isPresidencia) {
                         row.innerHTML = `<td class="px-4 py-3"><input type="checkbox" data-id="${r.id}" class="row-checkbox"></td><td class="px-4 py-3 text-sm">${dispDate}</td><td class="px-4 py-3 text-sm">${escapeHtml(dispDept)}</td><td class="px-4 py-3 text-sm">${r.mealType}</td><td class="px-4 py-3 text-right">${r.totalQuantity}</td><td class="px-4 py-3 text-right font-bold">${formatCost(r.totalCost)}</td><td class="px-4 py-3 text-center">${badge}</td><td class="px-4 py-3 text-right"><div class="action-cell"><button onclick="editRequest(${r.id})" class="bg-blue-500 hover:bg-blue-600 text-white py-1 px-2 rounded-md text-xs">Editar</button><button onclick="deleteSingleRequest(${r.id})" class="bg-red-500 hover:bg-red-600 text-white py-1 px-2 rounded-md text-xs">Eliminar</button></div></td><td class="px-4 py-3 text-center text-sm">${escapeHtml(approver)}</td><td class="px-4 py-3 text-center text-sm">${cityBadge}</td>`;
@@ -1507,25 +1380,17 @@
             }
 
             window.deleteSingleRequest = (id) => {
-                const selected = [id];
                 modalText.textContent = '¿Estás seguro de que quieres eliminar esta solicitud?';
                 deleteModal.classList.remove('hidden');
                 confirmDeleteBtn.onclick = async () => {
                     try {
-                        await deleteRequestsFromFirestore(selected);
-                        foodRequests = foodRequests.filter(r => !selected.includes(r.id));
+                        await deleteRequestsFromFirestore([id]);
+                        foodRequests = foodRequests.filter(r => r.id !== id);
                         renderTable(getFilteredRequestsForDisplay());
                         updateSummaryTotals(getFilteredRequestsForDisplay());
-                        if (isAdmin) {
-                            updateCharts();
-                            if (reportMonthInput && reportMonthInput.value) generateReport();
-                        }
                         deleteModal.classList.add('hidden');
                         displayMessage('Solicitud eliminada.', 'success');
-                    } catch(e) {
-                        displayMessage('Error al eliminar: '+e.message, 'error');
-                        deleteModal.classList.add('hidden');
-                    }
+                    } catch(e) { displayMessage('Error al eliminar: '+e.message, 'error'); deleteModal.classList.add('hidden'); }
                 };
                 cancelDeleteBtn.onclick = () => deleteModal.classList.add('hidden');
             };
@@ -1540,7 +1405,8 @@
                     activeFiltersContainer.appendChild(tag);
                 });
                 document.querySelectorAll('.filter-tag-remove').forEach(btn => btn.addEventListener('click', function() {
-                    removeFilter(parseInt(this.getAttribute('data-index')));
+                    activeFilters.splice(parseInt(this.getAttribute('data-index')), 1);
+                    renderActiveFilters();
                 }));
                 renderTable();
             }
@@ -1550,7 +1416,7 @@
                 if (!term) { displayMessage('Ingrese un término', 'error'); return; }
                 let field = 'all';
                 const tl = term.toLowerCase();
-                if (['desayuno', 'almuerzo', 'cena', 'refrigerios'].some(t => tl.includes(t))) field = 'mealType';
+                if (['desayuno','almuerzo','cena','refrigerios'].some(t => tl.includes(t))) field = 'mealType';
                 else if (tl.includes('monteluso') || tl.includes('susi') || tl.includes('cumbes') || tl.includes('sub_brayan') || tl.includes('corporación')) field = 'provider';
                 else if (tl.split(' ').length >= 2) field = 'staff';
                 else if (tl.includes('admin') || tl.includes('comercial') || tl.includes('gerencia') || tl.includes('head') || tl.includes('mso') || tl.includes('ocad') || tl.includes('obras') || tl.includes('guarenas') || tl.includes('guatire') || tl.includes('presidencia') || tl.includes('visitante') || tl.includes('marketing') || tl.includes('interconexiones') || tl.includes('importaciones') || tl.includes('rrhh') || tl.includes('logistica') || tl.includes('backbone')) field = 'department';
@@ -1558,16 +1424,13 @@
                 filterInput.value = '';
                 renderActiveFilters();
             }
-            function removeFilter(i) { activeFilters.splice(i, 1); renderActiveFilters(); }
-            function clearAllFilters() { activeFilters = []; filterInput.value = ''; renderActiveFilters(); }
+
             addFilterBtn.addEventListener('click', addFilter);
             filterInput.addEventListener('keypress', e => { if (e.key === 'Enter') addFilter(); });
-            clearAllFiltersBtn.addEventListener('click', clearAllFilters);
-            if (selectAllCheckboxes) {
-                selectAllCheckboxes.addEventListener('change', e => {
-                    document.querySelectorAll('.row-checkbox').forEach(cb => { if (cb) cb.checked = e.target.checked; });
-                });
-            }
+            clearAllFiltersBtn.addEventListener('click', () => { activeFilters = []; filterInput.value = ''; renderActiveFilters(); });
+            if (selectAllCheckboxes) selectAllCheckboxes.addEventListener('change', e => {
+                document.querySelectorAll('.row-checkbox').forEach(cb => { if (cb) cb.checked = e.target.checked; });
+            });
             if (deleteSelectedBtn) {
                 deleteSelectedBtn.addEventListener('click', async () => {
                     const selected = Array.from(document.querySelectorAll('.row-checkbox:checked')).map(cb => parseInt(cb.getAttribute('data-id')));
@@ -1580,16 +1443,9 @@
                             foodRequests = foodRequests.filter(r => !selected.includes(r.id));
                             renderTable(getFilteredRequestsForDisplay());
                             updateSummaryTotals(getFilteredRequestsForDisplay());
-                            if (isAdmin) {
-                                updateCharts();
-                                if (reportMonthInput && reportMonthInput.value) generateReport();
-                            }
                             deleteModal.classList.add('hidden');
                             displayMessage('Solicitudes eliminadas.', 'success');
-                        } catch(e) {
-                            displayMessage('Error: '+e.message, 'error');
-                            deleteModal.classList.add('hidden');
-                        }
+                        } catch(e) { displayMessage('Error: '+e.message, 'error'); deleteModal.classList.add('hidden'); }
                     };
                     cancelDeleteBtn.onclick = () => deleteModal.classList.add('hidden');
                 });
@@ -1601,30 +1457,168 @@
                     toExp = toExp.filter(r => r.msoDepartment === 'Presidencia');
                 }
                 if (!toExp.length) { displayMessage('No hay datos para exportar', 'error'); return; }
-                const quote = s => `"${String(s || '').replace(/"/g, '""')}"`;
-                let csv = ["Fecha de Entrega;Departamento;Departamento MSO;Tipo de Comida;Evento;Personal Externo;Personal Inter;Total Comidas;Lugar de Entrega;Motivo;Proveedor;Costo Unitario;Costo Total Comida;Costo Delivery;Costo Total Final;Aprobado por;Estado;Ciudad"].join("\n") + "\n";
-                toExp.forEach(r => {
-                    const ext = r.externalStaff ? Object.keys(r.externalStaff).map(k => `${k}(${r.externalStaff[k]})`).join('|') : '';
-                    const inter = r.interStaff ? r.interStaff.join('|') : '';
-                    const totalComida = r.totalQuantity * r.unitCost;
-                    const row = [
-                        quote(r.deliveryDate), quote(r.department), quote(r.msoDepartment || ''),
-                        quote(r.mealType), quote(r.event || ''), quote(ext), quote(inter),
-                        r.totalQuantity, quote(r.deliveryPlace), quote(r.reason), quote(r.providerName),
-                        r.unitCost.toFixed(2).replace('.', ','), totalComida.toFixed(2).replace('.', ','),
-                        r.deliveryCost.toFixed(2).replace('.', ','), r.totalCost.toFixed(2).replace('.', ','),
-                        quote(r.approvedBy || ''), quote(r.status || 'aprobado'), quote(r.city || 'ccs')
-                    ];
-                    csv += row.join(";") + "\n";
+
+                const registrosAuditados = toExp.map(r => {
+                    const calc = calcularTotalesRegistro(r);
+                    return {
+                        ...r,
+                        externalStaffNorm: calc.externalStaffNormalizado,
+                        extTotal: calc.externalStaffTotal,
+                        interTotal: calc.interStaffTotal,
+                        totalQuantityCalc: calc.totalQuantity,
+                        unitCostCalc: calc.unitCost,
+                        deliveryCostCalc: calc.deliveryCost,
+                        totalCostCalc: calc.totalCost,
+                        discrepaQty: calc.totalQuantity !== r.totalQuantity,
+                        discrepaCost: Math.abs(calc.totalCost - (parseFloat(r.totalCost) || 0)) > 0.01
+                    };
                 });
+
+                const conProblemas = registrosAuditados.filter(r => r.discrepaQty || r.discrepaCost);
+                if (conProblemas.length > 0) {
+                    console.warn('⚠️ Registros con discrepancias:', conProblemas);
+                    if (!confirm(`Se detectaron ${conProblemas.length} registro(s) con totales inconsistentes. El CSV usará los valores recalculados. ¿Continuar?`)) return;
+                }
+
+                const quote = s => `"${String(s == null ? '' : s).replace(/"/g, '""')}"`;
+                const num = n => (parseFloat(n) || 0).toFixed(2).replace('.', ',');
+
+                // Columnas reestructuradas para un desglose perfecto
+                let csv = [
+                    "Fecha de Entrega",
+                    "Ciudad",
+                    "Departamento",
+                    "Departamento Completo",
+                    "Departamento MSO",
+                    "Tipo de Comida",
+                    "Evento",
+                    "Lugar de Entrega",
+                    "Motivo",
+                    "Proveedor",
+                    "Cant. CANTV",
+                    "Cant. EDC",
+                    "Cant. Otros Ext.",
+                    "Total Personal Externo",
+                    "Personal Inter (Nombres)",
+                    "Cant. Personal Inter",
+                    "TOTAL COMIDAS (Ext + Int)",
+                    "Costo Unitario",
+                    "Costo Total Comida",
+                    "Costo Delivery",
+                    "Costo Total Final",
+                    "Aprobado por",
+                    "Estado"
+                ].join(";") + "\n";
+
+                let sumQty = 0, sumExt = 0, sumInter = 0, sumCostoComida = 0, sumDelivery = 0, sumTotal = 0;
+                let sumCantv = 0, sumEdc = 0, sumOtros = 0;
+                const porProveedor = {};
+                const porDepartamento = {};
+
+                registrosAuditados.forEach(r => {
+                    const cantv = r.externalStaffNorm['CANTV'] || 0;
+                    const edc = r.externalStaffNorm['EDC'] || 0;
+                    const otros = r.externalStaffNorm['Otros'] || 0;
+                    
+                    sumCantv += cantv;
+                    sumEdc += edc;
+                    sumOtros += otros;
+
+                    const interDetalle = (r.interStaff || []).join(' | ');
+                    const deptCompleto = r.department === 'MSO' && r.msoDepartment ? `MSO - ${r.msoDepartment}` : r.department;
+                    const costoComida = r.totalQuantityCalc * r.unitCostCalc;
+                    
+                    const fila = [
+                        quote(r.deliveryDate), 
+                        quote(r.city === 'guar' ? 'Guarenas' : 'CCS'),
+                        quote(r.department), 
+                        quote(deptCompleto), 
+                        quote(r.msoDepartment || ''),
+                        quote(r.mealType), 
+                        quote(r.event || ''), 
+                        quote(r.deliveryPlace), 
+                        quote(r.reason), 
+                        quote(r.providerName || ''),
+                        cantv, 
+                        edc, 
+                        otros, 
+                        r.extTotal,
+                        quote(interDetalle), 
+                        r.interTotal, 
+                        r.totalQuantityCalc, // <-- AQUI SE SUMA EXTERNO + INTERNO
+                        num(r.unitCostCalc), 
+                        num(costoComida), 
+                        num(r.deliveryCostCalc),
+                        num(r.totalCostCalc), 
+                        quote(r.approvedBy || ''), 
+                        quote(r.status || 'aprobado')
+                    ];
+                    csv += fila.join(";") + "\n";
+                    
+                    sumQty += r.totalQuantityCalc;
+                    sumExt += r.extTotal;
+                    sumInter += r.interTotal;
+                    sumCostoComida += costoComida;
+                    sumDelivery += r.deliveryCostCalc;
+                    sumTotal += r.totalCostCalc;
+                    
+                    const prov = r.providerName || 'SIN_PROVEEDOR';
+                    if (!porProveedor[prov]) porProveedor[prov] = { qty: 0, costo: 0 };
+                    porProveedor[prov].qty += r.totalQuantityCalc;
+                    porProveedor[prov].costo += r.totalCostCalc;
+                    
+                    if (!porDepartamento[deptCompleto]) porDepartamento[deptCompleto] = { qty: 0, costo: 0 };
+                    porDepartamento[deptCompleto].qty += r.totalQuantityCalc;
+                    porDepartamento[deptCompleto].costo += r.totalCostCalc;
+                });
+
+                // Fila de totales generales (alineada con las nuevas columnas)
+                csv += "\n";
+                csv += ["TOTALES","","","","","","","","","", sumCantv, sumEdc, sumOtros, sumExt, "", sumInter, sumQty, "", num(sumCostoComida), num(sumDelivery), num(sumTotal), "", ""].join(";") + "\n";
+
+                // Resumen por proveedor
+                csv += "\nRESUMEN POR PROVEEDOR\n";
+                csv += ["Proveedor","Cantidad Comidas","Importe Total"].join(";") + "\n";
+                let sumProvQty = 0, sumProvCosto = 0;
+                Object.keys(porProveedor).sort().forEach(p => {
+                    csv += [quote(p), porProveedor[p].qty, num(porProveedor[p].costo)].join(";") + "\n";
+                    sumProvQty += porProveedor[p].qty;
+                    sumProvCosto += porProveedor[p].costo;
+                });
+                csv += ["TOTAL PROVEEDORES", sumProvQty, num(sumProvCosto)].join(";") + "\n";
+
+                // Resumen por departamento
+                csv += "\nRESUMEN POR DEPARTAMENTO\n";
+                csv += ["Departamento","Cantidad Comidas","Importe Total"].join(";") + "\n";
+                let sumDeptQty = 0, sumDeptCosto = 0;
+                Object.keys(porDepartamento).sort().forEach(d => {
+                    csv += [quote(d), porDepartamento[d].qty, num(porDepartamento[d].costo)].join(";") + "\n";
+                    sumDeptQty += porDepartamento[d].qty;
+                    sumDeptCosto += porDepartamento[d].costo;
+                });
+                csv += ["TOTAL DEPARTAMENTOS", sumDeptQty, num(sumDeptCosto)].join(";") + "\n";
+
+                // Verificación de cuadre
+                csv += "\nVERIFICACIÓN DE CUADRE\n";
+                csv += `Suma Total Comidas (Ext + Int):;${sumQty}\n`;
+                csv += `Suma Cant. Externos:;${sumExt}\n`;
+                csv += `Suma Cant. Internos:;${sumInter}\n`;
+                csv += `¿Cuadra cantidad total?:;${sumQty === (sumExt + sumInter) ? 'SÍ' : 'NO'}\n`;
+                csv += `Suma Costo Total Final:;${num(sumTotal)}\n`;
+                csv += `¿Cuadra costo?:;${Math.abs(sumTotal - (sumCostoComida + sumDelivery)) < 0.01 ? 'SÍ' : 'NO'}\n`;
+                csv += `Suma por Proveedores:;${num(sumProvCosto)}\n`;
+                csv += `¿Cuadra con proveedores?:;${Math.abs(sumTotal - sumProvCosto) < 0.01 ? 'SÍ' : 'NO'}\n`;
+                csv += `Suma por Departamentos:;${num(sumDeptCosto)}\n`;
+                csv += `¿Cuadra con departamentos?:;${Math.abs(sumTotal - sumDeptCosto) < 0.01 ? 'SÍ' : 'NO'}\n`;
+
                 const blob = new Blob(["\uFEFF", csv], { type: 'text/csv;charset=utf-8;' });
                 const a = document.createElement('a');
                 a.href = URL.createObjectURL(blob);
-                a.download = 'solicitudes_comidas.csv';
+                a.download = `solicitudes_comidas_${new Date().toISOString().split('T')[0]}.csv`;
                 document.body.appendChild(a);
                 a.click();
                 document.body.removeChild(a);
-                displayMessage('Exportado a CSV', 'success');
+                displayMessage(`Exportado: ${registrosAuditados.length} registros, ${sumQty} comidas, $${num(sumTotal)}`, 'success');
             });
 
             function updateSummaryTotals(requests = foodRequests) {
@@ -1634,8 +1628,7 @@
                 }
                 const now = new Date();
                 const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-                const weekStart = new Date(today);
-                weekStart.setDate(today.getDate() - today.getDay());
+                const weekStart = new Date(today); weekStart.setDate(today.getDate() - today.getDay());
                 const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
                 let daily = 0, weekly = 0, monthly = 0;
                 filtered.forEach(r => {
@@ -1651,150 +1644,9 @@
                 monthlyTotalEl.textContent = formatCost(monthly);
             }
 
-            function getChartColor(i) {
-                const c = ['#005BAA', '#5CE1E6', '#00B8D9', '#FF9800', '#667EEA', '#F6AD55', '#E53E3E', '#38B2AC', '#E85D04', '#6A4C93'];
-                return c[i % c.length];
-            }
-
-            function updateCharts() {
-                if (!isAdmin) return;
-                const approved = getFilteredApprovedRequests();
-                
-                console.log("updateCharts - Datos aprobados filtrados:", approved.length);
-
-                const now = new Date(), curMonth = now.getMonth(), curYear = now.getFullYear();
-                const curMonthReqs = approved.filter(r => {
-                    const d = new Date(r.deliveryDate + 'T12:00:00');
-                    return d.getMonth() === curMonth && d.getFullYear() === curYear;
-                });
-                const curYearReqs = approved.filter(r => {
-                    const d = new Date(r.deliveryDate + 'T12:00:00');
-                    return d.getFullYear() === curYear;
-                });
-                
-                const monthlyProv = {};
-                curMonthReqs.forEach(r => {
-                    monthlyProv[r.providerName] = (monthlyProv[r.providerName] || 0) + (parseFloat(r.totalCost) || 0);
-                });
-                const provLabels = Object.keys(monthlyProv), provData = provLabels.map(p => monthlyProv[p]), provColors = provLabels.map((p, i) => CHART_COLORS[p] || getChartColor(i));
-                if (monthlyProvidersChart) monthlyProvidersChart.destroy();
-                monthlyProvidersChart = new Chart(document.getElementById('monthlyProvidersChart'), {
-                    type: 'doughnut',
-                    data: { labels: provLabels, datasets: [{ data: provData, backgroundColor: provColors, borderWidth: 1 }] },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: { position: window.innerWidth <= 768 ? 'bottom' : 'right' },
-                            tooltip: { callbacks: { label: ctx => { const v = ctx.parsed || 0, total = ctx.dataset.data.reduce((a, b) => a + b, 0); return `${ctx.label}: $${v.toFixed(2)} (${Math.round(v/total*100)}%)`; } } }
-                        }
-                    }
-                });
-                
-                const annualProv = {};
-                curYearReqs.forEach(r => {
-                    const d = new Date(r.deliveryDate + 'T12:00:00');
-                    const mk = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2, '0')}`;
-                    if (!annualProv[mk]) annualProv[mk] = {};
-                    annualProv[mk][r.providerName] = (annualProv[mk][r.providerName] || 0) + (parseFloat(r.totalCost) || 0);
-                });
-                const months = Object.keys(annualProv).sort(), allProv = [...new Set(curYearReqs.map(r => r.providerName))];
-                const provDatasets = allProv.map((p, i) => ({
-                    label: p,
-                    data: months.map(m => annualProv[m][p] || 0),
-                    backgroundColor: CHART_COLORS[p] || getChartColor(i),
-                    borderColor: CHART_COLORS[p] || getChartColor(i),
-                    fill: false,
-                    tension: 0.1
-                }));
-                if (annualProvidersChart) annualProvidersChart.destroy();
-                annualProvidersChart = new Chart(document.getElementById('annualProvidersChart'), {
-                    type: 'line',
-                    data: { labels: months, datasets: provDatasets },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        scales: { y: { beginAtZero: true, title: { display: true, text: 'Gasto Total (USD $)' } } },
-                        plugins: { legend: { position: window.innerWidth <= 768 ? 'bottom' : 'top' } }
-                    }
-                });
-                
-                const deptMonthly = {};
-                curYearReqs.forEach(r => {
-                    const d = new Date(r.deliveryDate + 'T12:00:00');
-                    const mk = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2, '0')}`;
-                    if (!deptMonthly[mk]) deptMonthly[mk] = {};
-                    deptMonthly[mk][r.department] = (deptMonthly[mk][r.department] || 0) + (parseFloat(r.totalCost) || 0);
-                });
-                const deptMonths = Object.keys(deptMonthly).sort(), allDepts = [...new Set(curYearReqs.map(r => r.department))];
-                const deptDatasets = allDepts.map((d, i) => ({
-                    label: d,
-                    data: deptMonths.map(m => deptMonthly[m][d] || 0),
-                    backgroundColor: getChartColor(i),
-                    borderColor: getChartColor(i),
-                    fill: false,
-                    tension: 0.1
-                }));
-                if (departmentExpensesChart) departmentExpensesChart.destroy();
-                departmentExpensesChart = new Chart(document.getElementById('departmentExpensesChart'), {
-                    type: 'line',
-                    data: { labels: deptMonths, datasets: deptDatasets },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        scales: { y: { beginAtZero: true, title: { display: true, text: 'Gasto Total (USD $)' } } },
-                        plugins: { legend: { position: window.innerWidth <= 768 ? 'bottom' : 'top' } }
-                    }
-                });
-                
-                const staffCnt = {};
-                curYearReqs.forEach(r => {
-                    if (r.interStaff) r.interStaff.forEach(s => staffCnt[s] = (staffCnt[s] || 0) + 1);
-                });
-                const topStaff = Object.entries(staffCnt).sort((a, b) => b[1] - a[1]).slice(0, 10);
-                const staffLabels = topStaff.map(s => s[0]), staffData = topStaff.map(s => s[1]), staffColors = staffData.map((_, i) => getChartColor(i));
-                if (staffRequestsChart) staffRequestsChart.destroy();
-                staffRequestsChart = new Chart(document.getElementById('staffRequestsChart'), {
-                    type: 'bar',
-                    data: {
-                        labels: staffLabels,
-                        datasets: [{ label: 'Número de Solicitudes', data: staffData, backgroundColor: staffColors, borderWidth: 1 }]
-                    },
-                    options: {
-                        indexAxis: 'y',
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        scales: {
-                            x: { beginAtZero: true, title: { display: true, text: 'Cantidad de Solicitudes' }, ticks: { stepSize: 1, callback: v => v % 1 === 0 ? v : null } }
-                        },
-                        plugins: { legend: { display: false } }
-                    }
-                });
-                
-                const deptCnt = {};
-                curYearReqs.forEach(r => deptCnt[r.department] = (deptCnt[r.department] || 0) + 1);
-                const deptLabels = Object.keys(deptCnt).sort(), deptData = deptLabels.map(d => deptCnt[d]), deptColors = deptData.map((_, i) => getChartColor(i + 3));
-                if (departmentRequestsChart) departmentRequestsChart.destroy();
-                departmentRequestsChart = new Chart(document.getElementById('departmentRequestsChart'), {
-                    type: 'bar',
-                    data: {
-                        labels: deptLabels,
-                        datasets: [{ label: 'Número de Solicitudes', data: deptData, backgroundColor: deptColors, borderColor: deptColors, borderWidth: 1 }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        scales: {
-                            y: { beginAtZero: true, title: { display: true, text: 'Cantidad de Solicitudes' }, ticks: { stepSize: 1, callback: v => v % 1 === 0 ? v : null } },
-                            x: { title: { display: true, text: 'Departamento' } }
-                        },
-                        plugins: { legend: { display: false } }
-                    }
-                });
-            }
-
-            // Reportes
-            const now = new Date(), yr = now.getFullYear(), mo = String(now.getMonth()+1).padStart(2, '0');
+            // ============================================================================
+            // FUNCIONES DE REPORTES FINANCIEROS Y GRÁFICOS
+            // ============================================================================
             const reportMonthInput = document.getElementById('reportMonth');
             const periodMonthly = document.getElementById('periodMonthly');
             const periodBiweekly = document.getElementById('periodBiweekly');
@@ -1805,556 +1657,298 @@
             const generateReportBtn = document.getElementById('generateReportBtn');
             const exportReportBtn = document.getElementById('exportReportBtn');
             const exportPdfBtn = document.getElementById('exportPdfBtn');
-            const departmentReportBody = document.getElementById('departmentReportBody');
-            const providerReportBody = document.getElementById('providerReportBody');
-            const totalDepartmentMeals = document.getElementById('totalDepartmentMeals');
-            const totalDepartmentAmount = document.getElementById('totalDepartmentAmount');
-            const totalProviderMeals = document.getElementById('totalProviderMeals');
-            const totalProviderAmount = document.getElementById('totalProviderAmount');
-            const ccsTotalMeals = document.getElementById('ccsTotalMeals');
-            const ccsTotalAmount = document.getElementById('ccsTotalAmount');
-            const msoTotalMeals = document.getElementById('msoTotalMeals');
-            const msoTotalAmount = document.getElementById('msoTotalAmount');
-            const grandTotalAmount = document.getElementById('grandTotalAmount');
-            const unitProviderReportBody = document.getElementById('unitProviderReportBody');
-            const totalUnitProviderMeals = document.getElementById('totalUnitProviderMeals');
-            const totalUnitProviderAmount = document.getElementById('totalUnitProviderAmount');
 
-            if (reportMonthInput) reportMonthInput.value = `${yr}-${mo}`;
-            if (biweekStartDate && biweekEndDate) {
-                biweekStartDate.value = `${yr}-${mo}-01`;
-                biweekEndDate.value = new Date(yr, parseInt(mo), 15).toISOString().split('T')[0];
+            const todayReport = new Date();
+            if (reportMonthInput) {
+                reportMonthInput.value = `${todayReport.getFullYear()}-${String(todayReport.getMonth() + 1).padStart(2, '0')}`;
             }
-            if (periodMonthly) periodMonthly.addEventListener('change', function() {
-                if (this.checked) { monthlyFilter.classList.remove('hidden'); biweeklyFilter.classList.add('hidden'); }
-            });
-            if (periodBiweekly) periodBiweekly.addEventListener('change', function() {
-                if (this.checked) { monthlyFilter.classList.add('hidden'); biweeklyFilter.classList.remove('hidden'); }
-            });
 
-            function mapDepartment(dept, msoDept) {
-                if (!dept) return 'NO ESPECIFICADO';
-                const d = dept.toString().trim().toUpperCase();
-                if (d.includes('EL ROSAL')) return 'C.O El Rosal';
-                if (d.includes('LOS RUICES')) return 'C.O Los Ruices';
-                if (d.includes('LA NAYA')) return 'C.O La Naya';
-                if (d.includes('PARAISO')) return 'C.O Paraiso-Catia';
-                if (d.includes('GUARENAS')) return 'C.O Guarenas';
-                if (d.includes('GUATIRE')) return 'C.O Guatire';
-                if (d.includes('OBRAS')) return 'Obras';
-                if (d.includes('COMERCIAL')) return 'Área Comercial';
-                if (d.includes('GERENCIA SENIOR')) return 'Gerencia Senior';
-                if (d.includes('MSO')) return 'MSO';
-                if (d.includes('HEAD END')) return 'Head End';
-                if (d.includes('ADMINISTRACION')) return 'Administración';
-                if (d.includes('OCAD')) return 'Ocad';
-                return formatDepartmentName(dept);
+            if (periodMonthly && periodBiweekly) {
+                document.querySelectorAll('input[name="periodType"]').forEach(radio => {
+                    radio.addEventListener('change', () => {
+                        if (periodMonthly.checked) {
+                            monthlyFilter.classList.remove('hidden');
+                            biweeklyFilter.classList.add('hidden');
+                        } else {
+                            monthlyFilter.classList.add('hidden');
+                            biweeklyFilter.classList.remove('hidden');
+                        }
+                    });
+                });
             }
-            function classifyUnit(dept, msoDept) {
-                const d = dept.toString().trim().toUpperCase();
-                return (d === 'MSO' || d.includes('PRESIDENCIA') || d.includes('MARKETING') || d.includes('INTERCONEXIONES') || d.includes('IMPORTACIONES') || d.includes('RRHH MSO') || d.includes('DOCUMENTACION') || d.includes('LOGISTICA') || d.includes('PERSONAL VISITANTE') || d.includes('BACKBONE')) ? 'MSO' : 'CCS';
-            }
-            function getMonthName(m) {
-                return ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'][parseInt(m)-1];
+
+            function getRequestsForReportPeriod() {
+                let base = getFilteredRequestsForDisplay();
+                base = base.filter(r => r.status === 'aprobado');
+                
+                if (periodMonthly.checked) {
+                    const monthVal = reportMonthInput.value;
+                    if (!monthVal) return [];
+                    return base.filter(r => {
+                        const d = normalizeDate(r.deliveryDate);
+                        return d && d.startsWith(monthVal);
+                    });
+                } else {
+                    const start = biweekStartDate.value;
+                    const end = biweekEndDate.value;
+                    if (!start || !end) return [];
+                    return base.filter(r => {
+                        const d = normalizeDate(r.deliveryDate);
+                        return d && d >= start && d <= end;
+                    });
+                }
             }
 
             function generateReport() {
-                if (!isAdmin) return;
-                const isMonthly = periodMonthly.checked;
-                let filtered = [];
+                const requests = getRequestsForReportPeriod();
                 
-                const approvedFiltered = getFilteredApprovedRequests();
+                const byDept = {};
+                requests.forEach(r => {
+                    const dept = r.department === 'MSO' && r.msoDepartment ? `MSO (${r.msoDepartment})` : r.department;
+                    if (!byDept[dept]) byDept[dept] = { qty: 0, amount: 0 };
+                    byDept[dept].qty += r.totalQuantity;
+                    byDept[dept].amount += parseFloat(r.totalCost) || 0;
+                });
+
+                const deptBody = document.getElementById('departmentReportBody');
+                deptBody.innerHTML = '';
+                let totalDeptQty = 0, totalDeptAmount = 0;
+                Object.keys(byDept).sort().forEach(dept => {
+                    const row = deptBody.insertRow();
+                    row.innerHTML = `<td class="px-3 md:px-6 py-2 border border-gray-300">${escapeHtml(dept)}</td><td class="px-3 md:px-6 py-2 border border-gray-300 text-right">${byDept[dept].qty}</td><td class="px-3 md:px-6 py-2 border border-gray-300 text-right">$${byDept[dept].amount.toFixed(2)}</td>`;
+                    totalDeptQty += byDept[dept].qty;
+                    totalDeptAmount += byDept[dept].amount;
+                });
+                document.getElementById('totalDepartmentMeals').textContent = totalDeptQty;
+                document.getElementById('totalDepartmentAmount').textContent = `$${totalDeptAmount.toFixed(2)}`;
+
+                const byProv = {};
+                requests.forEach(r => {
+                    const prov = r.providerName || 'SIN PROVEEDOR';
+                    if (!byProv[prov]) byProv[prov] = { qty: 0, amount: 0 };
+                    byProv[prov].qty += r.totalQuantity;
+                    byProv[prov].amount += parseFloat(r.totalCost) || 0;
+                });
+
+                const provBody = document.getElementById('providerReportBody');
+                provBody.innerHTML = '';
+                let totalProvQty = 0, totalProvAmount = 0;
+                Object.keys(byProv).sort().forEach(prov => {
+                    const row = provBody.insertRow();
+                    row.innerHTML = `<td class="px-3 md:px-6 py-2 border border-gray-300">${escapeHtml(prov)}</td><td class="px-3 md:px-6 py-2 border border-gray-300 text-right">${byProv[prov].qty}</td><td class="px-3 md:px-6 py-2 border border-gray-300 text-right">$${byProv[prov].amount.toFixed(2)}</td>`;
+                    totalProvQty += byProv[prov].qty;
+                    totalProvAmount += byProv[prov].amount;
+                });
+                document.getElementById('totalProviderMeals').textContent = totalProvQty;
+                document.getElementById('totalProviderAmount').textContent = `$${totalProvAmount.toFixed(2)}`;
+
+                let ccsQty = 0, ccsAmount = 0, msoQty = 0, msoAmount = 0;
+                requests.forEach(r => {
+                    if (r.city === 'guar') return;
+                    if (r.department === 'MSO') {
+                        msoQty += r.totalQuantity;
+                        msoAmount += parseFloat(r.totalCost) || 0;
+                    } else {
+                        ccsQty += r.totalQuantity;
+                        ccsAmount += parseFloat(r.totalCost) || 0;
+                    }
+                });
+                document.getElementById('ccsTotalMeals').textContent = ccsQty;
+                document.getElementById('ccsTotalAmount').textContent = `$${ccsAmount.toFixed(2)}`;
+                document.getElementById('msoTotalMeals').textContent = msoQty;
+                document.getElementById('msoTotalAmount').textContent = `$${msoAmount.toFixed(2)}`;
+                document.getElementById('grandTotalAmount').textContent = `$${(ccsAmount + msoAmount).toFixed(2)}`;
+
+                const byUnitProv = {};
+                requests.forEach(r => {
+                    const unit = r.department === 'MSO' ? 'MSO' : 'CCS';
+                    const prov = r.providerName || 'SIN PROVEEDOR';
+                    const key = `${unit}|${prov}`;
+                    if (!byUnitProv[key]) byUnitProv[key] = { unit, prov, qty: 0, amount: 0 };
+                    byUnitProv[key].qty += r.totalQuantity;
+                    byUnitProv[key].amount += parseFloat(r.totalCost) || 0;
+                });
+
+                const unitProvBody = document.getElementById('unitProviderReportBody');
+                unitProvBody.innerHTML = '';
+                let totalUpQty = 0, totalUpAmount = 0;
+                Object.values(byUnitProv).sort((a, b) => a.unit.localeCompare(b.unit) || a.prov.localeCompare(b.prov)).forEach(item => {
+                    const row = unitProvBody.insertRow();
+                    row.innerHTML = `<td class="px-3 md:px-6 py-2 border border-gray-300">${escapeHtml(item.unit)}</td><td class="px-3 md:px-6 py-2 border border-gray-300">${escapeHtml(item.prov)}</td><td class="px-3 md:px-6 py-2 border border-gray-300 text-right">${item.qty}</td><td class="px-3 md:px-6 py-2 border border-gray-300 text-right">$${item.amount.toFixed(2)}</td>`;
+                    totalUpQty += item.qty;
+                    totalUpAmount += item.amount;
+                });
+                document.getElementById('totalUnitProviderMeals').textContent = totalUpQty;
+                document.getElementById('totalUnitProviderAmount').textContent = `$${totalUpAmount.toFixed(2)}`;
+
+                if (exportReportBtn) exportReportBtn.classList.remove('hidden');
+                if (exportPdfBtn) exportPdfBtn.classList.remove('hidden');
+            }
+
+            if (generateReportBtn) {
+                generateReportBtn.addEventListener('click', () => {
+                    generateReport();
+                    if (isAdmin) updateCharts();
+                });
+            }
+
+            if (exportReportBtn) {
+                exportReportBtn.addEventListener('click', () => {
+                    const requests = getRequestsForReportPeriod();
+                    if (!requests.length) { displayMessage('No hay datos para exportar', 'error'); return; }
+                    
+                    const quote = s => `"${String(s || '').replace(/"/g, '""')}"`;
+                    let csv = "REPORTE DE GASTOS - CONTROL DE COMIDAS\n\n";
+                    
+                    csv += "SOLICITUD DE COMIDAS POR UNIDAD DE OPERACIONES\n";
+                    csv += "Departamento;Cantidad;Importe\n";
+                    const byDept = {};
+                    requests.forEach(r => {
+                        const dept = r.department === 'MSO' && r.msoDepartment ? `MSO (${r.msoDepartment})` : r.department;
+                        if (!byDept[dept]) byDept[dept] = { qty: 0, amount: 0 };
+                        byDept[dept].qty += r.totalQuantity;
+                        byDept[dept].amount += parseFloat(r.totalCost) || 0;
+                    });
+                    let tQty = 0, tAmount = 0;
+                    Object.keys(byDept).sort().forEach(d => {
+                        csv += `${quote(d)};${byDept[d].qty};${byDept[d].amount.toFixed(2)}\n`;
+                        tQty += byDept[d].qty; tAmount += byDept[d].amount;
+                    });
+                    csv += `TOTAL;${tQty};${tAmount.toFixed(2)}\n\n`;
+
+                    csv += "SOLICITUD DE COMIDAS POR PROVEEDOR\n";
+                    csv += "Proveedor;Cantidad;Importe\n";
+                    const byProv = {};
+                    requests.forEach(r => {
+                        const prov = r.providerName || 'SIN PROVEEDOR';
+                        if (!byProv[prov]) byProv[prov] = { qty: 0, amount: 0 };
+                        byProv[prov].qty += r.totalQuantity;
+                        byProv[prov].amount += parseFloat(r.totalCost) || 0;
+                    });
+                    let pQty = 0, pAmount = 0;
+                    Object.keys(byProv).sort().forEach(p => {
+                        csv += `${quote(p)};${byProv[p].qty};${byProv[p].amount.toFixed(2)}\n`;
+                        pQty += byProv[p].qty; pAmount += byProv[p].amount;
+                    });
+                    csv += `TOTAL;${pQty};${pAmount.toFixed(2)}\n\n`;
+
+                    const blob = new Blob(["\uFEFF", csv], { type: 'text/csv;charset=utf-8;' });
+                    const a = document.createElement('a');
+                    a.href = URL.createObjectURL(blob);
+                    a.download = `reporte_gastos_${new Date().toISOString().split('T')[0]}.csv`;
+                    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+                    displayMessage('Reporte exportado', 'success');
+                });
+            }
+
+            function updateCharts() {
+                const requests = getFilteredRequestsForDisplay().filter(r => r.status === 'aprobado');
                 
-                if (isMonthly) {
-                    const sm = reportMonthInput.value;
-                    if (!sm) { displayMessage('Seleccione un mes', 'error'); return; }
-                    const [y, m] = sm.split('-');
-                    filtered = approvedFiltered.filter(r => {
-                        const d = new Date(r.deliveryDate + 'T12:00:00');
-                        return d.getFullYear() === parseInt(y) && d.getMonth()+1 === parseInt(m);
+                if (monthlyProvidersChart) monthlyProvidersChart.destroy();
+                const currentMonth = new Date().toISOString().slice(0, 7);
+                const monthlyReqs = requests.filter(r => normalizeDate(r.deliveryDate)?.startsWith(currentMonth));
+                const monthlyByProv = {};
+                monthlyReqs.forEach(r => {
+                    const p = r.providerName || 'Otros';
+                    monthlyByProv[p] = (monthlyByProv[p] || 0) + (parseFloat(r.totalCost) || 0);
+                });
+                const ctx1 = document.getElementById('monthlyProvidersChart').getContext('2d');
+                monthlyProvidersChart = new Chart(ctx1, {
+                    type: 'bar',
+                    data: {
+                        labels: Object.keys(monthlyByProv),
+                        datasets: [{ label: 'Monto ($)', data: Object.values(monthlyByProv), backgroundColor: '#005BAA' }]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false }
+                });
+
+                if (annualProvidersChart) annualProvidersChart.destroy();
+                const currentYear = new Date().getFullYear().toString();
+                const annualReqs = requests.filter(r => normalizeDate(r.deliveryDate)?.startsWith(currentYear));
+                const annualByProv = {};
+                annualReqs.forEach(r => {
+                    const p = r.providerName || 'Otros';
+                    annualByProv[p] = (annualByProv[p] || 0) + (parseFloat(r.totalCost) || 0);
+                });
+                const ctx2 = document.getElementById('annualProvidersChart').getContext('2d');
+                annualProvidersChart = new Chart(ctx2, {
+                    type: 'pie',
+                    data: {
+                        labels: Object.keys(annualByProv),
+                        datasets: [{ data: Object.values(annualByProv), backgroundColor: ['#005BAA', '#5CE1E6', '#E85D04', '#FF9800', '#667EEA'] }]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false }
+                });
+
+                if (departmentExpensesChart) departmentExpensesChart.destroy();
+                const months = ['01','02','03','04','05','06','07','08','09','10','11','12'];
+                const depts = [...new Set(requests.map(r => r.department))];
+                const datasets = depts.map((d, i) => {
+                    const data = months.map(m => {
+                        return requests.filter(r => {
+                            const date = normalizeDate(r.deliveryDate);
+                            return date && date.startsWith(`${currentYear}-${m}`) && r.department === d;
+                        }).reduce((sum, r) => sum + (parseFloat(r.totalCost) || 0), 0);
                     });
-                } else {
-                    const sd = biweekStartDate.value, ed = biweekEndDate.value;
-                    if (!sd || !ed) { displayMessage('Seleccione fechas', 'error'); return; }
-                    if (new Date(ed) < new Date(sd)) { displayMessage('Fecha fin debe ser mayor', 'error'); return; }
-                    if (Math.ceil(Math.abs(new Date(ed) - new Date(sd)) / (1000 * 60 * 60 * 24)) > 31) {
-                        displayMessage('Periodo no debe exceder 31 días', 'error');
-                        return;
-                    }
-                    filtered = approvedFiltered.filter(r => {
-                        const d = new Date(r.deliveryDate + 'T00:00:00');
-                        return d >= new Date(sd + 'T00:00:00') && d <= new Date(ed + 'T23:59:59.999');
-                    });
-                }
-
-                console.log("generateReport - Solicitudes filtradas:", filtered.length);
-
-                const unitDisplay = getUnitDisplayName();
-
-                const unitCcsTitle = document.getElementById('unitCcsTitle');
-                const unitMsoTitle = document.getElementById('unitMsoTitle');
-                if (unitCcsTitle) {
-                    if (isAdminGuar || isUserGuar) {
-                        unitCcsTitle.textContent = 'UNIDAD GUARENAS';
-                    } else {
-                        unitCcsTitle.textContent = 'UNIDAD CCS';
-                    }
-                }
-                if (unitMsoTitle) {
-                    if (isAdminGuar || isUserGuar) {
-                        unitMsoTitle.textContent = 'UNIDAD MSO (No aplica)';
-                        const msoCard = unitMsoTitle.closest('.bg-white');
-                        if (msoCard) msoCard.style.display = 'none';
-                    } else {
-                        unitMsoTitle.textContent = 'UNIDAD MSO';
-                        const msoCard = unitMsoTitle.closest('.bg-white');
-                        if (msoCard) msoCard.style.display = 'block';
-                    }
-                }
-
-                const deptData = {};
-                const allDepts = getConfig().departments || [];
-                allDepts.forEach(d => deptData[d] = { meals: 0, amount: 0 });
-                const provData = {}, unitProvData = { CCS: {}, MSO: {} };
-                filtered.forEach(r => {
-                    const dk = formatDepartmentName(mapDepartment(r.department, r.msoDepartment));
-                    const pk = r.providerName || 'No especificado';
-                    const unit = classifyUnit(r.department, r.msoDepartment);
-                    const meals = parseInt(r.totalQuantity) || 0;
-                    const amt = parseFloat(r.totalCost) || 0;
-                    if (deptData[dk]) { deptData[dk].meals += meals; deptData[dk].amount += amt; }
-                    if (!provData[pk]) provData[pk] = { meals: 0, amount: 0 };
-                    provData[pk].meals += meals; provData[pk].amount += amt;
-                    if (unit === 'MSO') {
-                        let key = 'MSO';
-                        if (r.msoDepartment) key = `MSO (${r.msoDepartment})`;
-                        if (!unitProvData['MSO'][key]) unitProvData['MSO'][key] = { meals: 0, amount: 0 };
-                        unitProvData['MSO'][key].meals += meals;
-                        unitProvData['MSO'][key].amount += amt;
-                    } else {
-                        if (!unitProvData['CCS'][pk]) unitProvData['CCS'][pk] = { meals: 0, amount: 0 };
-                        unitProvData['CCS'][pk].meals += meals;
-                        unitProvData['CCS'][pk].amount += amt;
-                    }
+                    return { label: d, data: data, borderColor: CHART_COLORS[d] || `hsl(${i * 40}, 70%, 50%)`, fill: false };
                 });
-                renderDepartmentReport(deptData);
-                renderProviderReport(provData);
-                calculateTotals(deptData, unitDisplay);
-                renderUnitProviderReport(unitProvData);
-                exportReportBtn.classList.remove('hidden');
-                exportPdfBtn.classList.remove('hidden');
-                displayMessage(`Reporte: ${filtered.length} solicitudes procesadas`, 'success');
-            }
+                const ctx3 = document.getElementById('departmentExpensesChart').getContext('2d');
+                departmentExpensesChart = new Chart(ctx3, {
+                    type: 'line',
+                    data: { labels: ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'], datasets: datasets },
+                    options: { responsive: true, maintainAspectRatio: false }
+                });
 
-            function renderDepartmentReport(data) {
-                if (!departmentReportBody) return;
-                departmentReportBody.innerHTML = '';
-                let tM = 0, tA = 0;
-                Object.keys(data).sort((a, b) => a.localeCompare(b, 'es')).forEach(d => {
-                    const r = data[d];
-                    tM += r.meals;
-                    tA += r.amount;
-                    const row = document.createElement('tr');
-                    row.innerHTML = `<td class="px-3 py-2 border">${escapeHtml(d)}</td><td class="px-3 py-2 border text-center">${r.meals}</td><td class="px-3 py-2 border text-right">$${r.amount.toFixed(2)}</td>`;
-                    departmentReportBody.appendChild(row);
-                });
-                if (totalDepartmentMeals) totalDepartmentMeals.textContent = tM;
-                if (totalDepartmentAmount) totalDepartmentAmount.textContent = `$${tA.toFixed(2)}`;
-            }
-            function renderProviderReport(data) {
-                if (!providerReportBody) return;
-                providerReportBody.innerHTML = '';
-                let tM = 0, tA = 0;
-                Object.keys(data).sort((a, b) => data[b].meals - data[a].meals).forEach(p => {
-                    const d = data[p];
-                    tM += d.meals;
-                    tA += d.amount;
-                    const row = document.createElement('tr');
-                    row.innerHTML = `<td class="px-3 py-2 border">${escapeHtml(p)}</td><td class="px-3 py-2 border text-center">${d.meals}</td><td class="px-3 py-2 border text-right">$${d.amount.toFixed(2)}</td>`;
-                    providerReportBody.appendChild(row);
-                });
-                if (totalProviderMeals) totalProviderMeals.textContent = tM;
-                if (totalProviderAmount) totalProviderAmount.textContent = `$${tA.toFixed(2)}`;
-            }
-            function calculateTotals(data, unitDisplay) {
-                let ccsM = 0, ccsA = 0, msoM = 0, msoA = 0;
-                Object.keys(data).forEach(d => {
-                    const r = data[d];
-                    if (d.includes('MSO')) { msoM += r.meals; msoA += r.amount; }
-                    else { ccsM += r.meals; ccsA += r.amount; }
-                });
-                if (ccsTotalMeals) ccsTotalMeals.textContent = ccsM;
-                if (ccsTotalAmount) ccsTotalAmount.textContent = `$${ccsA.toFixed(2)}`;
-                if (msoTotalMeals) msoTotalMeals.textContent = msoM;
-                if (msoTotalAmount) msoTotalAmount.textContent = `$${msoA.toFixed(2)}`;
-                if (grandTotalAmount) grandTotalAmount.textContent = `$${(ccsA + msoA).toFixed(2)}`;
-            }
-            function renderUnitProviderReport(data) {
-                if (!unitProviderReportBody) return;
-                unitProviderReportBody.innerHTML = '';
-                let tM = 0, tA = 0;
-                ['CCS', 'MSO'].forEach(unit => {
-                    const ud = data[unit];
-                    if (ud && Object.keys(ud).length) {
-                        const header = document.createElement('tr');
-                        header.innerHTML = `<td colspan="4" class="px-3 py-2 font-bold text-inter-primary border bg-blue-50">UNIDAD ${unit}</td>`;
-                        unitProviderReportBody.appendChild(header);
-                        Object.keys(ud).filter(p => ud[p].meals > 0).sort((a, b) => ud[b].meals - ud[a].meals).forEach(p => {
-                            const d = ud[p];
-                            tM += d.meals;
-                            tA += d.amount;
-                            const row = document.createElement('tr');
-                            row.innerHTML = `<td class="px-3 py-2 border"></td><td class="px-3 py-2 border">${escapeHtml(p)}</td><td class="px-3 py-2 border text-center">${d.meals}</td><td class="px-3 py-2 border text-right">$${d.amount.toFixed(2)}</td>`;
-                            unitProviderReportBody.appendChild(row);
-                        });
-                        const uM = Object.keys(ud).reduce((s, p) => s + ud[p].meals, 0);
-                        const uA = Object.keys(ud).reduce((s, p) => s + ud[p].amount, 0);
-                        const sub = document.createElement('tr');
-                        sub.innerHTML = `<td colspan="2" class="px-3 py-2 border text-right font-bold">Subtotal ${unit}</td><td class="px-3 py-2 border text-center font-bold text-inter-primary">${uM}</td><td class="px-3 py-2 border text-right font-bold text-inter-primary">$${uA.toFixed(2)}</td>`;
-                        unitProviderReportBody.appendChild(sub);
-                        const sp = document.createElement('tr');
-                        sp.innerHTML = '<td colspan="4" class="py-2"></td>';
-                        unitProviderReportBody.appendChild(sp);
-                    }
-                });
-                if (totalUnitProviderMeals) totalUnitProviderMeals.textContent = tM;
-                if (totalUnitProviderAmount) totalUnitProviderAmount.textContent = `$${tA.toFixed(2)}`;
-            }
-
-            function exportReportToExcel() {
-                if (!isAdmin) return;
-                const isMonthly = periodMonthly.checked;
-                let fn = '';
-                if (isMonthly) {
-                    const sm = reportMonthInput.value;
-                    if (!sm) return;
-                    const [y, m] = sm.split('-');
-                    fn = `Reporte_Mensual_Comidas_${getMonthName(m)}_${y}.csv`;
-                } else {
-                    if (!biweekStartDate.value || !biweekEndDate.value) return;
-                    fn = `Reporte_Quincenal_Comidas_${formatDateForFilename(biweekStartDate.value)}_${formatDateForFilename(biweekEndDate.value)}.csv`;
-                }
-                let csv = 'Reporte de Gastos de Comida\n\n';
-                csv += "SOLICITUD DE COMIDAS POR UNIDAD DE OPERACIONES\nUNIDAD DE OPERACION;CANTIDAD;IMPORTE\n";
-                Array.from(departmentReportBody.querySelectorAll('tr')).forEach(r => {
-                    const c = r.querySelectorAll('td');
-                    if (c.length >= 3) csv += `${c[0].textContent.replace(';', ',')};${c[1].textContent};${c[2].textContent.replace('$', '').replace('.', ',')}\n`;
-                });
-                csv += `TOTAL;${totalDepartmentMeals.textContent};${totalDepartmentAmount.textContent.replace('$', '').replace('.', ',')}\n\n`;
-                csv += "SOLICITUD DE COMIDAS POR PROVEEDOR\nPROVEEDOR;CANTIDAD;IMPORTE\n";
-                Array.from(providerReportBody.querySelectorAll('tr')).forEach(r => {
-                    const c = r.querySelectorAll('td');
-                    if (c.length >= 3) csv += `${c[0].textContent.replace(';', ',')};${c[1].textContent};${c[2].textContent.replace('$', '').replace('.', ',')}\n`;
-                });
-                csv += `TOTAL;${totalProviderMeals.textContent};${totalProviderAmount.textContent.replace('$', '').replace('.', ',')}\n\n`;
-                csv += "SERVICIOS POR UNIDAD Y PROVEEDOR\nUNIDAD;PROVEEDOR;CANTIDAD;IMPORTE\n";
-                Array.from(unitProviderReportBody.querySelectorAll('tr')).forEach(r => {
-                    const c = r.querySelectorAll('td');
-                    if (c.length === 4) {
-                        const u = c[0].textContent || '', p = c[1].textContent.replace(';', ','), m = c[2].textContent, a = c[3].textContent.replace('$', '').replace('.', ',');
-                        if (u.trim() || p.trim()) csv += `${u};${p};${m};${a}\n`;
-                    } else if (c.length === 1 && c[0].colSpan === 4) {
-                        csv += `${c[0].textContent.replace(';', ',')};;;;\n`;
-                    }
-                });
-                csv += `TOTAL GENERAL;;${totalUnitProviderMeals.textContent};${totalUnitProviderAmount.textContent.replace('$', '').replace('.', ',')}\n\n`;
-                csv += "RESUMEN POR TIPO DE UNIDAD\n";
-                csv += `UNIDAD CCS Total Comidas;${ccsTotalMeals.textContent}\nUNIDAD CCS Importe Total;${ccsTotalAmount.textContent.replace('$', '').replace('.', ',')}\n`;
-                csv += `UNIDAD MSO Total Comidas;${msoTotalMeals.textContent}\nUNIDAD MSO Importe Total;${msoTotalAmount.textContent.replace('$', '').replace('.', ',')}\nTotal;${grandTotalAmount.textContent.replace('$', '').replace('.', ',')}\n`;
-                const blob = new Blob(["\uFEFF", csv], { type: 'text/csv;charset=utf-8;' });
-                const a = document.createElement('a');
-                a.href = URL.createObjectURL(blob);
-                a.download = fn;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                displayMessage('Reporte exportado', 'success');
-            }
-
-            async function exportReportToPDF() {
-                if (!isAdmin) return;
-                const isMonthly = periodMonthly.checked;
-                let period = '';
-                let periodRaw = '';
-                if (isMonthly) {
-                    const sm = reportMonthInput.value;
-                    if (!sm) { displayMessage('Genere reporte primero', 'error'); return; }
-                    const [y, m] = sm.split('-');
-                    period = `${getMonthName(m)} ${y}`;
-                    periodRaw = sm;
-                } else {
-                    if (!biweekStartDate.value || !biweekEndDate.value) { displayMessage('Genere reporte primero', 'error'); return; }
-                    period = `${formatDateForDisplay(biweekStartDate.value)} al ${formatDateForDisplay(biweekEndDate.value)}`;
-                    periodRaw = `${biweekStartDate.value}_${biweekEndDate.value}`;
-                }
-                const todayStr = new Date().toLocaleDateString('es-ES');
-                displayMessage('Generando PDF con nuevo formato...', 'success');
-
-                try {
-                    const approvedFiltered = getFilteredApprovedRequests();
-                    let filtered = [];
-                    if (isMonthly) {
-                        const [y, m] = reportMonthInput.value.split('-');
-                        filtered = approvedFiltered.filter(r => {
-                            const d = new Date(r.deliveryDate + 'T12:00:00');
-                            return d.getFullYear() === parseInt(y) && d.getMonth()+1 === parseInt(m);
-                        });
-                    } else {
-                        const sd = biweekStartDate.value, ed = biweekEndDate.value;
-                        filtered = approvedFiltered.filter(r => {
-                            const d = new Date(r.deliveryDate + 'T00:00:00');
-                            return d >= new Date(sd + 'T00:00:00') && d <= new Date(ed + 'T23:59:59.999');
+                if (staffRequestsChart) staffRequestsChart.destroy();
+                const staffCount = {};
+                requests.forEach(r => {
+                    if (r.interStaff) {
+                        r.interStaff.forEach(s => {
+                            staffCount[s] = (staffCount[s] || 0) + 1;
                         });
                     }
+                });
+                const sortedStaff = Object.entries(staffCount).sort((a,b) => b[1] - a[1]).slice(0, 15);
+                const ctx4 = document.getElementById('staffRequestsChart').getContext('2d');
+                staffRequestsChart = new Chart(ctx4, {
+                    type: 'bar',
+                    data: {
+                        labels: sortedStaff.map(s => s[0]),
+                        datasets: [{ label: 'Solicitudes', data: sortedStaff.map(s => s[1]), backgroundColor: '#5CE1E6' }]
+                    },
+                    options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false }
+                });
 
-                    const unitDisplay = getUnitDisplayName();
-
-                    const deptMap = new Map();
-                    filtered.forEach(r => {
-                        const deptName = mapDepartment(r.department, r.msoDepartment);
-                        const unit = classifyUnit(r.department, r.msoDepartment);
-                        const meals = parseInt(r.totalQuantity) || 0;
-                        const amount = parseFloat(r.totalCost) || 0;
-                        const key = `${deptName}|${unit}`;
-                        if (!deptMap.has(key)) {
-                            deptMap.set(key, { departamento: deptName, centro: unit, meals: 0, amount: 0 });
-                        }
-                        const entry = deptMap.get(key);
-                        entry.meals += meals;
-                        entry.amount += amount;
-                    });
-
-                    let ccsSubtotal = 0, msoSubtotal = 0;
-                    const deptRows = [];
-                    for (const [_, item] of deptMap.entries()) {
-                        const row = `<tr>
-                            <td style="border:1px solid #999; padding:5px;">${escapeHtml(item.departamento)}</td>
-                            <td style="border:1px solid #999; padding:5px;">${item.centro}</td>
-                            <td style="border:1px solid #999; padding:5px; text-align:right;">$${item.amount.toFixed(2)}</td>
-                        </tr>`;
-                        deptRows.push(row);
-                        if (item.centro === 'CCS') ccsSubtotal += item.amount;
-                        else if (item.centro === 'MSO') msoSubtotal += item.amount;
-                    }
-
-                    const ccsProviders = new Map();
-                    const msoProviders = new Map();
-                    filtered.forEach(r => {
-                        const provider = r.providerName || 'No especificado';
-                        const unit = classifyUnit(r.department, r.msoDepartment);
-                        const meals = parseInt(r.totalQuantity) || 0;
-                        const amount = parseFloat(r.totalCost) || 0;
-                        const targetMap = unit === 'CCS' ? ccsProviders : msoProviders;
-                        if (!targetMap.has(provider)) {
-                            targetMap.set(provider, { meals: 0, amount: 0 });
-                        }
-                        const provData = targetMap.get(provider);
-                        provData.meals += meals;
-                        provData.amount += amount;
-                    });
-
-                    let totalCcsMeals = 0, totalCcsAmount = 0, totalMsoMeals = 0, totalMsoAmount = 0;
-                    const providerRows = [];
-                    const allProviderNames = new Set([...ccsProviders.keys(), ...msoProviders.keys()]);
-                    const sortedProviders = Array.from(allProviderNames).sort();
-
-                    for (const prov of sortedProviders) {
-                        const ccs = ccsProviders.get(prov) || { meals: 0, amount: 0 };
-                        const mso = msoProviders.get(prov) || { meals: 0, amount: 0 };
-                        const mealsCcs = ccs.meals, amountCcs = ccs.amount;
-                        const mealsMso = mso.meals, amountMso = mso.amount;
-                        totalCcsMeals += mealsCcs; totalCcsAmount += amountCcs;
-                        totalMsoMeals += mealsMso; totalMsoAmount += amountMso;
-
-                        const ccsCell = mealsCcs > 0 ? `${mealsCcs} serv<br/>$${amountCcs.toFixed(2)}` : '0 serv<br/>$0.00';
-                        const msoCell = mealsMso > 0 ? `${mealsMso} serv<br/>$${amountMso.toFixed(2)}` : '0 serv<br/>$0.00';
-                        const totalAmount = amountCcs + amountMso;
-                        const totalMeals = mealsCcs + mealsMso;
-                        const totalCell = totalMeals > 0 ? `${totalMeals} serv<br/>$${totalAmount.toFixed(2)}` : '0 serv<br/>$0.00';
-
-                        const row = `<tr>
-                            <td style="border:1px solid #999; padding:5px;">${escapeHtml(prov)}</td>
-                            <td style="border:1px solid #999; padding:5px;">${ccsCell}</td>
-                            <td style="border:1px solid #999; padding:5px;">${msoCell}</td>
-                            <td style="border:1px solid #999; padding:5px;">${totalCell}</td>
-                        </tr>`;
-                        providerRows.push(row);
-                    }
-
-                    const totalGeneralAmount = totalCcsAmount + totalMsoAmount;
-                    const totalGeneralMeals = totalCcsMeals + totalMsoMeals;
-
-                    const unitTitle = isAdminGuar || isUserGuar ? 'Guarenas' : 'CCS y MSO';
-
-                    const htmlContent = `
-                        <div style="font-family: 'Inter', sans-serif; background: white; padding: 15px; font-size: 8px;">
-                            <div style="text-align: center; margin-bottom: 15px;">
-                                <h2 style="color: #005BAA; font-size: 16px; margin: 0;">Gastos de comida ${currentCity === 'guar' ? '- Guarenas' : ''}</h2>
-                                <p style="margin: 2px 0; font-size: 10px;">${period}</p>
-                                <p style="margin: 2px 0; font-size: 9px;">Fecha: ${todayStr}</p>
-                                <p style="margin: 2px 0; font-size: 9px;">Unidad: ${unitTitle}</p>
-                            </div>
-                            <table style="width:100%; border-collapse: collapse; margin-bottom: 15px;">
-                                <thead>
-                                    <tr style="background-color: #f0f7ff;">
-                                        <th style="border:1px solid #999; padding:5px; text-align:left;">DEPARTAMENTO</th>
-                                        <th style="border:1px solid #999; padding:5px; text-align:left;">CENTRO DE OPERACIONES</th>
-                                        <th style="border:1px solid #999; padding:5px; text-align:left;">IMPORTE (USD)</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    ${deptRows.join('')}
-                                    <tr style="background-color: #f9f9f9; font-weight:bold;">
-                                        <td colspan="2" style="border:1px solid #999; padding:5px; text-align:right;">TOTAL ${isAdminGuar || isUserGuar ? 'GUARENAS' : 'CCS'}</td>
-                                        <td style="border:1px solid #999; padding:5px; text-align:right;">$${ccsSubtotal.toFixed(2)}</td>
-                                    </tr>
-                                    ${!isAdminGuar && !isUserGuar ? `
-                                    <tr style="background-color: #f9f9f9; font-weight:bold;">
-                                        <td colspan="2" style="border:1px solid #999; padding:5px; text-align:right;">TOTAL MSO</td>
-                                        <td style="border:1px solid #999; padding:5px; text-align:right;">$${msoSubtotal.toFixed(2)}</td>
-                                    </tr>
-                                    <tr style="background-color: #e6f3ff; font-weight:bold;">
-                                        <td colspan="2" style="border:1px solid #999; padding:5px; text-align:right;">TOTAL GENERAL</td>
-                                        <td style="border:1px solid #999; padding:5px; text-align:right;">$${(ccsSubtotal + msoSubtotal).toFixed(2)}</td>
-                                    </tr>
-                                    ` : ''}
-                                </tbody>
-                            </table>
-                            <div style="margin-top: 15px;">
-                                <h3 style="color: #005BAA; font-size: 11px; margin: 5px 0;">EMPRESAS PROVEEDORAS DE SERVICIO</h3>
-                                <table style="width:100%; border-collapse: collapse; margin-bottom: 15px;">
-                                    <thead>
-                                        <tr style="background-color: #f0f7ff;">
-                                            <th style="border:1px solid #999; padding:5px; text-align:left;">EMPRESA</th>
-                                            <th style="border:1px solid #999; padding:5px; text-align:center;">SERVICIOS A ${isAdminGuar || isUserGuar ? 'GUARENAS' : 'CCS'}</th>
-                                            ${!isAdminGuar && !isUserGuar ? `<th style="border:1px solid #999; padding:5px; text-align:center;">SERVICIOS A MSO</th>` : ''}
-                                            <th style="border:1px solid #999; padding:5px; text-align:center;">TOTAL</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        ${providerRows.join('')}
-                                        <tr style="background-color: #f9f9f9; font-weight:bold;">
-                                            <td style="border:1px solid #999; padding:5px; text-align:right;">TOTALES</td>
-                                            <td style="border:1px solid #999; padding:5px; text-align:center;">${totalCcsMeals} serv<br/>$${totalCcsAmount.toFixed(2)}</td>
-                                            ${!isAdminGuar && !isUserGuar ? `<td style="border:1px solid #999; padding:5px; text-align:center;">${totalMsoMeals} serv<br/>$${totalMsoAmount.toFixed(2)}</td>` : ''}
-                                            <td style="border:1px solid #999; padding:5px; text-align:center;">${totalGeneralMeals} serv<br/>$${totalGeneralAmount.toFixed(2)}</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                            <div style="margin-top: 15px;">
-                                <h3 style="color: #005BAA; font-size: 11px; margin: 5px 0;">RESUMEN POR UNIDAD</h3>
-                                <table style="width:100%; border-collapse: collapse;">
-                                    <thead>
-                                        <tr style="background-color: #f0f7ff;">
-                                            <th style="border:1px solid #999; padding:5px; text-align:left;">UNIDAD</th>
-                                            <th style="border:1px solid #999; padding:5px; text-align:center;">CANTIDAD</th>
-                                            <th style="border:1px solid #999; padding:5px; text-align:right;">IMPORTE TOTAL</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td style="border:1px solid #999; padding:5px;">UNIDAD ${isAdminGuar || isUserGuar ? 'GUARENAS' : 'CCS'}</td>
-                                            <td style="border:1px solid #999; padding:5px; text-align:center;">${totalCcsMeals} servicios</td>
-                                            <td style="border:1px solid #999; padding:5px; text-align:right;">$${totalCcsAmount.toFixed(2)}</td>
-                                        </tr>
-                                        ${!isAdminGuar && !isUserGuar ? `
-                                        <tr>
-                                            <td style="border:1px solid #999; padding:5px;">UNIDAD MSO</td>
-                                            <td style="border:1px solid #999; padding:5px; text-align:center;">${totalMsoMeals} servicios</td>
-                                            <td style="border:1px solid #999; padding:5px; text-align:right;">$${totalMsoAmount.toFixed(2)}</td>
-                                        </tr>
-                                        <tr style="background-color: #e6f3ff; font-weight:bold;">
-                                            <td style="border:1px solid #999; padding:5px;">TOTAL GENERAL</td>
-                                            <td style="border:1px solid #999; padding:5px; text-align:center;">${totalGeneralMeals} servicios</td>
-                                            <td style="border:1px solid #999; padding:5px; text-align:right;">$${totalGeneralAmount.toFixed(2)}</td>
-                                        </tr>
-                                        ` : ''}
-                                    </tbody>
-                                </table>
-                            </div>
-                            <div style="text-align: center; margin-top: 20px; padding-top: 8px; border-top: 1px solid #ddd; color: #666; font-size: 7px;">
-                                Reporte generado el ${todayStr}<br/>Control de Solicitud de Comidas - Inter
-                            </div>
-                        </div>
-                    `;
-
-                    const container = document.createElement('div');
-                    container.innerHTML = htmlContent;
-                    container.style.position = 'absolute';
-                    container.style.left = '-9999px';
-                    container.style.width = '700px';
-                    container.style.background = 'white';
-                    container.style.padding = '15px';
-                    document.body.appendChild(container);
-
-                    await new Promise(r => setTimeout(r, 300));
-                    const canvas = await html2canvas(container, { scale: 2, backgroundColor: '#ffffff', width: 700, height: container.scrollHeight });
-                    document.body.removeChild(container);
-
-                    const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
-                    const imgData = canvas.toDataURL('image/png');
-                    const imgWidth = 190;
-                    const imgHeight = (canvas.height * imgWidth) / canvas.width;
-                    const pageHeight = pdf.internal.pageSize.getHeight();
-
-                    if (imgHeight < pageHeight - 20) {
-                        pdf.addImage(imgData, 'PNG', 10, 10, imgWidth, imgHeight);
-                    } else {
-                        let yOffset = 10;
-                        let remainingHeight = imgHeight;
-                        let imgY = 0;
-                        while (remainingHeight > 0) {
-                            if (yOffset > 10) pdf.addPage();
-                            const sliceHeight = Math.min(pageHeight - 20, remainingHeight);
-                            const canvasSlice = document.createElement('canvas');
-                            canvasSlice.width = canvas.width;
-                            canvasSlice.height = canvas.height * (sliceHeight / imgHeight);
-                            const ctx = canvasSlice.getContext('2d');
-                            ctx.drawImage(canvas, 0, imgY, canvas.width, canvas.height * (sliceHeight / imgHeight), 0, 0, canvasSlice.width, canvasSlice.height);
-                            const sliceData = canvasSlice.toDataURL('image/png');
-                            pdf.addImage(sliceData, 'PNG', 10, yOffset, imgWidth, sliceHeight);
-                            yOffset = 10;
-                            imgY += canvas.height * (sliceHeight / imgHeight);
-                            remainingHeight -= sliceHeight;
-                        }
-                    }
-
-                    let filename = '';
-                    if (isMonthly) {
-                        const [y, m] = reportMonthInput.value.split('-');
-                        filename = `Gastos_Comida_${currentCity}_${getMonthName(m)}_${y}.pdf`;
-                    } else {
-                        filename = `Gastos_Comida_${currentCity}_${formatDateForFilename(biweekStartDate.value)}_${formatDateForFilename(biweekEndDate.value)}.pdf`;
-                    }
-                    pdf.save(filename);
-                    displayMessage('PDF generado con éxito', 'success');
-                } catch(e) {
-                    console.error(e);
-                    displayMessage('Error al generar PDF: ' + e.message, 'error');
-                }
+                if (departmentRequestsChart) departmentRequestsChart.destroy();
+                const deptCount = {};
+                requests.forEach(r => {
+                    deptCount[r.department] = (deptCount[r.department] || 0) + 1;
+                });
+                const ctx5 = document.getElementById('departmentRequestsChart').getContext('2d');
+                departmentRequestsChart = new Chart(ctx5, {
+                    type: 'doughnut',
+                    data: {
+                        labels: Object.keys(deptCount),
+                        datasets: [{ data: Object.values(deptCount), backgroundColor: ['#005BAA', '#5CE1E6', '#E85D04', '#FF9800', '#667EEA', '#6A4C93'] }]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false }
+                });
             }
 
-            generateReportBtn?.addEventListener('click', generateReport);
-            exportReportBtn?.addEventListener('click', exportReportToExcel);
-            exportPdfBtn?.addEventListener('click', exportReportToPDF);
-
-            updateUIForProfile();
-            initializeForm();
-            loadCityData();
+            // Cargar datos iniciales
             try {
-                foodRequests = await loadRequests();
-                console.log("Solicitudes cargadas:", foodRequests.length);
-                foodRequests.forEach(r => console.log("Solicitud:", r.id, "ciudad:", r.city || "undefined"));
-                renderTable(getFilteredRequestsForDisplay());
-                updateSummaryTotals(getFilteredRequestsForDisplay());
-                if (isAdmin) {
-                    updateCharts();
-                    if (reportMonthInput?.value) generateReport();
-                }
-                console.log("Aplicación inicializada correctamente");
-            } catch(e) {
-                console.error(e);
+                const loaded = await loadRequests();
+                foodRequests = loaded;
+            } catch (e) {
+                console.error("Error cargando datos:", e);
+            }
+            initializeForm();
+            renderTable(getFilteredRequestsForDisplay());
+            updateSummaryTotals(getFilteredRequestsForDisplay());
+            
+            if (currentProfile === 'admin_ccs' || currentProfile === 'admin_guar') {
+                generateReport();
+                updateCharts();
             }
         }
     </script>
