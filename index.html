@@ -119,6 +119,7 @@
         <div id="dashboard-tab" class="tab-content active">
             <section class="mb-6 md:mb-8 p-4 md:p-6 bg-white rounded-lg border border-inter-primary shadow-lg">
                 <h2 class="text-xl md:text-2xl font-bold text-inter-primary mb-3 md:mb-4">Registrar Nueva Solicitud de Comida</h2>
+
                 <form id="foodRequestForm" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
                     <div id="departmentField">
                         <label for="department" class="block text-sm font-medium text-gray-700 mb-1">Departamento/Área</label>
@@ -165,18 +166,24 @@
                             <option value="Otros">Otros</option>
                         </select>
                     </div>
+
+                    <!-- CONTENEDORES EXCLUSIVOS PARA PRESIDENCIA (Campos Numéricos) -->
                     <div id="presidenciaExternoQtyContainer" class="col-span-1 hidden">
                         <label for="presidenciaExternoQty" class="block text-sm font-medium text-gray-700 mb-1">Cant. Personal Externo</label>
                         <input type="number" id="presidenciaExternoQty" min="0" value="0" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-inter-primary focus:border-inter-primary text-sm md:text-base">
                     </div>
+                    
                     <div id="presidenciaInternoQtyContainer" class="col-span-1 hidden">
                         <label for="presidenciaInternoQty" class="block text-sm font-medium text-gray-700 mb-1">Cant. Personal Interno</label>
                         <input type="number" id="presidenciaInternoQty" min="0" value="0" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-inter-primary focus:border-inter-primary text-sm md:text-base">
                     </div>
+
+                    <!-- CONTENEDORES PARA CCS Y GUARENAS (Buscador y Checkboxes) -->
                     <div id="externalStaffMainContainer" class="col-span-1 admin-and-user">
                         <label class="block text-sm font-medium text-gray-700 mb-1">Personal Externo</label>
                         <div class="space-y-1 md:space-y-2" id="externalStaffContainer"></div>
                     </div>
+
                     <div id="interStaffMainContainer" class="col-span-1 admin-and-user">
                         <label class="block text-sm font-medium text-gray-700 mb-1">Personal Inter</label>
                         <div class="relative">
@@ -185,10 +192,12 @@
                         </div>
                         <ul id="interStaffSelected" class="mt-2 space-y-1 md:space-y-2 max-h-32 overflow-y-auto"></ul>
                     </div>
+
                     <div class="col-span-1">
                         <label for="totalQuantity" class="block text-sm font-medium text-gray-700 mb-1">Total de Comidas</label>
                         <input type="number" id="totalQuantity" min="0" value="0" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-inter-primary focus:border-inter-primary text-sm md:text-base bg-gray-100 cursor-not-allowed" readonly>
                     </div>
+                    
                     <div class="col-span-1 md:col-span-2">
                         <label for="deliveryPlace" class="block text-sm font-medium text-gray-700 mb-1">Lugar de Entrega</label>
                         <input type="text" id="deliveryPlace" required class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-inter-primary focus:border-inter-primary text-sm md:text-base" placeholder="Ej. Administración, Sede Principal, Campo (con dirección)">
@@ -352,9 +361,6 @@
     </script>
 
     <script>
-        /* ══════════════════════════════════════════════════════════════════
-           VARIABLES GLOBALES Y CONFIGURACIÓN
-           ══════════════════════════════════════════════════════════════════ */
         let db, firebaseFunctions;
         const { jsPDF } = window.jspdf;
         let currentProfile = 'admin_ccs', isLoggedIn = false;
@@ -374,10 +380,62 @@
                 departments: ['Administración','Área Comercial','C.O El Rosal','C.O La Naya','C.O Los Ruices','C.O Paraiso-Catia','Gerencia Senior','Head End','MSO','Ocad','Obras'],
                 providers: ['Monteluso','Susi fresh','Cumbes Barlovento'],
                 unitName: 'CCS',
-                // ⚠️ REEMPLAZA ESTA LISTA CON TU staffList ORIGINAL DE CCS
                 staffList: [
-                    { id: 1, name: "GALEA CESAR" }, { id: 2, name: "CASTILLO TIBET" },
-                    /* ... aquí va tu lista completa original de 163 empleados CCS ... */
+                    { id: 1, name: "GALEA CESAR" }, { id: 2, name: "CASTILLO TIBET" }, { id: 3, name: "QUINTERO ROSANA" },
+                    { id: 4, name: "GONZALEZ LINO" }, { id: 5, name: "MORILLO ANA" }, { id: 6, name: "LEAL GREGORYS" },
+                    { id: 7, name: "DELGADO JONATHAN" }, { id: 8, name: "VILLAMIZAR NANCY" }, { id: 9, name: "BRITO RONEY" },
+                    { id: 10, name: "MUÑOZ KELVIN" }, { id: 11, name: "CARTAYA LENNYIS" }, { id: 12, name: "MORENO GEINES" },
+                    { id: 13, name: "SUAREZ KIR" }, { id: 14, name: "MACHADO JOSE" }, { id: 15, name: "GARCIA ANGELICA" },
+                    { id: 16, name: "VEGAS ENYMAR" }, { id: 17, name: "CONTRERAS NOELIA" }, { id: 18, name: "ARRAEZ JOSE" },
+                    { id: 19, name: "JIMENEZ DAIRELI" }, { id: 20, name: "GOMEZ SAMUEL" }, { id: 21, name: "LONGA JESUS" },
+                    { id: 22, name: "QUIJADA WILFREDO" }, { id: 23, name: "PINO ALEJANDRO" }, { id: 24, name: "TERAN CASTO" },
+                    { id: 25, name: "CHINCHILLA OSMEL" }, { id: 26, name: "AMORUZO ANGELO" }, { id: 27, name: "CARRERO JOSHUA" },
+                    { id: 28, name: "TOVAR JAIRO" }, { id: 29, name: "PEREZ LUIS" }, { id: 30, name: "BRITO JOSE" },
+                    { id: 31, name: "ASCANIO FELIX" }, { id: 32, name: "HELLO ALBANY" }, { id: 33, name: "CASTILLO JHOAN" },
+                    { id: 34, name: "RODRIGUEZ MISAEL" }, { id: 35, name: "TORRES KEIVER" }, { id: 36, name: "ORTA WILNER" },
+                    { id: 37, name: "TOVAR LUIS" }, { id: 38, name: "FERRER GABRIEL" }, { id: 39, name: "HOLGUIN DEYKER" },
+                    { id: 40, name: "CORONADO MIGUEL" }, { id: 41, name: "PIRELA WILMER" }, { id: 42, name: "CASTELLANOS FRANKLIN" },
+                    { id: 43, name: "GONZALEZ JUAN" }, { id: 44, name: "JIMENEZ RONMEL" }, { id: 45, name: "PRIETO JAVIER" },
+                    { id: 46, name: "LARA EDUARDO" }, { id: 47, name: "CASTILLO ORIANA" }, { id: 48, name: "GARRIDO ADOLFO" },
+                    { id: 49, name: "MORENO JOELIMAR" }, { id: 50, name: "CENTENO LUIS" }, { id: 51, name: "NEGRIN CARLOS" },
+                    { id: 52, name: "LADERA DAYANA" }, { id: 53, name: "PEREZ NELSON" }, { id: 54, name: "CHACON EDUARDO" },
+                    { id: 55, name: "UZCATEGUI DARWIN" }, { id: 56, name: "VALENZUELA CARLOS" }, { id: 57, name: "DIAZ ENNIO" },
+                    { id: 58, name: "MANRIQUE LUIS" }, { id: 59, name: "TORRES CARLOS" }, { id: 60, name: "LOPEZ JIM" },
+                    { id: 61, name: "RAMOS LISMAR" }, { id: 62, name: "CHIRINOS RHONY" }, { id: 63, name: "MORALES JOSUE" },
+                    { id: 64, name: "CASTILLO JUNIOR" }, { id: 65, name: "VERGARA JORGE" }, { id: 66, name: "DELGADO BRAYAN" },
+                    { id: 67, name: "REVERON ROGELIO" }, { id: 68, name: "HERNANDEZ SERGIO" }, { id: 69, name: "CEDEÑO LEONEL" },
+                    { id: 70, name: "UZCATEGUI BREINER" }, { id: 71, name: "MALDONADO DYLAN" }, { id: 72, name: "HERNANDEZ LUIS" },
+                    { id: 73, name: "MENESES KELVIS" }, { id: 74, name: "HERNANDEZ RAFAEL" }, { id: 75, name: "VILLAMIZAR YOHAN" },
+                    { id: 76, name: "CASTRO MANUEL" }, { id: 77, name: "BRICEÑO ALEX" }, { id: 78, name: "ROCA YUNIOR" },
+                    { id: 79, name: "DIAZ MANUEL" }, { id: 80, name: "ZERPA ODREIMY" }, { id: 81, name: "RODRIGUEZ FELIX" },
+                    { id: 82, name: "GARCIA ANGEL" }, { id: 83, name: "TONITO JULIO" }, { id: 84, name: "GARCIA EDNEY" },
+                    { id: 85, name: "CASTRILLO MANUEL" }, { id: 86, name: "GUERRERO GABRIEL" }, { id: 87, name: "MATHEUS FERNANDO" },
+                    { id: 88, name: "GARCIA LUIS" }, { id: 89, name: "VELASQUEZ JOSE" }, { id: 90, name: "PERNETT CESAR" },
+                    { id: 91, name: "RODRIGUEZ OMAR" }, { id: 92, name: "RAMIREZ DARWIN" }, { id: 93, name: "YEMES GUILLERMO" },
+                    { id: 94, name: "BAZAN WILLIAMS" }, { id: 95, name: "RAMIREZ FRANKLIN" }, { id: 96, name: "LOPEZ JORGE" },
+                    { id: 97, name: "RAMOS ROBERT" }, { id: 98, name: "GARCIA CARLOS" }, { id: 99, name: "PALACIOS LUIS" },
+                    { id: 100, name: "MACHADO DANNY" }, { id: 101, name: "ROMERO LUIS" }, { id: 102, name: "RAMIREZ JOHN" },
+                    { id: 103, name: "MORA DYLAN" }, { id: 104, name: "JULIO DANIEL" }, { id: 105, name: "BARRETO ANDRES" },
+                    { id: 106, name: "CARVAJAL JOSE" }, { id: 107, name: "PEREZ KEINER" }, { id: 108, name: "GARCIA MENRY" },
+                    { id: 109, name: "MEJIA LUIS" }, { id: 110, name: "CARRASCO HAROLD" }, { id: 111, name: "MENDOZA ENDERSON" },
+                    { id: 112, name: "PINEDA BRAYAN" }, { id: 113, name: "GONZALEZ ALVARO" }, { id: 114, name: "MOSQUERA ARQUIMIDES" },
+                    { id: 115, name: "GONZALEZ SAMUEL" }, { id: 116, name: "GARCIA YORMAN" }, { id: 117, name: "BLANCO EDWAR" },
+                    { id: 118, name: "POSADA RAMON" }, { id: 119, name: "GUZMAN CESAR" }, { id: 120, name: "CAMPOS ARQUIMEDES" },
+                    { id: 121, name: "ROJAS RONALD" }, { id: 122, name: "MOSQUERA JAVIER" }, { id: 123, name: "ESCORCIA ELITH" },
+                    { id: 124, name: "VASQUEZ VICTOR" }, { id: 125, name: "ESCALONA WUILMER" }, { id: 126, name: "YEPEZ CESAR" },
+                    { id: 127, name: "AYALA JOSE" }, { id: 128, name: "MACHADO CARLOS" }, { id: 129, name: "ANGARITA ANGEL" },
+                    { id: 130, name: "BRITO HARRISON" }, { id: 131, name: "APONTE YOSKARLA" }, { id: 132, name: "AZUAJE YAMILETH" },
+                    { id: 133, name: "VALERO VANESA" }, { id: 134, name: "GIL DEMIAN" }, { id: 135, name: "MALVACEA ALANY" },
+                    { id: 136, name: "FIGUERA REBECA" }, { id: 137, name: "VIVENES YETZIBEL" }, { id: 138, name: "RUIZ JONATHAN" },
+                    { id: 139, name: "DUMONT ANGEL" }, { id: 140, name: "BERROTERAN LUIS" }, { id: 141, name: "URBAEZ HEISHMAR" },
+                    { id: 142, name: "SANCHEZ SARAI" }, { id: 143, name: "GALVAN RICARDO" }, { id: 144, name: "SIERRA DAVID" },
+                    { id: 145, name: "SERRANO WILLIANA" }, { id: 146, name: "ESCORCHE VICTORIA" }, { id: 147, name: "LEDEZMA RALTH" },
+                    { id: 148, name: "ORTIZ KATHERINE" }, { id: 149, name: "SANCHEZ ADRIANA" }, { id: 150, name: "RODRIGUEZ MERLIN" },
+                    { id: 151, name: "VAMONDE JOSE" }, { id: 152, name: "MARTINEZ MARINA" }, { id: 153, name: "MARQUEZ ACXEL" },
+                    { id: 154, name: "BARON YOSMAR" }, { id: 155, name: "CALDERON LUISANA" }, { id: 156, name: "BASUALDO JORGE" },
+                    { id: 157, name: "PEREZ JENNYFER" }, { id: 158, name: "URBINA GENESIS" }, { id: 159, name: "MAGALLANES LUIS" },
+                    { id: 160, name: "ESCALONA KARLA" }, { id: 161, name: "BRICEÑO ALEXA" }, { id: 162, name: "RUIZ EDGAR" },
+                    { id: 163, name: "CEBALLOS LEONID" }
                 ],
                 externalStaff: [
                     { id: 'CANTV', label: 'CANTV' },
@@ -393,10 +451,33 @@
                 departments: ['Administración','Área Comercial','C.O Guarenas','C.O Guatire','Gerencia Senior','Head End','Ocad','Obras'],
                 providers: ['Sub_Brayan','Corporación Stark (Bunker)'],
                 unitName: 'Guarenas',
-                // ⚠️ REEMPLAZA ESTA LISTA CON TU staffList ORIGINAL DE GUARENAS
                 staffList: [
-                    { id: 1, name: "PEREIRA JOSE" },
-                    /* ... aquí va tu lista completa original de 76 empleados Guarenas ... */
+                    { id: 1, name: "PEREIRA JOSE" }, { id: 2, name: "AZUAJE YENNY" }, { id: 3, name: "ROMERO ORLANDO" },
+                    { id: 4, name: "AZUAJE YETZENIA" }, { id: 5, name: "BUSTAMANTE ROSSIRYS" }, { id: 6, name: "SIFONTES YUBRIN" },
+                    { id: 7, name: "OROZCO GINA" }, { id: 8, name: "VILLALONGA EUNICE" }, { id: 9, name: "PAJARO JESUS" },
+                    { id: 10, name: "RODRIGUEZ GARVEN" }, { id: 11, name: "TOVAR ANA" }, { id: 12, name: "CARABALLO DANIELA" },
+                    { id: 13, name: "NIETO RICARDO" }, { id: 14, name: "MEDINA SANTIAGO" }, { id: 15, name: "MARCANO JHONATHAN" },
+                    { id: 16, name: "MURO IBRAHIM" }, { id: 17, name: "ISTURIZ MAIKOL" }, { id: 18, name: "CAMPOS DICXIS" },
+                    { id: 19, name: "TORRES OLIVER" }, { id: 20, name: "BRICEÑO RAMSES" }, { id: 21, name: "SALMERON LUIS" },
+                    { id: 22, name: "RUIZ JONATHAN" }, { id: 23, name: "BELLO ERICK" }, { id: 24, name: "APONTE IRVIN" },
+                    { id: 25, name: "REQUENA JONATHAN" }, { id: 26, name: "CUMARIN RONALD" }, { id: 27, name: "DE LA ROSA JESUS" },
+                    { id: 28, name: "MUÑOZ MACARIO" }, { id: 29, name: "PEREZ JOSE" }, { id: 30, name: "URBINA JEISON" },
+                    { id: 31, name: "ARVELO LUIS" }, { id: 32, name: "RODRIGUEZ YERARDO" }, { id: 33, name: "DIAZ FRITGERALD" },
+                    { id: 34, name: "GARCIA KERWIN" }, { id: 35, name: "FERNANDEZ JORGE" }, { id: 36, name: "SEQUERA AARON" },
+                    { id: 37, name: "GUZMAN ANGEL" }, { id: 38, name: "GONZALEZ JORGE" }, { id: 39, name: "FLORES DEIKER" },
+                    { id: 40, name: "FERRER ELEAZAR" }, { id: 41, name: "BALLEN BRAYAN" }, { id: 42, name: "UZCATEGUI ANDERSO" },
+                    { id: 43, name: "CALVO JUAN" }, { id: 44, name: "FIGUEROA ADRIAN" }, { id: 45, name: "VELIZ ROYMA" },
+                    { id: 46, name: "MOLINA JEZREEL" }, { id: 47, name: "CARMONA ROSIBEL" }, { id: 48, name: "SOJO ANALYS" },
+                    { id: 49, name: "MUJICA JESUS" }, { id: 50, name: "PAREDES NIURLEXI" }, { id: 51, name: "GONZALEZ LUIS" },
+                    { id: 52, name: "LINARES AURISBELIS" }, { id: 53, name: "CHINA GABRIELA" }, { id: 54, name: "ABAD NAIRUSKA" },
+                    { id: 55, name: "DIAZ JEISA" }, { id: 56, name: "LOPEZ DANIELYS" }, { id: 57, name: "GARCIA DANIELA" },
+                    { id: 58, name: "BASTIDAS ROSSI" }, { id: 59, name: "CAPOTE YEINVIC" }, { id: 60, name: "VILLARREAL ARTURO" },
+                    { id: 61, name: "MORALES SHARON" }, { id: 62, name: "GRISALEZ DENZEL" }, { id: 63, name: "PIÑANGO DARYALI" },
+                    { id: 64, name: "COLINA ADRIANA" }, { id: 65, name: "MOLINA PAOLA" }, { id: 66, name: "PADOANI GABRIEL" },
+                    { id: 67, name: "SANTANA JOSHANY" }, { id: 68, name: "BELMONTE KEVIN" }, { id: 69, name: "YANEZ DAVID" },
+                    { id: 70, name: "RADA OMAR" }, { id: 71, name: "CAMPOS MARIA" }, { id: 72, name: "DUGARTE CRISTHIAN" },
+                    { id: 73, name: "MACHADO FRAIDERLIN" }, { id: 74, name: "GARCIA BARBARA" }, { id: 75, name: "COLINA MERY" },
+                    { id: 76, name: "TORRES EDGAR" }
                 ],
                 externalStaff: [
                     { id: 'CANTV', label: 'CANTV' },
@@ -409,6 +490,9 @@
 
         function getCityConfig(city) { return CITY_CONFIG[city] || CITY_CONFIG.ccs; }
 
+        // ============================================================================
+        // FUNCIÓN CENTRAL DE CÁLCULO
+        // ============================================================================
         function calcularTotalesRegistro(registro) {
             const externalStaff = registro.externalStaff || {};
             let extTotal = 0;
@@ -428,12 +512,14 @@
             const unitCost = parseFloat(registro.unitCost) || 0;
             const deliveryCost = parseFloat(registro.deliveryCost) || 0;
             const totalCost = (totalQuantity * unitCost) + deliveryCost;
-            return { externalStaffNormalizado: extNormalizado, externalStaffTotal: extTotal, interStaffTotal: interTotal, totalQuantity, unitCost, deliveryCost, totalCost };
+            return {
+                externalStaffNormalizado: extNormalizado,
+                externalStaffTotal: extTotal,
+                interStaffTotal: interTotal,
+                totalQuantity, unitCost, deliveryCost, totalCost
+            };
         }
 
-        /* ══════════════════════════════════════════════════════════════════
-           FUNCIONES DE REPARACIÓN / AUDITORÍA
-           ══════════════════════════════════════════════════════════════════ */
         async function fixCityRecords() {
             if (!confirm('Esta acción reparará los registros que no tengan ciudad asignada, asignándoles "ccs" por defecto. ¿Estás seguro?')) return;
             try {
@@ -467,9 +553,11 @@
                     const costGuardado = parseFloat(r.totalCost) || 0;
                     if (qtyGuardada !== calc.totalQuantity || Math.abs(costGuardado - calc.totalCost) > 0.01) {
                         await updateDoc(doc(window.firebaseDb, 'foodRequests', document.id), {
-                            totalQuantity: calc.totalQuantity, totalCost: calc.totalCost,
+                            totalQuantity: calc.totalQuantity,
+                            totalCost: calc.totalCost,
                             externalStaff: calc.externalStaffNormalizado,
-                            externalStaffTotal: calc.externalStaffTotal, interStaffTotal: calc.interStaffTotal
+                            externalStaffTotal: calc.externalStaffTotal,
+                            interStaffTotal: calc.interStaffTotal
                         });
                         corregidos++;
                         detalles.push({ id: r.id, dept: r.department, qtyAntes: qtyGuardada, qtyDespues: calc.totalQuantity, costAntes: costGuardado, costDespues: calc.totalCost });
@@ -495,7 +583,12 @@
                     sumaQtyG += qtyG; sumaQtyC += calc.totalQuantity;
                     sumaCostG += costG; sumaCostC += calc.totalCost;
                     if (qtyG !== calc.totalQuantity || Math.abs(costG - calc.totalCost) > 0.01) {
-                        problemas.push({ id: r.id, dept: r.department, msoDept: r.msoDepartment || '', qtyGuardada: qtyG, qtyCalculada: calc.totalQuantity, costGuardado: costG.toFixed(2), costCalculado: calc.totalCost.toFixed(2), externos: JSON.stringify(r.externalStaff || {}), internos: (r.interStaff || []).join(', ') });
+                        problemas.push({
+                            id: r.id, dept: r.department, msoDept: r.msoDepartment || '',
+                            qtyGuardada: qtyG, qtyCalculada: calc.totalQuantity,
+                            costGuardado: costG.toFixed(2), costCalculado: calc.totalCost.toFixed(2),
+                            externos: JSON.stringify(r.externalStaff || {}), internos: (r.interStaff || []).join(', ')
+                        });
                     }
                 });
                 console.log('=== AUDITORÍA ===');
@@ -508,9 +601,6 @@
             } catch(e) { console.error(e); alert('Error: ' + e.message); }
         }
 
-        /* ══════════════════════════════════════════════════════════════════
-           INICIALIZACIÓN Y LOGIN
-           ══════════════════════════════════════════════════════════════════ */
         document.addEventListener('DOMContentLoaded', () => {
             const savedProfile = localStorage.getItem('savedProfile');
             if (savedProfile) {
@@ -628,9 +718,6 @@
             }));
         }
 
-        /* ══════════════════════════════════════════════════════════════════
-           LÓGICA PRINCIPAL DE LA APLICACIÓN
-           ══════════════════════════════════════════════════════════════════ */
         async function initializeAppContent() {
             const form = document.getElementById('foodRequestForm');
             const departmentSelect = document.getElementById('department');
@@ -720,6 +807,7 @@
             function loadCityData() {
                 const config = getConfig();
                 const isPresidenciaProfile = currentProfile === 'presidencia';
+                
                 departmentSelect.innerHTML = `<option value="" disabled selected>Selecciona un Departamento</option>`;
                 if (isPresidenciaProfile) {
                     const opt = document.createElement('option');
@@ -733,12 +821,14 @@
                         departmentSelect.appendChild(opt);
                     });
                 }
+                
                 providerNameSelect.innerHTML = `<option value="" disabled selected>Selecciona un Proveedor</option>`;
                 config.providers.forEach(p => {
                     const opt = document.createElement('option');
                     opt.value = p; opt.textContent = p;
                     providerNameSelect.appendChild(opt);
                 });
+                
                 const externalContainer = document.getElementById('externalStaffContainer');
                 if (externalContainer) {
                     externalContainer.innerHTML = '';
@@ -786,10 +876,11 @@
                         });
                     });
                 }
+                
                 if (isPresidenciaProfile) {
                     msoObservationsContainer.classList.remove('hidden');
                     msoObservationsContainer.classList.remove('mso-hidden');
-                    externalStaffMainContainer.style.display = 'none';
+                    externalStaffMainContainer.style.display = 'none'; 
                     interStaffMainContainer.style.display = 'none';
                 } else if (!config.hasMSO) {
                     msoObservationsContainer.classList.add('mso-hidden');
@@ -797,6 +888,7 @@
                 } else {
                     msoObservationsContainer.classList.remove('mso-hidden');
                 }
+                
                 updateCityBadge();
                 selectedInterStaff = [];
                 renderSelectedStaff();
@@ -806,8 +898,10 @@
 
             function getStaffList() { return getConfig().staffList || []; }
 
+            // Lógica para sumar Interno y Externo en Presidencia, o los checkbox y lista en otros perfiles
             function calculateTotalQuantity() {
                 let externalTotal = 0, internalTotal = 0;
+                
                 if (isPresidencia) {
                     externalTotal = parseInt(presidenciaExternoQtyInput.value) || 0;
                     internalTotal = parseInt(presidenciaInternoQtyInput.value) || 0;
@@ -820,6 +914,7 @@
                         internalTotal = selectedInterStaff.length;
                     }
                 }
+                
                 const total = externalTotal + internalTotal;
                 if (totalQuantityInput) totalQuantityInput.value = total;
                 return total;
@@ -829,7 +924,9 @@
                 const total = calculateTotalQuantity();
                 const unit = parseFloat(unitCostInput.value) || 0;
                 let delivery = 0;
-                if (!isUser) delivery = deliveryFree.checked ? 0 : (parseFloat(deliveryCostInput.value) || 0);
+                if (!isUser) {
+                    delivery = deliveryFree.checked ? 0 : (parseFloat(deliveryCostInput.value) || 0);
+                }
                 const totalCost = (total * unit) + delivery;
                 if (costInput) costInput.value = totalCost.toFixed(2);
                 return totalCost;
@@ -873,6 +970,7 @@
                         }
                     }
                 });
+
                 interStaffSearchInput.addEventListener('input', () => {
                     const query = interStaffSearchInput.value.trim().toUpperCase();
                     interStaffSearchResults.innerHTML = '';
@@ -911,8 +1009,19 @@
             }
             if (unitCostInput) unitCostInput.addEventListener('input', calculateTotalCost);
             if (deliveryCostInput) deliveryCostInput.addEventListener('input', calculateTotalCost);
-            if (presidenciaExternoQtyInput) presidenciaExternoQtyInput.addEventListener('input', () => { calculateTotalQuantity(); calculateTotalCost(); });
-            if (presidenciaInternoQtyInput) presidenciaInternoQtyInput.addEventListener('input', () => { calculateTotalQuantity(); calculateTotalCost(); });
+            
+            if (presidenciaExternoQtyInput) {
+                presidenciaExternoQtyInput.addEventListener('input', () => {
+                    calculateTotalQuantity();
+                    calculateTotalCost();
+                });
+            }
+            if (presidenciaInternoQtyInput) {
+                presidenciaInternoQtyInput.addEventListener('input', () => {
+                    calculateTotalQuantity();
+                    calculateTotalCost();
+                });
+            }
 
             departmentSelect.addEventListener('change', function() {
                 const config = getConfig();
@@ -968,6 +1077,7 @@
                 if (totalQuantityInput) totalQuantityInput.value = '0';
                 if (presidenciaExternoQtyInput) presidenciaExternoQtyInput.value = '0';
                 if (presidenciaInternoQtyInput) presidenciaInternoQtyInput.value = '0';
+                
                 editingRequestId = null;
                 if (submitButton) {
                     submitButton.textContent = 'Registrar Solicitud';
@@ -1004,6 +1114,7 @@
                     presidenciaInternoQtyContainer.classList.remove('hidden');
                     externalStaffMainContainer.style.display = 'none';
                     interStaffMainContainer.style.display = 'none';
+
                     departmentSelect.innerHTML = `<option value="" disabled selected>Selecciona un Departamento</option><option value="MSO">MSO</option>`;
                     departmentSelect.value = 'MSO';
                     msoObservationsSelect.innerHTML = `<option value="" selected>Selecciona departamento MSO</option><option value="Presidencia">Presidencia</option><option value="Personal Visitante">Personal Visitante</option>`;
@@ -1143,6 +1254,7 @@
                 unitCostInput.value = parseFloat(req.unitCost || 0).toFixed(2);
                 providerNameSelect.value = req.providerName || '';
                 reasonTextarea.value = req.reason || '';
+                
                 const config = getConfig();
                 const isPresidenciaProfile = currentProfile === 'presidencia';
                 if (req.department === 'MSO' && (config.hasMSO || isPresidenciaProfile)) {
@@ -1154,6 +1266,7 @@
                     if (!config.hasMSO && !isPresidenciaProfile) msoObservationsContainer.classList.add('mso-hidden');
                     msoObservationsSelect.value = '';
                 }
+
                 if (isPresidenciaProfile) {
                     if (req.externalStaff) {
                         let totalExt = 0;
@@ -1189,6 +1302,7 @@
                         renderSelectedStaff();
                     }
                 }
+                
                 const delCost = parseFloat(req.deliveryCost || 0);
                 if (delCost > 0 && !isUser) {
                     deliveryCostOption.checked = true; deliveryFree.checked = false;
@@ -1216,12 +1330,16 @@
                 e.preventDefault();
                 let externalStaffData = {};
                 const isAdminOrUser = isAdmin || isUser;
+                
                 if (isPresidencia) {
                     const qtyExt = parseInt(presidenciaExternoQtyInput.value) || 0;
                     if (qtyExt > 0) externalStaffData['Otros'] = qtyExt;
+                    
                     const qtyInt = parseInt(presidenciaInternoQtyInput.value) || 0;
                     selectedInterStaff = [];
-                    for(let i=0; i<qtyInt; i++) selectedInterStaff.push(`Empleado Interno ${i+1}`);
+                    for(let i=0; i<qtyInt; i++) {
+                        selectedInterStaff.push(`Empleado Interno ${i+1}`);
+                    }
                 } else if (isAdminOrUser) {
                     document.querySelectorAll('input[name="externalStaff"]:checked').forEach(cb => {
                         const qi = document.getElementById(`quantity${cb.value}`);
@@ -1229,15 +1347,18 @@
                         if (qty > 0) externalStaffData[cb.value] = qty;
                     });
                 }
+                
                 const totalQty = calculateTotalQuantity();
                 const delCost = deliveryFree.checked ? 0 : (parseFloat(deliveryCostInput.value) || 0);
                 const unitCostVal = isUser ? 0 : (parseFloat(unitCostInput.value) || 0);
                 const totalCost = isUser ? 0 : ((totalQty * unitCostVal) + delCost);
+                
                 if (totalQty === 0) { displayMessage('El total de comidas debe ser mayor a 0.', 'error'); return; }
                 if (!departmentSelect.value) { displayMessage('Debe seleccionar un Departamento/Área.', 'error'); return; }
                 if (!isUser && !providerNameSelect.value) { displayMessage('Debe seleccionar un Proveedor.', 'error'); return; }
                 if (!eventSelect.value) { displayMessage('Debe seleccionar un Evento.', 'error'); return; }
                 if (!reasonTextarea.value.trim()) { displayMessage('Debe completar el Motivo de la Solicitud.', 'error'); return; }
+                
                 const status = isUser ? 'pendiente' : 'aprobado';
                 const approver = getApprover(departmentSelect.value, msoObservationsSelect.value);
                 const newReq = {
@@ -1405,31 +1526,38 @@
                 });
             }
 
-            function updateSummaryTotals(requests) {
-                const today = new Date(); today.setHours(0,0,0,0);
-                const startOfWeek = new Date(today); startOfWeek.setDate(today.getDate() - today.getDay() + 1); startOfWeek.setHours(0,0,0,0);
-                const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
-                let daily = 0, weekly = 0, monthly = 0;
-                requests.forEach(r => {
-                    if (r.status === 'pendiente') return;
-                    const date = new Date(r.deliveryDate + 'T12:00:00');
-                    if (isNaN(date.getTime())) return;
-                    const cost = parseFloat(r.totalCost) || 0;
-                    if (date >= today && date < new Date(today.getTime() + 86400000)) daily += cost;
-                    if (date >= startOfWeek) weekly += cost;
-                    if (date >= startOfMonth) monthly += cost;
-                });
-                if (dailyTotalEl) dailyTotalEl.textContent = formatCost(daily);
-                if (weeklyTotalEl) weeklyTotalEl.textContent = formatCost(weekly);
-                if (monthlyTotalEl) monthlyTotalEl.textContent = formatCost(monthly);
-            }
-
             exportCsvBtn.addEventListener('click', () => {
                 let toExp = getFilteredRequestsForDisplay();
-                if (isPresidencia && activeFilters.length === 0) toExp = toExp.filter(r => r.msoDepartment === 'Presidencia');
+                if (isPresidencia && activeFilters.length === 0) {
+                    toExp = toExp.filter(r => r.msoDepartment === 'Presidencia');
+                }
                 if (!toExp.length) { displayMessage('No hay datos para exportar', 'error'); return; }
+
+                const registrosAuditados = toExp.map(r => {
+                    const calc = calcularTotalesRegistro(r);
+                    return {
+                        ...r,
+                        externalStaffNorm: calc.externalStaffNormalizado,
+                        extTotal: calc.externalStaffTotal,
+                        interTotal: calc.interStaffTotal,
+                        totalQuantityCalc: calc.totalQuantity,
+                        unitCostCalc: calc.unitCost,
+                        deliveryCostCalc: calc.deliveryCost,
+                        totalCostCalc: calc.totalCost,
+                        discrepaQty: calc.totalQuantity !== r.totalQuantity,
+                        discrepaCost: Math.abs(calc.totalCost - (parseFloat(r.totalCost) || 0)) > 0.01
+                    };
+                });
+
+                const conProblemas = registrosAuditados.filter(r => r.discrepaQty || r.discrepaCost);
+                if (conProblemas.length > 0) {
+                    console.warn('⚠️ Registros con discrepancias:', conProblemas);
+                    if (!confirm(`Se detectaron ${conProblemas.length} registro(s) con totales inconsistentes. El CSV usará los valores recalculados. ¿Continuar?`)) return;
+                }
+
                 const quote = s => `"${String(s == null ? '' : s).replace(/"/g, '""')}"`;
                 const num = n => (parseFloat(n) || 0).toFixed(2).replace('.', ',');
+
                 let csv = [
                     "Fecha de Entrega", "Ciudad", "Departamento", "Departamento Completo", "Departamento MSO",
                     "Tipo de Comida", "Evento", "Lugar de Entrega", "Motivo", "Proveedor",
@@ -1437,42 +1565,125 @@
                     "Personal Inter (Nombres)", "Cant. Personal Inter", "TOTAL COMIDAS (Ext + Int)",
                     "Costo Unitario", "Costo Total Comida", "Costo Delivery", "Costo Total Final",
                     "Aprobado por", "Estado"
-                ].join(';') + '\n';
-                toExp.forEach(r => {
-                    const calc = calcularTotalesRegistro(r);
-                    const extNorm = calc.externalStaffNormalizado;
-                    const ext = r.externalStaff || {};
-                    let cantCantv = 0, cantEdc = 0, cantOtros = 0;
-                    Object.keys(ext).forEach(k => {
-                        const q = parseInt(ext[k]) || 0;
-                        if (k === 'CANTV') cantCantv += q;
-                        else if (k === 'EDC') cantEdc += q;
-                        else cantOtros += q;
-                    });
-                    const costoComida = calc.totalQuantity * calc.unitCost;
-                    csv += [
-                        quote(r.deliveryDate), quote(r.city === 'guar' ? 'Guarenas' : (r.city === 'mso' ? 'MSO' : 'CCS')),
-                        quote(r.department), quote(r.department === 'MSO' && r.msoDepartment ? `${r.department} (${r.msoDepartment})` : r.department),
-                        quote(r.msoDepartment || ''), quote(r.mealType), quote(r.event || ''), quote(r.deliveryPlace), quote(r.reason || ''),
-                        quote(r.providerName || ''), num(cantCantv), num(cantEdc), num(cantOtros), num(calc.externalStaffTotal),
-                        quote((r.interStaff || []).join(', ')), num(calc.interStaffTotal), num(calc.totalQuantity),
-                        num(calc.unitCost), num(costoComida), num(calc.deliveryCost), num(calc.totalCost),
-                        quote(r.approvedBy || ''), quote(r.status || '')
-                    ].join(';') + '\n';
+                ].join(";") + "\n";
+
+                let sumQty = 0, sumExt = 0, sumInter = 0, sumCostoComida = 0, sumDelivery = 0, sumTotal = 0;
+                let sumCantv = 0, sumEdc = 0, sumOtros = 0;
+                const porProveedor = {};
+                const porDepartamento = {};
+
+                registrosAuditados.forEach(r => {
+                    const cantv = r.externalStaffNorm['CANTV'] || 0;
+                    const edc = r.externalStaffNorm['EDC'] || 0;
+                    const otros = r.externalStaffNorm['Otros'] || 0;
+                    
+                    sumCantv += cantv;
+                    sumEdc += edc;
+                    sumOtros += otros;
+
+                    const interDetalle = (r.interStaff || []).join(' | ');
+                    const deptCompleto = r.department === 'MSO' && r.msoDepartment ? `MSO - ${r.msoDepartment}` : r.department;
+                    const costoComida = r.totalQuantityCalc * r.unitCostCalc;
+                    
+                    const fila = [
+                        quote(r.deliveryDate), quote(r.city === 'guar' ? 'Guarenas' : 'CCS'),
+                        quote(r.department), quote(deptCompleto), quote(r.msoDepartment || ''),
+                        quote(r.mealType), quote(r.event || ''), quote(r.deliveryPlace), quote(r.reason), quote(r.providerName || ''),
+                        cantv, edc, otros, r.extTotal,
+                        quote(interDetalle), r.interTotal, r.totalQuantityCalc,
+                        num(r.unitCostCalc), num(costoComida), num(r.deliveryCostCalc), num(r.totalCostCalc),
+                        quote(r.approvedBy || ''), quote(r.status || 'aprobado')
+                    ];
+                    csv += fila.join(";") + "\n";
+                    
+                    sumQty += r.totalQuantityCalc;
+                    sumExt += r.extTotal;
+                    sumInter += r.interTotal;
+                    sumCostoComida += costoComida;
+                    sumDelivery += r.deliveryCostCalc;
+                    sumTotal += r.totalCostCalc;
+                    
+                    const prov = r.providerName || 'SIN_PROVEEDOR';
+                    if (!porProveedor[prov]) porProveedor[prov] = { qty: 0, costo: 0 };
+                    porProveedor[prov].qty += r.totalQuantityCalc;
+                    porProveedor[prov].costo += r.totalCostCalc;
+                    
+                    if (!porDepartamento[deptCompleto]) porDepartamento[deptCompleto] = { qty: 0, costo: 0 };
+                    porDepartamento[deptCompleto].qty += r.totalQuantityCalc;
+                    porDepartamento[deptCompleto].costo += r.totalCostCalc;
                 });
-                const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
-                const url = URL.createObjectURL(blob);
+
+                csv += "\n";
+                csv += ["TOTALES","","","","","","","","","", sumCantv, sumEdc, sumOtros, sumExt, "", sumInter, sumQty, "", num(sumCostoComida), num(sumDelivery), num(sumTotal), "", ""].join(";") + "\n";
+
+                csv += "\nRESUMEN POR PROVEEDOR\n";
+                csv += ["Proveedor","Cantidad Comidas","Importe Total"].join(";") + "\n";
+                let sumProvQty = 0, sumProvCosto = 0;
+                Object.keys(porProveedor).sort().forEach(p => {
+                    csv += [quote(p), porProveedor[p].qty, num(porProveedor[p].costo)].join(";") + "\n";
+                    sumProvQty += porProveedor[p].qty;
+                    sumProvCosto += porProveedor[p].costo;
+                });
+                csv += ["TOTAL PROVEEDORES", sumProvQty, num(sumProvCosto)].join(";") + "\n";
+
+                csv += "\nRESUMEN POR DEPARTAMENTO\n";
+                csv += ["Departamento","Cantidad Comidas","Importe Total"].join(";") + "\n";
+                let sumDeptQty = 0, sumDeptCosto = 0;
+                Object.keys(porDepartamento).sort().forEach(d => {
+                    csv += [quote(d), porDepartamento[d].qty, num(porDepartamento[d].costo)].join(";") + "\n";
+                    sumDeptQty += porDepartamento[d].qty;
+                    sumDeptCosto += porDepartamento[d].costo;
+                });
+                csv += ["TOTAL DEPARTAMENTOS", sumDeptQty, num(sumDeptCosto)].join(";") + "\n";
+
+                csv += "\nVERIFICACIÓN DE CUADRE\n";
+                csv += `Suma Total Comidas (Ext + Int):;${sumQty}\n`;
+                csv += `Suma Cant. Externos:;${sumExt}\n`;
+                csv += `Suma Cant. Internos:;${sumInter}\n`;
+                csv += `¿Cuadra cantidad total?:;${sumQty === (sumExt + sumInter) ? 'SÍ' : 'NO'}\n`;
+                csv += `Suma Costo Total Final:;${num(sumTotal)}\n`;
+                csv += `¿Cuadra costo?:;${Math.abs(sumTotal - (sumCostoComida + sumDelivery)) < 0.01 ? 'SÍ' : 'NO'}\n`;
+                csv += `Suma por Proveedores:;${num(sumProvCosto)}\n`;
+                csv += `¿Cuadra con proveedores?:;${Math.abs(sumTotal - sumProvCosto) < 0.01 ? 'SÍ' : 'NO'}\n`;
+                csv += `Suma por Departamentos:;${num(sumDeptCosto)}\n`;
+                csv += `¿Cuadra con departamentos?:;${Math.abs(sumTotal - sumDeptCosto) < 0.01 ? 'SÍ' : 'NO'}\n`;
+
+                const blob = new Blob(["\uFEFF", csv], { type: 'text/csv;charset=utf-8;' });
                 const a = document.createElement('a');
-                a.href = url;
-                a.download = `Solicitudes_Comidas_${currentCity}_${new Date().toISOString().split('T')[0]}.csv`;
+                a.href = URL.createObjectURL(blob);
+                a.download = `solicitudes_comidas_${new Date().toISOString().split('T')[0]}.csv`;
+                document.body.appendChild(a);
                 a.click();
-                URL.revokeObjectURL(url);
-                displayMessage('CSV exportado correctamente', 'success');
+                document.body.removeChild(a);
+                displayMessage(`Exportado: ${registrosAuditados.length} registros, ${sumQty} comidas, $${num(sumTotal)}`, 'success');
             });
 
-            /* ══════════════════════════════════════════════════════════════
-               REPORTE FINANCIERO + EXPORTAR PDF + EXPORTAR EXCEL + CHARTS
-               ══════════════════════════════════════════════════════════════ */
+            function updateSummaryTotals(requests = foodRequests) {
+                let filtered = getFilteredRequestsForDisplay();
+                if (isPresidencia && activeFilters.length === 0) {
+                    filtered = filtered.filter(r => r.msoDepartment === 'Presidencia');
+                }
+                const now = new Date();
+                const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+                const weekStart = new Date(today); weekStart.setDate(today.getDate() - today.getDay());
+                const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+                let daily = 0, weekly = 0, monthly = 0;
+                filtered.forEach(r => {
+                    if (r.status !== 'aprobado') return;
+                    const d = new Date(r.deliveryDate + 'T12:00:00');
+                    const c = parseFloat(r.totalCost) || 0;
+                    if (d >= monthStart) monthly += c;
+                    if (d >= weekStart) weekly += c;
+                    if (r.deliveryDate === today.toISOString().split('T')[0]) daily += c;
+                });
+                dailyTotalEl.textContent = formatCost(daily);
+                weeklyTotalEl.textContent = formatCost(weekly);
+                monthlyTotalEl.textContent = formatCost(monthly);
+            }
+
+            // ============================================================================
+            // FUNCIONES DE REPORTES FINANCIEROS Y GRÁFICOS
+            // ============================================================================
             const reportMonthInput = document.getElementById('reportMonth');
             const periodMonthly = document.getElementById('periodMonthly');
             const periodBiweekly = document.getElementById('periodBiweekly');
@@ -1484,541 +1695,378 @@
             const exportReportBtn = document.getElementById('exportReportBtn');
             const exportPdfBtn = document.getElementById('exportPdfBtn');
 
-            function getReportPeriod() {
-                const type = document.querySelector('input[name="periodType"]:checked')?.value || 'monthly';
-                if (type === 'monthly') {
-                    const month = reportMonthInput.value;
-                    if (!month) return null;
-                    const [y, m] = month.split('-').map(Number);
-                    const start = new Date(y, m - 1, 1);
-                    const end = new Date(y, m, 0);
-                    return { type, start, end, label: `Mensual ${month}` };
+            const todayReport = new Date();
+            if (reportMonthInput) {
+                reportMonthInput.value = `${todayReport.getFullYear()}-${String(todayReport.getMonth() + 1).padStart(2, '0')}`;
+            }
+
+            if (periodMonthly && periodBiweekly) {
+                document.querySelectorAll('input[name="periodType"]').forEach(radio => {
+                    radio.addEventListener('change', () => {
+                        if (periodMonthly.checked) {
+                            monthlyFilter.classList.remove('hidden');
+                            biweeklyFilter.classList.add('hidden');
+                        } else {
+                            monthlyFilter.classList.add('hidden');
+                            biweeklyFilter.classList.remove('hidden');
+                        }
+                    });
+                });
+            }
+
+            function getRequestsForReportPeriod() {
+                let base = getFilteredRequestsForDisplay();
+                base = base.filter(r => r.status === 'aprobado');
+                
+                if (periodMonthly.checked) {
+                    const monthVal = reportMonthInput.value;
+                    if (!monthVal) return [];
+                    return base.filter(r => {
+                        const d = normalizeDate(r.deliveryDate);
+                        return d && d.startsWith(monthVal);
+                    });
                 } else {
-                    const s = biweekStartDate.value, e = biweekEndDate.value;
-                    if (!s || !e) return null;
-                    return { type, start: new Date(s + 'T00:00:00'), end: new Date(e + 'T23:59:59'), label: `Quincenal ${s} al ${e}` };
+                    const start = biweekStartDate.value;
+                    const end = biweekEndDate.value;
+                    if (!start || !end) return [];
+                    return base.filter(r => {
+                        const d = normalizeDate(r.deliveryDate);
+                        return d && d >= start && d <= end;
+                    });
                 }
             }
 
             function generateReport() {
-                const period = getReportPeriod();
-                if (!period) { displayMessage('Seleccione un período válido', 'error'); return; }
-                const filtered = foodRequests.filter(r => {
-                    if (!r.deliveryDate) return false;
-                    const d = new Date(r.deliveryDate + 'T12:00:00');
-                    if (isNaN(d.getTime())) return false;
-                    if (currentCity === 'guar' && r.city !== 'guar') return false;
-                    if (currentCity === 'ccs' && r.city === 'guar') return false;
-                    return d >= period.start && d <= period.end;
+                const requests = getRequestsForReportPeriod();
+                
+                const byDept = {};
+                requests.forEach(r => {
+                    const dept = r.department === 'MSO' && r.msoDepartment ? `MSO (${r.msoDepartment})` : r.department;
+                    if (!byDept[dept]) byDept[dept] = { qty: 0, amount: 0 };
+                    byDept[dept].qty += r.totalQuantity;
+                    byDept[dept].amount += parseFloat(r.totalCost) || 0;
                 });
-                const deptMap = {};
-                filtered.forEach(r => {
-                    const key = r.department === 'MSO' && r.msoDepartment ? `MSO - ${r.msoDepartment}` : r.department;
-                    if (!deptMap[key]) deptMap[key] = { qty: 0, amount: 0 };
-                    deptMap[key].qty += parseFloat(r.totalQuantity) || 0;
-                    deptMap[key].amount += parseFloat(r.totalCost) || 0;
-                });
+
                 const deptBody = document.getElementById('departmentReportBody');
                 deptBody.innerHTML = '';
-                let totalDeptMeals = 0, totalDeptAmount = 0;
-                Object.keys(deptMap).sort().forEach(k => {
-                    totalDeptMeals += deptMap[k].qty; totalDeptAmount += deptMap[k].amount;
-                    deptBody.innerHTML += `<tr><td class="px-3 md:px-6 py-2 border border-gray-300">${escapeHtml(k)}</td><td class="px-3 md:px-6 py-2 border border-gray-300 text-right">${deptMap[k].qty}</td><td class="px-3 md:px-6 py-2 border border-gray-300 text-right">${formatCost(deptMap[k].amount)}</td></tr>`;
+                let totalDeptQty = 0, totalDeptAmount = 0;
+                Object.keys(byDept).sort().forEach(dept => {
+                    const row = deptBody.insertRow();
+                    row.innerHTML = `<td class="px-3 md:px-6 py-2 border border-gray-300">${escapeHtml(dept)}</td><td class="px-3 md:px-6 py-2 border border-gray-300 text-right">${byDept[dept].qty}</td><td class="px-3 md:px-6 py-2 border border-gray-300 text-right">$${byDept[dept].amount.toFixed(2)}</td>`;
+                    totalDeptQty += byDept[dept].qty;
+                    totalDeptAmount += byDept[dept].amount;
                 });
-                document.getElementById('totalDepartmentMeals').textContent = totalDeptMeals;
-                document.getElementById('totalDepartmentAmount').textContent = formatCost(totalDeptAmount);
+                document.getElementById('totalDepartmentMeals').textContent = totalDeptQty;
+                document.getElementById('totalDepartmentAmount').textContent = `$${totalDeptAmount.toFixed(2)}`;
 
-                const provMap = {};
-                filtered.forEach(r => {
-                    const key = r.providerName || 'Sin proveedor';
-                    if (!provMap[key]) provMap[key] = { qty: 0, amount: 0 };
-                    provMap[key].qty += parseFloat(r.totalQuantity) || 0;
-                    provMap[key].amount += parseFloat(r.totalCost) || 0;
+                const byProv = {};
+                requests.forEach(r => {
+                    const prov = r.providerName || 'SIN PROVEEDOR';
+                    if (!byProv[prov]) byProv[prov] = { qty: 0, amount: 0 };
+                    byProv[prov].qty += r.totalQuantity;
+                    byProv[prov].amount += parseFloat(r.totalCost) || 0;
                 });
+
                 const provBody = document.getElementById('providerReportBody');
                 provBody.innerHTML = '';
-                let totalProvMeals = 0, totalProvAmount = 0;
-                Object.keys(provMap).sort().forEach(k => {
-                    totalProvMeals += provMap[k].qty; totalProvAmount += provMap[k].amount;
-                    provBody.innerHTML += `<tr><td class="px-3 md:px-6 py-2 border border-gray-300">${escapeHtml(k)}</td><td class="px-3 md:px-6 py-2 border border-gray-300 text-right">${provMap[k].qty}</td><td class="px-3 md:px-6 py-2 border border-gray-300 text-right">${formatCost(provMap[k].amount)}</td></tr>`;
+                let totalProvQty = 0, totalProvAmount = 0;
+                Object.keys(byProv).sort().forEach(prov => {
+                    const row = provBody.insertRow();
+                    row.innerHTML = `<td class="px-3 md:px-6 py-2 border border-gray-300">${escapeHtml(prov)}</td><td class="px-3 md:px-6 py-2 border border-gray-300 text-right">${byProv[prov].qty}</td><td class="px-3 md:px-6 py-2 border border-gray-300 text-right">$${byProv[prov].amount.toFixed(2)}</td>`;
+                    totalProvQty += byProv[prov].qty;
+                    totalProvAmount += byProv[prov].amount;
                 });
-                document.getElementById('totalProviderMeals').textContent = totalProvMeals;
-                document.getElementById('totalProviderAmount').textContent = formatCost(totalProvAmount);
+                document.getElementById('totalProviderMeals').textContent = totalProvQty;
+                document.getElementById('totalProviderAmount').textContent = `$${totalProvAmount.toFixed(2)}`;
 
-                let ccsMeals = 0, ccsAmount = 0, msoMeals = 0, msoAmount = 0;
-                filtered.forEach(r => {
-                    const isMSO = r.department === 'MSO' || r.msoDepartment;
-                    if (isMSO) { msoMeals += parseFloat(r.totalQuantity) || 0; msoAmount += parseFloat(r.totalCost) || 0; }
-                    else { ccsMeals += parseFloat(r.totalQuantity) || 0; ccsAmount += parseFloat(r.totalCost) || 0; }
+                let ccsQty = 0, ccsAmount = 0, msoQty = 0, msoAmount = 0;
+                requests.forEach(r => {
+                    if (r.city === 'guar') return;
+                    if (r.department === 'MSO') {
+                        msoQty += r.totalQuantity;
+                        msoAmount += parseFloat(r.totalCost) || 0;
+                    } else {
+                        ccsQty += r.totalQuantity;
+                        ccsAmount += parseFloat(r.totalCost) || 0;
+                    }
                 });
-                document.getElementById('ccsTotalMeals').textContent = ccsMeals;
-                document.getElementById('ccsTotalAmount').textContent = formatCost(ccsAmount);
-                document.getElementById('msoTotalMeals').textContent = msoMeals;
-                document.getElementById('msoTotalAmount').textContent = formatCost(msoAmount);
-                document.getElementById('grandTotalAmount').textContent = formatCost(ccsAmount + msoAmount);
+                document.getElementById('ccsTotalMeals').textContent = ccsQty;
+                document.getElementById('ccsTotalAmount').textContent = `$${ccsAmount.toFixed(2)}`;
+                document.getElementById('msoTotalMeals').textContent = msoQty;
+                document.getElementById('msoTotalAmount').textContent = `$${msoAmount.toFixed(2)}`;
+                document.getElementById('grandTotalAmount').textContent = `$${(ccsAmount + msoAmount).toFixed(2)}`;
 
-                const unitProvMap = {};
-                filtered.forEach(r => {
-                    const unit = (r.department === 'MSO' || r.msoDepartment) ? 'MSO' : 'CCS';
-                    const prov = r.providerName || 'Sin proveedor';
-                    const key = `${unit}||${prov}`;
-                    if (!unitProvMap[key]) unitProvMap[key] = { unit, prov, qty: 0, amount: 0 };
-                    unitProvMap[key].qty += parseFloat(r.totalQuantity) || 0;
-                    unitProvMap[key].amount += parseFloat(r.totalCost) || 0;
+                const byUnitProv = {};
+                requests.forEach(r => {
+                    const unit = r.department === 'MSO' ? 'MSO' : 'CCS';
+                    const prov = r.providerName || 'SIN PROVEEDOR';
+                    const key = `${unit}|${prov}`;
+                    if (!byUnitProv[key]) byUnitProv[key] = { unit, prov, qty: 0, amount: 0 };
+                    byUnitProv[key].qty += r.totalQuantity;
+                    byUnitProv[key].amount += parseFloat(r.totalCost) || 0;
                 });
-                const upBody = document.getElementById('unitProviderReportBody');
-                upBody.innerHTML = '';
-                let totalUpMeals = 0, totalUpAmount = 0;
-                Object.values(unitProvMap).sort((a, b) => a.unit.localeCompare(b.unit) || a.prov.localeCompare(b.prov)).forEach(v => {
-                    totalUpMeals += v.qty; totalUpAmount += v.amount;
-                    upBody.innerHTML += `<tr><td class="px-3 md:px-6 py-2 border border-gray-300">${escapeHtml(v.unit)}</td><td class="px-3 md:px-6 py-2 border border-gray-300">${escapeHtml(v.prov)}</td><td class="px-3 md:px-6 py-2 border border-gray-300 text-right">${v.qty}</td><td class="px-3 md:px-6 py-2 border border-gray-300 text-right">${formatCost(v.amount)}</td></tr>`;
-                });
-                document.getElementById('totalUnitProviderMeals').textContent = totalUpMeals;
-                document.getElementById('totalUnitProviderAmount').textContent = formatCost(totalUpAmount);
 
-                exportReportBtn.classList.remove('hidden');
-                exportPdfBtn.classList.remove('hidden');
-                displayMessage('Reporte generado correctamente', 'success');
+                const unitProvBody = document.getElementById('unitProviderReportBody');
+                unitProvBody.innerHTML = '';
+                let totalUpQty = 0, totalUpAmount = 0;
+                Object.values(byUnitProv).sort((a, b) => a.unit.localeCompare(b.unit) || a.prov.localeCompare(b.prov)).forEach(item => {
+                    const row = unitProvBody.insertRow();
+                    row.innerHTML = `<td class="px-3 md:px-6 py-2 border border-gray-300">${escapeHtml(item.unit)}</td><td class="px-3 md:px-6 py-2 border border-gray-300">${escapeHtml(item.prov)}</td><td class="px-3 md:px-6 py-2 border border-gray-300 text-right">${item.qty}</td><td class="px-3 md:px-6 py-2 border border-gray-300 text-right">$${item.amount.toFixed(2)}</td>`;
+                    totalUpQty += item.qty;
+                    totalUpAmount += item.amount;
+                });
+                document.getElementById('totalUnitProviderMeals').textContent = totalUpQty;
+                document.getElementById('totalUnitProviderAmount').textContent = `$${totalUpAmount.toFixed(2)}`;
+
+                if (exportReportBtn) exportReportBtn.classList.remove('hidden');
+                if (exportPdfBtn) exportPdfBtn.classList.remove('hidden');
             }
 
-            generateReportBtn.addEventListener('click', generateReport);
+            if (generateReportBtn) {
+                generateReportBtn.addEventListener('click', () => {
+                    generateReport();
+                    if (isAdmin) updateCharts();
+                });
+            }
 
-            periodMonthly.addEventListener('change', () => {
-                monthlyFilter.classList.remove('hidden');
-                biweeklyFilter.classList.add('hidden');
-            });
-            periodBiweekly.addEventListener('change', () => {
-                monthlyFilter.classList.add('hidden');
-                biweeklyFilter.classList.remove('hidden');
-            });
-
-            /* ── EXPORTAR REPORTE A EXCEL (CSV) ── */
-            exportReportBtn.addEventListener('click', () => {
-                try {
-                    const tables = document.querySelectorAll('#reportContent table');
-                    if (!tables.length) { displayMessage('No hay reporte generado', 'error'); return; }
-                    const quote = s => `"${String(s == null ? '' : s).replace(/"/g, '""')}"`;
-                    let csv = '';
-                    tables.forEach((table, idx) => {
-                        const title = table.closest('.bg-gray-50')?.querySelector('h3')?.textContent || `Tabla ${idx + 1}`;
-                        csv += `\n${quote(title)}\n`;
-                        table.querySelectorAll('tr').forEach(row => {
-                            const cells = Array.from(row.querySelectorAll('th, td')).map(c => quote(c.textContent.trim()));
-                            csv += cells.join(';') + '\n';
-                        });
-                        csv += '\n';
+            // EXPORTACIÓN DEL REPORTE EXACTA AL EJEMPLO SOLICITADO
+            if (exportReportBtn) {
+                exportReportBtn.addEventListener('click', () => {
+                    const requests = getRequestsForReportPeriod();
+                    if (!requests.length) { displayMessage('No hay datos para exportar', 'error'); return; }
+                    
+                    const quote = s => `"${String(s || '').replace(/"/g, '""')}"`;
+                    
+                    let csv = "Reporte de Gastos de Comida\n\n";
+                    
+                    // --- 1. SOLICITUD DE COMIDAS POR UNIDAD DE OPERACIONES ---
+                    csv += "SOLICITUD DE COMIDAS POR UNIDAD DE OPERACIONES\n";
+                    csv += "UNIDAD DE OPERACION;CANTIDAD;IMPORTE\n";
+                    
+                    const config = getConfig();
+                    const byDept = {};
+                    
+                    config.departments.forEach(d => { byDept[d] = { qty: 0, amount: 0 }; });
+                    
+                    requests.forEach(r => {
+                        const dept = r.department === 'MSO' && r.msoDepartment ? `MSO (${r.msoDepartment})` : r.department;
+                        if (!byDept[dept]) byDept[dept] = { qty: 0, amount: 0 };
+                        byDept[dept].qty += r.totalQuantity;
+                        byDept[dept].amount += parseFloat(r.totalCost) || 0;
                     });
-                    const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
-                    const url = URL.createObjectURL(blob);
+                    
+                    let totalDeptQty = 0, totalDeptAmount = 0;
+                    Object.keys(byDept).sort().forEach(d => {
+                        csv += `${quote(d)};${byDept[d].qty};${byDept[d].amount.toFixed(2).replace('.', ',')}\n`;
+                        totalDeptQty += byDept[d].qty;
+                        totalDeptAmount += byDept[d].amount;
+                    });
+                    csv += `TOTAL;${totalDeptQty};${totalDeptAmount.toFixed(2).replace('.', ',')}\n\n`;
+                    
+                    // --- 2. SOLICITUD DE COMIDAS POR PROVEEDOR ---
+                    csv += "SOLICITUD DE COMIDAS POR PROVEEDOR\n";
+                    csv += "PROVEEDOR;CANTIDAD;IMPORTE\n";
+                    
+                    const byProv = {};
+                    config.providers.forEach(p => { byProv[p] = { qty: 0, amount: 0 }; });
+                    
+                    requests.forEach(r => {
+                        const prov = r.providerName || 'SIN PROVEEDOR';
+                        if (!byProv[prov]) byProv[prov] = { qty: 0, amount: 0 };
+                        byProv[prov].qty += r.totalQuantity;
+                        byProv[prov].amount += parseFloat(r.totalCost) || 0;
+                    });
+                    
+                    let totalProvQty = 0, totalProvAmount = 0;
+                    Object.keys(byProv).sort().forEach(p => {
+                        csv += `${quote(p)};${byProv[p].qty};${byProv[p].amount.toFixed(2).replace('.', ',')}\n`;
+                        totalProvQty += byProv[p].qty;
+                        totalProvAmount += byProv[p].amount;
+                    });
+                    csv += `TOTAL;${totalProvQty};${totalProvAmount.toFixed(2).replace('.', ',')}\n\n`;
+
+                    // --- 3. SERVICIOS POR UNIDAD Y PROVEEDOR ---
+                    csv += "SERVICIOS POR UNIDAD Y PROVEEDOR\n";
+                    csv += "UNIDAD;PROVEEDOR;CANTIDAD;IMPORTE\n";
+                    
+                    let ccsQtyTotal = 0, ccsAmountTotal = 0;
+                    let msoQtyTotal = 0, msoAmountTotal = 0;
+                    
+                    const units = ['CCS', 'MSO'];
+                    
+                    units.forEach(unit => {
+                        const unitReqs = requests.filter(r => {
+                            const isMso = r.department === 'MSO';
+                            return unit === 'MSO' ? isMso : !isMso;
+                        });
+                        
+                        if (unitReqs.length === 0) return;
+                        
+                        const uQty = unitReqs.reduce((sum, r) => sum + r.totalQuantity, 0);
+                        const uAmount = unitReqs.reduce((sum, r) => sum + (parseFloat(r.totalCost) || 0), 0);
+                        
+                        if (unit === 'CCS') {
+                            ccsQtyTotal = uQty;
+                            ccsAmountTotal = uAmount;
+                        } else {
+                            msoQtyTotal = uQty;
+                            msoAmountTotal = uAmount;
+                        }
+                        
+                        csv += `UNIDAD ${unit};;${uQty};${uAmount.toFixed(2).replace('.', ',')}\n`;
+                        
+                        const byUnitDetail = {};
+                        unitReqs.forEach(r => {
+                            let key = r.providerName || 'SIN PROVEEDOR';
+                            if (unit === 'MSO') {
+                                key = r.msoDepartment ? `MSO (${r.msoDepartment})` : 'MSO';
+                            }
+                            if (!byUnitDetail[key]) byUnitDetail[key] = { qty: 0, amount: 0 };
+                            byUnitDetail[key].qty += r.totalQuantity;
+                            byUnitDetail[key].amount += parseFloat(r.totalCost) || 0;
+                        });
+                        
+                        Object.keys(byUnitDetail).sort().forEach(k => {
+                            csv += `;${quote(k)};${byUnitDetail[k].qty};${byUnitDetail[k].amount.toFixed(2).replace('.', ',')}\n`;
+                        });
+                        
+                        csv += ";;;\n";
+                    });
+                    
+                    const totalGralQty = ccsQtyTotal + msoQtyTotal;
+                    const totalGralAmount = ccsAmountTotal + msoAmountTotal;
+                    
+                    csv += `TOTAL GENERAL;;${totalGralQty};${totalGralAmount.toFixed(2).replace('.', ',')}\n\n`;
+
+                    // --- 4. RESUMEN POR TIPO DE UNIDAD ---
+                    csv += "RESUMEN POR TIPO DE UNIDAD\n";
+                    csv += `UNIDAD CCS Total Comidas;${ccsQtyTotal}\n`;
+                    csv += `UNIDAD CCS Importe Total;${ccsAmountTotal.toFixed(2).replace('.', ',')}\n`;
+                    csv += `UNIDAD MSO Total Comidas;${msoQtyTotal}\n`;
+                    csv += `UNIDAD MSO Importe Total;${msoAmountTotal.toFixed(2).replace('.', ',')}\n`;
+                    csv += `Total;${totalGralAmount.toFixed(2).replace('.', ',')}\n`;
+
+                    const blob = new Blob(["\uFEFF", csv], { type: 'text/csv;charset=utf-8;' });
                     const a = document.createElement('a');
-                    a.href = url;
-                    a.download = `Reporte_Financiero_${reportMonthInput.value || new Date().toISOString().split('T')[0]}.csv`;
-                    a.click();
-                    URL.revokeObjectURL(url);
-                    displayMessage('Reporte exportado a Excel', 'success');
-                } catch(err) { console.error(err); displayMessage('Error al exportar: ' + err.message, 'error'); }
-            });
-
-            /* ── EXPORTAR A PDF (DIRECTO CON JSPDF) ── */
-            exportPdfBtn.addEventListener('click', () => {
-                const originalText = exportPdfBtn.textContent;
-                try {
-                    const period = getReportPeriod();
-                    if (!period) {
-                        displayMessage('Seleccione un mes o rango de fechas válido antes de exportar.', 'error');
-                        return;
-                    }
-
-                    const hasRows = document.querySelectorAll('#reportContent tbody tr').length > 0;
-                    if (!hasRows) {
-                        displayMessage('Primero haz clic en "Generar Reporte" para calcular las métricas del período.', 'error');
-                        return;
-                    }
-
-                    exportPdfBtn.disabled = true;
-                    exportPdfBtn.textContent = 'Generando PDF...';
-
-                    const filtered = foodRequests.filter(r => {
-                        if (!r.deliveryDate) return false;
-                        const d = new Date(r.deliveryDate + 'T12:00:00');
-                        if (isNaN(d.getTime())) return false;
-                        if (currentCity === 'guar' && r.city !== 'guar') return false;
-                        if (currentCity === 'ccs' && r.city === 'guar') return false;
-                        return d >= period.start && d <= period.end;
-                    });
-
-                    const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
-                    const pageWidth = pdf.internal.pageSize.getWidth();
-                    const pageHeight = pdf.internal.pageSize.getHeight();
-                    const margin = 12;
-                    const usableWidth = pageWidth - margin * 2;
-                    let y = 12;
-
-                    function drawHeader() {
-                        pdf.setFillColor(0, 91, 170);
-                        pdf.rect(0, 0, pageWidth, 24, 'F');
-                        pdf.setTextColor(255, 255, 255);
-                        pdf.setFont('helvetica', 'bold');
-                        pdf.setFontSize(13);
-                        pdf.text('Reporte Financiero - Control de Solicitud de Comidas', margin, 10);
-
-                        pdf.setFont('helvetica', 'normal');
-                        pdf.setFontSize(9);
-                        const cityLabel = currentCity === 'guar' ? 'Guarenas' : 'CCS';
-                        pdf.text(`Período: ${period.label}  |  Sede: ${cityLabel}`, margin, 16);
-
-                        const now = new Date();
-                        pdf.text(
-                            `Generado: ${now.toLocaleDateString('es-ES')} ${now.toLocaleTimeString('es-ES')}`,
-                            margin,
-                            21
-                        );
-                        y = 30;
-                    }
-
-                    function ensureSpace(neededHeight) {
-                        if (y + neededHeight > pageHeight - 18) {
-                            pdf.addPage();
-                            drawHeader();
-                        }
-                    }
-
-                    function drawSectionTitle(title) {
-                        ensureSpace(16);
-                        pdf.setFillColor(227, 242, 253);
-                        pdf.rect(margin, y - 4, usableWidth, 7, 'F');
-                        pdf.setTextColor(0, 91, 170);
-                        pdf.setFont('helvetica', 'bold');
-                        pdf.setFontSize(10);
-                        pdf.text(title, margin + 2, y + 0.5);
-                        y += 6;
-                    }
-
-                    function drawTable(headers, rows, totalRow, colWidths) {
-                        const rowHeight = 6.5;
-
-                        ensureSpace(rowHeight * 2);
-                        pdf.setDrawColor(200, 205, 210);
-                        pdf.setFont('helvetica', 'bold');
-                        pdf.setFontSize(8.5);
-
-                        let x = margin;
-                        headers.forEach((h, idx) => {
-                            const w = colWidths[idx];
-                            pdf.setFillColor(235, 243, 252);
-                            pdf.rect(x, y, w, rowHeight, 'FD');
-                            pdf.setTextColor(0, 91, 170);
-                            const align = idx >= headers.length - 2 ? 'right' : 'left';
-                            const tx = align === 'right' ? x + w - 2 : x + 2;
-                            pdf.text(String(h ?? ''), tx, y + 4.3, { align });
-                            x += w;
-                        });
-                        y += rowHeight;
-
-                        pdf.setFont('helvetica', 'normal');
-                        pdf.setFontSize(8.5);
-
-                        rows.forEach(r => {
-                            ensureSpace(rowHeight + 2);
-                            x = margin;
-                            r.forEach((cell, idx) => {
-                                const w = colWidths[idx];
-                                pdf.setDrawColor(215, 220, 225);
-                                pdf.rect(x, y, w, rowHeight, 'D');
-                                pdf.setTextColor(30, 41, 59);
-                                const align = idx >= r.length - 2 ? 'right' : 'left';
-                                const tx = align === 'right' ? x + w - 2 : x + 2;
-                                const textVal = String(cell ?? '');
-                                pdf.text(textVal.slice(0, 55), tx, y + 4.3, { align });
-                                x += w;
-                            });
-                            y += rowHeight;
-                        });
-
-                        if (totalRow) {
-                            ensureSpace(rowHeight + 4);
-                            pdf.setFont('helvetica', 'bold');
-                            pdf.setFontSize(8.8);
-                            x = margin;
-                            totalRow.forEach((cell, idx) => {
-                                const w = colWidths[idx];
-                                pdf.setFillColor(230, 240, 250);
-                                pdf.setDrawColor(180, 195, 210);
-                                pdf.rect(x, y, w, rowHeight, 'FD');
-                                pdf.setTextColor(0, 91, 170);
-                                const align = idx >= totalRow.length - 2 ? 'right' : 'left';
-                                const tx = align === 'right' ? x + w - 2 : x + 2;
-                                pdf.text(String(cell ?? ''), tx, y + 4.3, { align });
-                                x += w;
-                            });
-                            y += rowHeight + 6;
-                        } else {
-                            y += 6;
-                        }
-                    }
-
-                    drawHeader();
-
-                    const totalSolicitudes = filtered.length;
-                    const totalComidas = filtered.reduce((acc, r) => acc + (parseFloat(r.totalQuantity) || 0), 0);
-                    const totalImporte = filtered.reduce((acc, r) => acc + (parseFloat(r.totalCost) || 0), 0);
-                    const aprobadas = filtered.filter(r => r.status !== 'pendiente').length;
-                    const pendientes = filtered.filter(r => r.status === 'pendiente').length;
-
-                    drawSectionTitle('RESUMEN GENERAL DEL PERÍODO');
-                    pdf.setFont('helvetica', 'normal');
-                    pdf.setFontSize(9);
-                    pdf.setTextColor(30, 41, 59);
-                    pdf.text(
-                        `Solicitudes registradas: ${totalSolicitudes} (Aprobadas: ${aprobadas} | Pendientes: ${pendientes})`,
-                        margin + 2,
-                        y
-                    );
-                    y += 5;
-                    pdf.text(
-                        `Total comidas: ${totalComidas}   |   Importe total: ${formatCost(totalImporte)}`,
-                        margin + 2,
-                        y
-                    );
-                    y += 8;
-
-                    const deptMap = {};
-                    filtered.forEach(r => {
-                        const key = r.department === 'MSO' && r.msoDepartment ? `MSO - ${r.msoDepartment}` : r.department;
-                        if (!deptMap[key]) deptMap[key] = { qty: 0, amount: 0 };
-                        deptMap[key].qty += parseFloat(r.totalQuantity) || 0;
-                        deptMap[key].amount += parseFloat(r.totalCost) || 0;
-                    });
-                    let sumDeptQty = 0, sumDeptAmt = 0;
-                    const deptRows = Object.keys(deptMap).sort().map(k => {
-                        sumDeptQty += deptMap[k].qty;
-                        sumDeptAmt += deptMap[k].amount;
-                        return [k, String(deptMap[k].qty), formatCost(deptMap[k].amount)];
-                    });
-                    drawSectionTitle('SOLICITUD DE COMIDAS POR UNIDAD DE OPERACIONES');
-                    drawTable(
-                        ['UNIDAD DE OPERACIÓN', 'CANTIDAD', 'IMPORTE'],
-                        deptRows,
-                        ['TOTAL', String(sumDeptQty), formatCost(sumDeptAmt)],
-                        [usableWidth * 0.60, usableWidth * 0.20, usableWidth * 0.20]
-                    );
-
-                    const provMap = {};
-                    filtered.forEach(r => {
-                        const key = r.providerName || 'Sin proveedor';
-                        if (!provMap[key]) provMap[key] = { qty: 0, amount: 0 };
-                        provMap[key].qty += parseFloat(r.totalQuantity) || 0;
-                        provMap[key].amount += parseFloat(r.totalCost) || 0;
-                    });
-                    let sumProvQty = 0, sumProvAmt = 0;
-                    const provRows = Object.keys(provMap).sort().map(k => {
-                        sumProvQty += provMap[k].qty;
-                        sumProvAmt += provMap[k].amount;
-                        return [k, String(provMap[k].qty), formatCost(provMap[k].amount)];
-                    });
-                    drawSectionTitle('SOLICITUD DE COMIDAS POR PROVEEDOR');
-                    drawTable(
-                        ['PROVEEDOR', 'CANTIDAD', 'IMPORTE'],
-                        provRows,
-                        ['TOTAL', String(sumProvQty), formatCost(sumProvAmt)],
-                        [usableWidth * 0.60, usableWidth * 0.20, usableWidth * 0.20]
-                    );
-
-                    let ccsMeals = 0, ccsAmount = 0, msoMeals = 0, msoAmount = 0;
-                    filtered.forEach(r => {
-                        const isMSO = r.department === 'MSO' || r.msoDepartment;
-                        if (isMSO) {
-                            msoMeals += parseFloat(r.totalQuantity) || 0;
-                            msoAmount += parseFloat(r.totalCost) || 0;
-                        } else {
-                            ccsMeals += parseFloat(r.totalQuantity) || 0;
-                            ccsAmount += parseFloat(r.totalCost) || 0;
-                        }
-                    });
-                    drawSectionTitle('RESUMEN POR TIPO DE UNIDAD');
-                    drawTable(
-                        ['TIPO DE UNIDAD', 'TOTAL COMIDAS', 'IMPORTE TOTAL'],
-                        [
-                            ['UNIDAD CCS', String(ccsMeals), formatCost(ccsAmount)],
-                            ['UNIDAD MSO', String(msoMeals), formatCost(msoAmount)]
-                        ],
-                        ['TOTAL GENERAL', String(ccsMeals + msoMeals), formatCost(ccsAmount + msoAmount)],
-                        [usableWidth * 0.60, usableWidth * 0.20, usableWidth * 0.20]
-                    );
-
-                    const unitProvMap = {};
-                    filtered.forEach(r => {
-                        const unit = (r.department === 'MSO' || r.msoDepartment) ? 'MSO' : 'CCS';
-                        const prov = r.providerName || 'Sin proveedor';
-                        const key = `${unit}||${prov}`;
-                        if (!unitProvMap[key]) unitProvMap[key] = { unit, prov, qty: 0, amount: 0 };
-                        unitProvMap[key].qty += parseFloat(r.totalQuantity) || 0;
-                        unitProvMap[key].amount += parseFloat(r.totalCost) || 0;
-                    });
-                    let sumUpQty = 0, sumUpAmt = 0;
-                    const upRows = Object.values(unitProvMap)
-                        .sort((a, b) => a.unit.localeCompare(b.unit) || a.prov.localeCompare(b.prov))
-                        .map(v => {
-                            sumUpQty += v.qty;
-                            sumUpAmt += v.amount;
-                            return [v.unit, v.prov, String(v.qty), formatCost(v.amount)];
-                        });
-                    drawSectionTitle('SERVICIOS POR UNIDAD Y PROVEEDOR');
-                    drawTable(
-                        ['UNIDAD', 'PROVEEDOR', 'CANTIDAD', 'IMPORTE'],
-                        upRows,
-                        ['TOTAL GENERAL', '', String(sumUpQty), formatCost(sumUpAmt)],
-                        [usableWidth * 0.20, usableWidth * 0.40, usableWidth * 0.20, usableWidth * 0.20]
-                    );
-
-                    const totalPages = pdf.internal.getNumberOfPages();
-                    for (let i = 1; i <= totalPages; i++) {
-                        pdf.setPage(i);
-                        pdf.setFont('helvetica', 'normal');
-                        pdf.setFontSize(8);
-                        pdf.setTextColor(120, 120, 120);
-                        pdf.text(`Página ${i} de ${totalPages}`, pageWidth / 2, pageHeight - 6, { align: 'center' });
-                        pdf.text('Inter - Tu mundo, nuestro compromiso', margin, pageHeight - 6);
-                    }
-
-                    const periodTag = period.label.replace(/[^a-zA-Z0-9_-]+/g, '_');
-                    pdf.save(`Reporte_Comidas_${periodTag}.pdf`);
-                    displayMessage('PDF generado correctamente con todas las métricas y totales.', 'success');
-                } catch (err) {
-                    console.error('Error al exportar PDF:', err);
-                    displayMessage('Error al generar PDF: ' + err.message, 'error');
-                } finally {
-                    exportPdfBtn.disabled = false;
-                    exportPdfBtn.textContent = originalText;
-                }
-            });
-
-            /* ══════════════════════════════════════════════════════════════
-               FUNCIÓN updateCharts (faltaba en tu código)
-               ══════════════════════════════════════════════════════════════ */
-            window.updateCharts = function() {
-                const now = new Date();
-                const currentMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
-                if (reportMonthInput && !reportMonthInput.value) reportMonthInput.value = currentMonth;
-
-                const filtered = foodRequests.filter(r => r.deliveryDate && r.deliveryDate.startsWith(currentMonth));
-
-                const providerTotals = {};
-                filtered.forEach(r => {
-                    const p = r.providerName || 'Sin proveedor';
-                    providerTotals[p] = (providerTotals[p] || 0) + (parseFloat(r.totalCost) || 0);
+                    a.href = URL.createObjectURL(blob);
+                    a.download = `Reporte_Mensual_Comidas_${new Date().toISOString().split('T')[0]}.csv`;
+                    document.body.appendChild(a); 
+                    a.click(); 
+                    document.body.removeChild(a);
+                    
+                    displayMessage('Reporte exportado con el formato solicitado', 'success');
                 });
-                const ctx1 = document.getElementById('monthlyProvidersChart');
-                if (ctx1) {
-                    if (monthlyProvidersChart) monthlyProvidersChart.destroy();
-                    monthlyProvidersChart = new Chart(ctx1, {
-                        type: 'bar',
-                        data: {
-                            labels: Object.keys(providerTotals),
-                            datasets: [{ label: 'Gasto ($)', data: Object.values(providerTotals), backgroundColor: Object.keys(providerTotals).map((p, i) => CHART_COLORS[p] || Object.values(CHART_COLORS)[i % Object.values(CHART_COLORS).length]) }]
-                        },
-                        options: { responsive: true, maintainAspectRatio: false }
-                    });
-                }
-
-                const year = now.getFullYear();
-                const yearFiltered = foodRequests.filter(r => r.deliveryDate && r.deliveryDate.startsWith(String(year)));
-                const annualProviderTotals = {};
-                yearFiltered.forEach(r => {
-                    const p = r.providerName || 'Sin proveedor';
-                    annualProviderTotals[p] = (annualProviderTotals[p] || 0) + (parseFloat(r.totalCost) || 0);
-                });
-                const ctx2 = document.getElementById('annualProvidersChart');
-                if (ctx2) {
-                    if (annualProvidersChart) annualProvidersChart.destroy();
-                    annualProvidersChart = new Chart(ctx2, {
-                        type: 'bar',
-                        data: {
-                            labels: Object.keys(annualProviderTotals),
-                            datasets: [{ label: 'Gasto anual ($)', data: Object.values(annualProviderTotals), backgroundColor: Object.keys(annualProviderTotals).map((p, i) => CHART_COLORS[p] || Object.values(CHART_COLORS)[i % Object.values(CHART_COLORS).length]) }]
-                        },
-                        options: { responsive: true, maintainAspectRatio: false }
-                    });
-                }
-
-                const months = [];
-                for (let i = 5; i >= 0; i--) {
-                    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-                    months.push(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`);
-                }
-                const depts = [...new Set(foodRequests.map(r => r.department).filter(Boolean))];
-                const datasets3 = depts.map((dept, i) => ({
-                    label: dept,
-                    data: months.map(m => foodRequests.filter(r => r.department === dept && r.deliveryDate && r.deliveryDate.startsWith(m)).reduce((sum, r) => sum + (parseFloat(r.totalCost) || 0), 0)),
-                    backgroundColor: Object.values(CHART_COLORS)[i % Object.values(CHART_COLORS).length]
-                }));
-                const ctx3 = document.getElementById('departmentExpensesChart');
-                if (ctx3) {
-                    if (departmentExpensesChart) departmentExpensesChart.destroy();
-                    departmentExpensesChart = new Chart(ctx3, {
-                        type: 'bar',
-                        data: { labels: months, datasets: datasets3 },
-                        options: { responsive: true, maintainAspectRatio: false }
-                    });
-                }
-
-                const staffCounts = {};
-                foodRequests.forEach(r => {
-                    (r.interStaff || []).forEach(name => { staffCounts[name] = (staffCounts[name] || 0) + 1; });
-                });
-                const sortedStaff = Object.entries(staffCounts).sort((a, b) => b[1] - a[1]).slice(0, 15);
-                const ctx4 = document.getElementById('staffRequestsChart');
-                if (ctx4) {
-                    if (staffRequestsChart) staffRequestsChart.destroy();
-                    staffRequestsChart = new Chart(ctx4, {
-                        type: 'bar',
-                        data: { labels: sortedStaff.map(s => s[0]), datasets: [{ label: 'Solicitudes', data: sortedStaff.map(s => s[1]), backgroundColor: '#005BAA' }] },
-                        options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false }
-                    });
-                }
-
-                const deptCounts = {};
-                foodRequests.forEach(r => {
-                    const d = r.department || 'Sin depto';
-                    deptCounts[d] = (deptCounts[d] || 0) + 1;
-                });
-                const ctx5 = document.getElementById('departmentRequestsChart');
-                if (ctx5) {
-                    if (departmentRequestsChart) departmentRequestsChart.destroy();
-                    departmentRequestsChart = new Chart(ctx5, {
-                        type: 'doughnut',
-                        data: {
-                            labels: Object.keys(deptCounts),
-                            datasets: [{ data: Object.values(deptCounts), backgroundColor: Object.keys(deptCounts).map((d, i) => Object.values(CHART_COLORS)[i % Object.values(CHART_COLORS).length]) }]
-                        },
-                        options: { responsive: true, maintainAspectRatio: false }
-                    });
-                }
-            };
-
-            /* ══════════════════════════════════════════════════════════════
-               INICIALIZAR DATOS
-               ══════════════════════════════════════════════════════════════ */
-            if (reportMonthInput) {
-                const now = new Date();
-                reportMonthInput.value = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
-            }
-            if (biweekStartDate) {
-                const now = new Date();
-                const day = now.getDate();
-                const y = now.getFullYear(), m = now.getMonth();
-                biweekStartDate.value = day <= 15
-                    ? `${y}-${String(m + 1).padStart(2, '0')}-01`
-                    : `${y}-${String(m + 1).padStart(2, '0')}-16`;
-                biweekEndDate.value = day <= 15
-                    ? `${y}-${String(m + 1).padStart(2, '0')}-15`
-                    : new Date(y, m + 1, 0).toISOString().split('T')[0];
             }
 
-            foodRequests = await loadRequests();
+            function updateCharts() {
+                const requests = getFilteredRequestsForDisplay().filter(r => r.status === 'aprobado');
+                
+                if (monthlyProvidersChart) monthlyProvidersChart.destroy();
+                const currentMonth = new Date().toISOString().slice(0, 7);
+                const monthlyReqs = requests.filter(r => normalizeDate(r.deliveryDate)?.startsWith(currentMonth));
+                const monthlyByProv = {};
+                monthlyReqs.forEach(r => {
+                    const p = r.providerName || 'Otros';
+                    monthlyByProv[p] = (monthlyByProv[p] || 0) + (parseFloat(r.totalCost) || 0);
+                });
+                const ctx1 = document.getElementById('monthlyProvidersChart').getContext('2d');
+                monthlyProvidersChart = new Chart(ctx1, {
+                    type: 'bar',
+                    data: {
+                        labels: Object.keys(monthlyByProv),
+                        datasets: [{ label: 'Monto ($)', data: Object.values(monthlyByProv), backgroundColor: '#005BAA' }]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false }
+                });
+
+                if (annualProvidersChart) annualProvidersChart.destroy();
+                const currentYear = new Date().getFullYear().toString();
+                const annualReqs = requests.filter(r => normalizeDate(r.deliveryDate)?.startsWith(currentYear));
+                const annualByProv = {};
+                annualReqs.forEach(r => {
+                    const p = r.providerName || 'Otros';
+                    annualByProv[p] = (annualByProv[p] || 0) + (parseFloat(r.totalCost) || 0);
+                });
+                const ctx2 = document.getElementById('annualProvidersChart').getContext('2d');
+                annualProvidersChart = new Chart(ctx2, {
+                    type: 'pie',
+                    data: {
+                        labels: Object.keys(annualByProv),
+                        datasets: [{ data: Object.values(annualByProv), backgroundColor: ['#005BAA', '#5CE1E6', '#E85D04', '#FF9800', '#667EEA'] }]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false }
+                });
+
+                if (departmentExpensesChart) departmentExpensesChart.destroy();
+                const months = ['01','02','03','04','05','06','07','08','09','10','11','12'];
+                const depts = [...new Set(requests.map(r => r.department))];
+                const datasets = depts.map((d, i) => {
+                    const data = months.map(m => {
+                        return requests.filter(r => {
+                            const date = normalizeDate(r.deliveryDate);
+                            return date && date.startsWith(`${currentYear}-${m}`) && r.department === d;
+                        }).reduce((sum, r) => sum + (parseFloat(r.totalCost) || 0), 0);
+                    });
+                    return { label: d, data: data, borderColor: CHART_COLORS[d] || `hsl(${i * 40}, 70%, 50%)`, fill: false };
+                });
+                const ctx3 = document.getElementById('departmentExpensesChart').getContext('2d');
+                departmentExpensesChart = new Chart(ctx3, {
+                    type: 'line',
+                    data: { labels: ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'], datasets: datasets },
+                    options: { responsive: true, maintainAspectRatio: false }
+                });
+
+                if (staffRequestsChart) staffRequestsChart.destroy();
+                const staffCount = {};
+                requests.forEach(r => {
+                    if (r.interStaff) {
+                        r.interStaff.forEach(s => {
+                            staffCount[s] = (staffCount[s] || 0) + 1;
+                        });
+                    }
+                });
+                const sortedStaff = Object.entries(staffCount).sort((a,b) => b[1] - a[1]).slice(0, 15);
+                const ctx4 = document.getElementById('staffRequestsChart').getContext('2d');
+                staffRequestsChart = new Chart(ctx4, {
+                    type: 'bar',
+                    data: {
+                        labels: sortedStaff.map(s => s[0]),
+                        datasets: [{ label: 'Solicitudes', data: sortedStaff.map(s => s[1]), backgroundColor: '#5CE1E6' }]
+                    },
+                    options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false }
+                });
+
+                if (departmentRequestsChart) departmentRequestsChart.destroy();
+                const deptCount = {};
+                requests.forEach(r => {
+                    deptCount[r.department] = (deptCount[r.department] || 0) + 1;
+                });
+                const ctx5 = document.getElementById('departmentRequestsChart').getContext('2d');
+                departmentRequestsChart = new Chart(ctx5, {
+                    type: 'doughnut',
+                    data: {
+                        labels: Object.keys(deptCount),
+                        datasets: [{ data: Object.values(deptCount), backgroundColor: ['#005BAA', '#5CE1E6', '#E85D04', '#FF9800', '#667EEA', '#6A4C93'] }]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false }
+                });
+            }
+
+            // Cargar datos iniciales
+            try {
+                const loaded = await loadRequests();
+                foodRequests = loaded;
+            } catch (e) {
+                console.error("Error cargando datos:", e);
+            }
             initializeForm();
             renderTable(getFilteredRequestsForDisplay());
             updateSummaryTotals(getFilteredRequestsForDisplay());
+            
+            if (currentProfile === 'admin_ccs' || currentProfile === 'admin_guar') {
+                generateReport();
+                updateCharts();
+            }
         }
     </script>
 </body>
